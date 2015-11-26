@@ -1,0 +1,61 @@
+<div ng-controller="EvilPortalTabController">
+
+	<nav class="navback navbar-default">
+	    <ul class="nav nav-tabs">
+	        <li ng-repeat="tab in tabs"
+	        	ng-class="{active:isActiveTab(tab.url)}"
+	        	ng-click="onClickTab(tab)"><a>{{ tab.title }}</a></li>
+	    </ul>
+	</nav>
+
+	<br />
+
+	<div id="mainView">
+	    <div ng-include="currentTab"></div>
+	</div>
+
+	<!-- The main tab view -->
+	<script type="text/ng-template" id="evilportal.controller.html">
+		<div class="row" ng-controller="EvilPortalController">
+
+			<div class="col-md-3">
+				<div class="panel panel-default">
+					<div class="panel-header text-muted text-center">
+						<h4>Controls<h4>
+					</div>
+					<div class="panel-body">
+						<table style="width:100%">
+							<tr ng-repeat="control in controls">
+							<td style="padding-bottom: .5em;">{{ control.title }}</td>
+							<!--<td style="text-align:right">{{ control.status }}</td>-->
+							<td style="text-align:right;padding-bottom: .5em;"><button class="btn-info btn-sm" style="width:75px">{{ control.status }}</button></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-7">
+				<div class="panel panel-default">
+					<div class="panel-header text-muted text-center">
+						<h4>Portals<h4>
+					</div>
+					<div class="panel-body">
+						<a href="">Create New</a>
+						<hr/>
+						<table class="table-striped text-center" style="width:100%">
+							<tr ng-repeat="portal in portals">
+							<td>{{ portal.title }}</td>
+							<td><a href="">Edit</a></td>
+							<td><a href="">Delete</a></td>
+							<td><a href="">Activate</a></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</script>
+
+</div>

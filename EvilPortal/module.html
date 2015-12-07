@@ -25,12 +25,20 @@
 					</div>
 					<div class="panel-body">
 						<table style="width:100%">
-							<tr ng-repeat="control in controls">
+							<tr ng-repeat="control in controls" ng-show="{{ control.visible }}">
 							<td style="padding-bottom: .5em;">{{ control.title }}</td>
 							<!--<td style="text-align:right">{{ control.status }}</td>-->
-							<td style="text-align:right;padding-bottom: .5em;"><button class="btn-info btn-sm" style="width:75px">{{ control.status }}</button></td>
+							<td style="text-align:right;padding-bottom: .5em;"><button class="btn-info btn-sm" style="width:75px" ng-click="{{ control.handler }}">{{ control.status }}</button></td>
 							</tr>
 						</table>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-header text-muted text-center">
+						<h4>Evil Portal Notifications<h4>
+					</div>
+					<div class="panel-body">
+						<p>No Notifications</p>
 					</div>
 				</div>
 			</div>

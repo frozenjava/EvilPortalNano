@@ -29,6 +29,33 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		module: "EvilPortal",
 		action: "getControlValues"
 	}, function(response) {
+		getControls(response);
+	});
+
+	$scope.portals = [
+	{
+		title: "Portal1"
+	},
+	{
+		title: "Portal2"
+	},
+	{
+		title: "Portal3"
+	},
+	{
+		title: "Portal4"
+	}];
+
+	$scope.handleDependencies = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "handleDepends"
+		}, function(response) {
+			alert(response.error);
+		});
+	}
+
+	function getControls(response) {
 		var deps;
 		var running;
 		var autostart;
@@ -51,30 +78,19 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		$scope.controls = [
 		{
 			title: "Dependencies",
-			status: deps
+			status: deps,
+			visible: true
 		},
 		{
 			title: "NoDogSplash",
-			status: running
+			status: running,
+			visible: response.dependencies
 		},
 		{
 			title: "Auto Start",
-			status: autostart
+			status: autostart,
+			visible: response.dependencies
 		}];
-	});
-
-	$scope.portals = [
-	{
-		title: "Portal1"
-	},
-	{
-		title: "Portal2"
-	},
-	{
-		title: "Portal3"
-	},
-	{
-		title: "Portal4"
-	}];
+	}
 
 }]);

@@ -8,7 +8,17 @@ class EvilPortal extends Module
 			case 'getControlValues':
 				$this->getControlValues();
 				break;
+
+			case 'handleDepends':
+				$this->handleDepends();
+				break;
 		}
+	}
+
+	public function handleDepends() {
+		$this->response = array(
+			"error" => "Error installing dependencies."
+		);
 	}
 
 	public function getControlValues() {
@@ -41,6 +51,20 @@ class EvilPortal extends Module
 		} else {
 			return true;
 		}
+	}
+
+	public function installDepends() {
+		exec("opkg update");
+		exec("opkg install nogdogsplash");
+		if ($this->checkDepends()) {
+			$this->response = array(
+				"dependencies" => "Successfully installed dependencies."
+			);
+		} else {
+			$this->response = array(
+				"error" => "Error installing dependencies."
+			);
+		} 
 	}
 
 }

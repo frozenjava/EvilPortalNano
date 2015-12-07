@@ -21,24 +21,37 @@
 			<div class="col-md-3">
 				<div class="panel panel-default">
 					<div class="panel-header text-muted text-center">
-						<h4>Controls<h4>
+						<h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4>
 					</div>
 					<div class="panel-body">
 						<table style="width:100%">
-							<tr ng-repeat="control in controls" ng-show="{{ control.visible }}">
-							<td style="padding-bottom: .5em;">{{ control.title }}</td>
-							<!--<td style="text-align:right">{{ control.status }}</td>-->
-							<td style="text-align:right;padding-bottom: .5em;"><button class="btn-info btn-sm" style="width:75px" ng-click="{{ control.handler }}">{{ control.status }}</button></td>
+							<tr ng-repeat="control in controls" ng-show="control.visible">
+								<td style="padding-bottom: .5em;">{{ control.title }}</td>
+								<!--<td style="text-align:right">{{ control.status }}</td>-->
+								<td style="text-align:right;padding-bottom: .5em;">
+									<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
+									<img src="/img/throbber.gif" ng-show="control.throbber" />
+								</td>
 							</tr>
 						</table>
 					</div>
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-header text-muted text-center">
-						<h4>Evil Portal Notifications<h4>
+						<h4>Evil Portal Messages<h4>
 					</div>
 					<div class="panel-body">
-						<p>No Notifications</p>
+						<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
+						<button ng-hide="(messages.length == 0)" ng-click="messages = []" class="btn btn-link pull-right">Clear All</button>
+						<table style="width:100%" ng-hide="(messages.length == 0)">
+							<tr ng-repeat="message in messages">
+								<td>
+									<h5><b>{{ message.title }}</b> <button ng-click="dismissMessage($index)" class="btn btn-link pull-right">Dismiss</button></h5>
+									<p><i>{{ message.msg }}</i></p>
+									<hr />
+								</td>
+							</tr>
+						</table>
 					</div>
 				</div>
 			</div>

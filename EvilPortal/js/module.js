@@ -25,12 +25,7 @@ registerController("EvilPortalTabController", ['$api', '$scope', function($api, 
 
 registerController("EvilPortalController", ['$api', '$scope', function($api, $scope) {
 
-	$api.request({
-		module: "EvilPortal",
-		action: "getControlValues"
-	}, function(response) {
-		getControls(response);
-	});
+	getControls();
 
 	$scope.portals = [
 	{
@@ -46,21 +41,80 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		title: "Portal4"
 	}];
 
-	$scope.handleDependencies = function() {
+	$scope.messages = [];
+
+	$scope.throbber = true;
+
+	$scope.handleControl = function(control) {
+		control.throbber = true;
+		switch (control.title) {
+			case "Dependencies":
+				$api.request({
+					module: "EvilPortal",
+					action: "handleDepends"
+				}, function(response) {
+					getControls();
+					control.throbber = false;
+					$scope.sendMessage(control.title, response.control_message);
+				});
+				break;
+
+			case "NoDogSplash":
+				$api.request({
+					module: "EvilPortal",
+					action: "startStop"
+				}, function(response) {
+					getControls();
+					control.throbber = false;
+					$scope.sendMessage(control.title, response.control_message);
+				});
+				break;
+
+			case "Auto Start":
+				$api.request({
+					module: "EvilPortal",
+					action: "enableDisable"
+				}, function(response) {
+					getControls();
+					control.throbber = false;
+					$scope.sendMessage(control.title, response.control_message);
+				});
+				break;
+		}
+	}
+
+	$scope.sendMessage = function(t, m) {
+		// Add a new message to the top of the list
+		$scope.messages.unshift({title: t, msg: m});
+
+		// if there are 4 items in the list remove the 4th item
+		if ($scope.messages.length == 4) {
+			$scope.dismissMessage(3);
+		}
+	}
+
+	$scope.dismissMessage = function($index) {
+		//var index = $scope.messages.indexOf(message);
+		$scope.messages.splice($index, 1);
+	}
+
+	function getControls() {
+		$scope.throbber = true;
 		$api.request({
 			module: "EvilPortal",
-			action: "handleDepends"
+			action: "getControlValues"
 		}, function(response) {
-			alert(response.error);
+			updateControls(response);
 		});
 	}
 
-	function getControls(response) {
+	function updateControls(response) {
 		var deps;
 		var running;
 		var autostart;
 		if (response.dependencies == false) {
 			deps = "Install";
+			$scope.sendMessage("Missing Dependencies", "NoDogSplash must first be installed before you can use Evil Portal");
 		} else {
 			deps = "Uninstall";
 		}
@@ -79,18 +133,22 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		{
 			title: "Dependencies",
 			status: deps,
-			visible: true
+			visible: true,
+			throbber: false
 		},
 		{
 			title: "NoDogSplash",
 			status: running,
-			visible: response.dependencies
+			visible: response.dependencies,
+			throbber: false
 		},
 		{
 			title: "Auto Start",
 			status: autostart,
-			visible: response.dependencies
+			visible: response.dependencies,
+			throbber: false
 		}];
+		$scope.throbber = false;
 	}
 
 }]);

@@ -32,6 +32,9 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	$scope.messages = [];
 	$scope.throbber = true;
 	$scope.dependencies = false;
+	$scope.running = false;
+	$scope.activePortalCode = "";
+	$scope.landingPage = '';
 
 	$scope.handleControl = function(control) {
 		control.throbber = true;
@@ -124,8 +127,10 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		}
 		if (response.running == false) {
 			running = "Start";
+			$scope.running = false;
 		} else {
 			running = "Stop";
+			$scope.running = true;
 		}
 		if (response.autostart == false) {
 			autostart = "Enable";
@@ -153,6 +158,27 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 			throbber: false
 		}];
 		$scope.throbber = false;
+	}
+
+	$scope.getActivePortalCode = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "activePortalCode"
+		}, function(response){
+			//$scope.activePortalCode = response.portalCode;
+		});
+	}
+
+	$scope.updateActivePortal = function() {
+		console.log($scope.landingPage);
+		/*$api.request({
+			module: "EvilPortal",
+			action: "updateActivePortal",
+			portalCode: $scope.activePortalCode
+		}, function(response){
+			console.log($scope.activePortalCode);
+			$scope.sendMessage("Saving Active Portal", response.message);
+		});*/
 	}
 
 }]);

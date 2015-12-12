@@ -3,37 +3,41 @@
 	<div class="col-md-3">
 		<div class="panel panel-default">
 			<div class="panel-header text-muted text-center">
-				<h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4>
+				<a href="javascript:;" data-toggle="collapse" data-target="#collapseControls"><h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4></a>
 			</div>
-			<div class="panel-body">
-				<table style="width:100%">
-					<tr ng-repeat="control in controls" ng-show="control.visible">
-						<td style="padding-bottom: .5em;">{{ control.title }}</td>
-						<!--<td style="text-align:right">{{ control.status }}</td>-->
-						<td style="text-align:right;padding-bottom: .5em;">
-							<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
-							<img src="/img/throbber.gif" ng-show="control.throbber" />
-						</td>
-					</tr>
-				</table>
+			<div id="collapseControls" class="panel-collapse collapse in">
+				<div class="panel-body">
+					<table style="width:100%">
+						<tr ng-repeat="control in controls" ng-show="control.visible">
+							<td style="padding-bottom: .5em;">{{ control.title }}</td>
+							<!--<td style="text-align:right">{{ control.status }}</td>-->
+							<td style="text-align:right;padding-bottom: .5em;">
+								<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
+								<img src="/img/throbber.gif" ng-show="control.throbber" />
+							</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-header text-muted text-center">
-				<h4>Evil Portal Messages<h4>
+				<a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages"><h4>Evil Portal Messages<h4></a>
 			</div>
-			<div class="panel-body">
-				<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
-				<button ng-hide="(messages.length < 2)" ng-click="messages = []" class="btn btn-link pull-right">Clear All</button>
-				<table style="width:100%" ng-hide="(messages.length == 0)">
-					<tr ng-repeat="message in messages">
-						<td>
-							<h5><b>{{ message.title }}</b> <button ng-click="dismissMessage($index)" class="btn btn-link pull-right">Dismiss</button></h5>
-							<p><i>{{ message.msg }}</i></p>
-							<hr />
-						</td>
-					</tr>
-				</table>
+			<div id="collapseMessages" class="panel-collapse collapse in">
+				<div class="panel-body">
+					<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
+					<a ng-hide="(messages.length < 2)" ng-click="messages = []" class="pull-right" href="javascript:;">Clear All</a>
+					<table style="width:100%" ng-hide="(messages.length == 0)">
+						<tr ng-repeat="message in messages">
+							<td>
+								<hr />
+								<h5><b>{{ message.title }}</b> <a ng-click="dismissMessage($index)" href="javascript:;" class="pull-right">Dismiss</a></h5>
+								<p class="text-muted"><i>{{ message.msg }}</i></p>
+							</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -66,13 +70,14 @@
 	<script type="text/ng-template" id="evilportal.portals.html">
 		
 		<div ng-show="dependencies">
-			<div class="row">
+			<div class="panel-group" id="accordion">
 				<div class="col-md-12">
-					<div class="panel panel-default">
+					<!-- Library panel -->
+					<div class="panel panel-default" ng-show="portals.length > 0">
 						<div class="panel-header text-muted text-center">
-							<h5><a data-toggle="collapse">Library</a><h5>
+							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLibrary">Library</a><h5>
 						</div>
-						<div id="collapse1" class="panel-collapse collapse">
+						<div id="collapseLibrary" class="panel-collapse collapse in">
 							<div class="panel-body">
 								<div ng-show="portals.length > 0">
 									<table class="table-striped text-center table-responsive" style="width:100%">
@@ -93,26 +98,65 @@
 					</div>
 				</div>
 				<div class="col-md-12">
+					<!-- Create Portal Panel -->
 					<div class="panel panel-default">
 						<div class="panel-header text-muted text-center">
-							<h5>Create New Portal<h5>
+							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseCreater">Create New Portal</a><h5>
 						</div>
-						<div class="panel-body">
-							<button class="btn btn-link">Create Portal</button>
-							<hr />
-							<div ng-show="portals.length > 0">
-								<table class="table-striped text-center table-responsive" style="width:100%">
-									<tr ng-repeat="portal in portals">
-										<td>{{ portal.title }}</td>
-										<td><a href="">Edit</a></td>
-										<td><a href="">Delete</a></td>
-										<td><a href="">Activate</a></td>
-									</tr>
-								</table>
+						<div id="collapseCreater" class="panel-collapse collapse">
+							<div class="panel-body">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label class="control-label">Portal Name</label>
+										<input type="text" class="form-control" placeholder="BookStore.html">
+									</div>
+									<div class="form-group">
+										<label class="control-label">Portal HTML</label>
+										<textarea class="form-control" rows="10" placeholder="<HTML><p>Hello World!</p></HTML>"></textarea>
+									</div>
+									<div class="form-group">
+										<button type="submit" class="btn btn-primary btn-sm">Create</button>
+									</div>
+								</form>
 							</div>
-
-							<div ng-hide="portals.length > 0">
-								<p class="text-muted"><i>No Portals in Library to Display.</i></p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<!-- Edit Active Portal Panel -->
+					<div class="panel panel-default">
+						<div class="panel-header text-muted text-center">
+							<h5><a href="javascript:;" ng-click="getActivePortalCode()" data-toggle="collapse" data-parent="#accordion" data-target="#collapseEditor">Edit Active Portal</a><h5>
+						</div>
+						<div id="collapseEditor" class="panel-collapse collapse">
+							<div class="panel-body">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label class="control-label">Portal HTML</label>
+										<textarea class="form-control" rows="10" placeholder="<HTML><p>Hello World!</p></HTML>" ng-model="landingPage"></textarea>
+									</div>
+									<div class="form-group">
+										<button type="submit" ng-click="updateActivePortal()" class="btn btn-primary btn-sm">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<!-- Live Preview Panel -->
+					<div class="panel panel-default" ng-show="running">
+						<div class="panel-header text-muted text-center">
+							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapsePreview">View Live Preview</a><h5>
+						</div>
+						<div id="collapsePreview" class="panel-collapse collapse">
+							<div class="panel-body">
+								<div ng-show="running">
+									<iframe src="http://172.16.42.1:2050" style="width:100%;height:300px;border:none;"></iframe>
+								</div>
+								<div ng-hide="running">
+									<p class="text-muted"><i>NoDogSplash Must Be Started First.</i></p>
+								</div>
 							</div>
 						</div>
 					</div>

@@ -24,7 +24,38 @@ class EvilPortal extends Module
 			case 'portalList':
 				$this->handleGetPortalList();
 				break;
+
+			case 'activePortalCode':
+				$this->getActivePortalCode();
+				break;
+
+			case 'updateActivePortal':
+				$this->updateActivePortal();
+				break;
 		}
+	}
+
+	public function updateActivePortal() {
+		$data = $this->request->portalCode;
+		file_put_contents("/etc/nodogsplash/htdocs/splash.html", $data);
+		$this->response = array(
+				"message" => "Updated Active Portal."
+			);
+	}
+
+	public function getActivePortalCode() {
+		$portalCode = "";
+		$portalExists = false;
+		if (file_exists("/etc/nodogsplash/htdocs/splash.html")) {
+			$portalExists = true;
+			$portalCode = file_get_contents("/etc/nodogsplash/htdocs/splash.html");
+		}
+
+		$this->response = array(
+				"exists" => $portalExists,
+				"portalCode" => $portalCode
+			);
+
 	}
 
 	public function handleGetPortalList() {

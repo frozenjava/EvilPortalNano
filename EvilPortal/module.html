@@ -1,81 +1,160 @@
-<div ng-controller="EvilPortalTabController">
+<div class="row" ng-controller="EvilPortalController">
 
-	<nav class="navback navbar-default">
-	    <ul class="nav nav-tabs">
-	        <li ng-repeat="tab in tabs"
-	        	ng-class="{active:isActiveTab(tab.url)}"
-	        	ng-click="onClickTab(tab)"><a>{{ tab.title }}</a></li>
-	    </ul>
-	</nav>
-
-	<br />
-
-	<div id="mainView">
-	    <div ng-include="currentTab"></div>
+	<div class="col-md-3">
+		<div class="panel panel-default">
+			<div class="panel-header text-muted text-center">
+				<h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4>
+			</div>
+			<div class="panel-body">
+				<table style="width:100%">
+					<tr ng-repeat="control in controls" ng-show="control.visible">
+						<td style="padding-bottom: .5em;">{{ control.title }}</td>
+						<!--<td style="text-align:right">{{ control.status }}</td>-->
+						<td style="text-align:right;padding-bottom: .5em;">
+							<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
+							<img src="/img/throbber.gif" ng-show="control.throbber" />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-header text-muted text-center">
+				<h4>Evil Portal Messages<h4>
+			</div>
+			<div class="panel-body">
+				<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
+				<button ng-hide="(messages.length < 2)" ng-click="messages = []" class="btn btn-link pull-right">Clear All</button>
+				<table style="width:100%" ng-hide="(messages.length == 0)">
+					<tr ng-repeat="message in messages">
+						<td>
+							<h5><b>{{ message.title }}</b> <button ng-click="dismissMessage($index)" class="btn btn-link pull-right">Dismiss</button></h5>
+							<p><i>{{ message.msg }}</i></p>
+							<hr />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 	</div>
 
-	<!-- The main tab view -->
-	<script type="text/ng-template" id="evilportal.controller.html">
-		<div class="row" ng-controller="EvilPortalController">
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div ng-controller="EvilPortalTabController">
 
-			<div class="col-md-3">
-				<div class="panel panel-default">
-					<div class="panel-header text-muted text-center">
-						<h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4>
-					</div>
-					<div class="panel-body">
-						<table style="width:100%">
-							<tr ng-repeat="control in controls" ng-show="control.visible">
-								<td style="padding-bottom: .5em;">{{ control.title }}</td>
-								<!--<td style="text-align:right">{{ control.status }}</td>-->
-								<td style="text-align:right;padding-bottom: .5em;">
-									<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
-									<img src="/img/throbber.gif" ng-show="control.throbber" />
-								</td>
-							</tr>
-						</table>
+				<div class="panel-header">
+					<nav class="navback navbar-default">
+			    		<ul class="nav nav-tabs">
+			        		<li ng-repeat="tab in tabs"
+			        			ng-class="{active:isActiveTab(tab.url)}"
+			        			ng-click="onClickTab(tab)"><a>{{ tab.title }}</a></li>
+			    		</ul>
+					</nav>
+				</div>
+
+				<div class="panel-body">
+					<div id="mainView">
+				    	<div ng-include="currentTab"></div>
 					</div>
 				</div>
-				<div class="panel panel-default">
-					<div class="panel-header text-muted text-center">
-						<h4>Evil Portal Messages<h4>
-					</div>
-					<div class="panel-body">
-						<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
-						<button ng-hide="(messages.length == 0)" ng-click="messages = []" class="btn btn-link pull-right">Clear All</button>
-						<table style="width:100%" ng-hide="(messages.length == 0)">
-							<tr ng-repeat="message in messages">
-								<td>
-									<h5><b>{{ message.title }}</b> <button ng-click="dismissMessage($index)" class="btn btn-link pull-right">Dismiss</button></h5>
-									<p><i>{{ message.msg }}</i></p>
-									<hr />
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
+
 			</div>
+		</div>
+	</div>
 
-			<div class="col-md-7">
-				<div class="panel panel-default">
-					<div class="panel-header text-muted text-center">
-						<h4>Portals<h4>
+	<!-- The Portal tab view -->
+	<script type="text/ng-template" id="evilportal.portals.html">
+		
+		<div ng-show="dependencies">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-header text-muted text-center">
+							<h5><a data-toggle="collapse">Library</a><h5>
+						</div>
+						<div id="collapse1" class="panel-collapse collapse">
+							<div class="panel-body">
+								<div ng-show="portals.length > 0">
+									<table class="table-striped text-center table-responsive" style="width:100%">
+										<tr ng-repeat="portal in portals">
+											<td>{{ portal.title }}</td>
+											<td><a href="">Edit</a></td>
+											<td><a href="">Delete</a></td>
+											<td><a href="">Activate</a></td>
+										</tr>
+									</table>
+								</div>
+
+								<div ng-hide="portals.length > 0">
+									<p class="text-muted"><i>No Portals in Library to Display.</i></p>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div class="panel-body">
-						<a href="">Create New</a>
-						<hr/>
-						<table class="table-striped text-center" style="width:100%">
-							<tr ng-repeat="portal in portals">
-							<td>{{ portal.title }}</td>
-							<td><a href="">Edit</a></td>
-							<td><a href="">Delete</a></td>
-							<td><a href="">Activate</a></td>
-							</tr>
-						</table>
+				</div>
+				<div class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-header text-muted text-center">
+							<h5>Create New Portal<h5>
+						</div>
+						<div class="panel-body">
+							<button class="btn btn-link">Create Portal</button>
+							<hr />
+							<div ng-show="portals.length > 0">
+								<table class="table-striped text-center table-responsive" style="width:100%">
+									<tr ng-repeat="portal in portals">
+										<td>{{ portal.title }}</td>
+										<td><a href="">Edit</a></td>
+										<td><a href="">Delete</a></td>
+										<td><a href="">Activate</a></td>
+									</tr>
+								</table>
+							</div>
+
+							<div ng-hide="portals.length > 0">
+								<p class="text-muted"><i>No Portals in Library to Display.</i></p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<div ng-hide="dependencies">
+			<p class="text-muted"><i>Dependencies must be installed first.</i></p>
+		</div>
+
+	</script>
+
+	<!-- The Config tab view -->
+	<script type="text/ng-template" id="evilportal.config.html">
+		
+		<div ng-show="dependencies">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Gateway Name: </label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control">
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div ng-hide="dependencies">
+			<p class="text-muted"><i>Dependencies must be installed first.</i></p>
+		</div>
+
+	</script>
+
+	<!-- The Change Log view -->
+	<script type="text/ng-template" id="evilportal.change.html">
+		
+		<ul>
+			<li><b>1.0</b></li>
+			<ul>
+				<li>Initial Pineapple Nano Release</li>
+			</ul>
+		</ul>
 
 	</script>
 

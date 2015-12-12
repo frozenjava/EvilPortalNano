@@ -1,17 +1,17 @@
 registerController("EvilPortalTabController", ['$api', '$scope', function($api, $scope) {
 
 	$scope.tabs = [{
-		title: "Evil Portal",
-		url: "evilportal.controller.html"
+		title: "Portals",
+		url: "evilportal.portals.html"
 	}, {
 		title: "Configuration",
-		url: "evilportal.config"
+		url: "evilportal.config.html"
 	}, {
 		title: "Changes",
-		url: "evilportal.change"
+		url: "evilportal.change.html"
 	}];
 
-	$scope.currentTab = "evilportal.controller.html";
+	$scope.currentTab = "evilportal.portals.html";
 
 	$scope.onClickTab = function(tab) {
 		$scope.currentTab = tab.url;
@@ -26,24 +26,12 @@ registerController("EvilPortalTabController", ['$api', '$scope', function($api, 
 registerController("EvilPortalController", ['$api', '$scope', function($api, $scope) {
 
 	getControls();
+	getPortals();
 
-	$scope.portals = [
-	{
-		title: "Portal1"
-	},
-	{
-		title: "Portal2"
-	},
-	{
-		title: "Portal3"
-	},
-	{
-		title: "Portal4"
-	}];
-
+	$scope.portals = [];
 	$scope.messages = [];
-
 	$scope.throbber = true;
+	$scope.dependencies = false;
 
 	$scope.handleControl = function(control) {
 		control.throbber = true;
@@ -108,6 +96,20 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		});
 	}
 
+	function getPortals() {
+		$api.request({
+			module: "EvilPortal",
+			action: "portalList"
+		}, function(response) {
+			//alert(response[0].title);
+			//$scope.portals = response;
+			for (var i = 0; i < response.length; i++) {
+				$scope.portals.unshift({title: response[i].title, location: response[i].location});
+				console.log({title: response[i].title, location: response[i].location});
+			}
+		});
+	}
+
 	function updateControls(response) {
 		var deps;
 		var running;
@@ -115,8 +117,10 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		if (response.dependencies == false) {
 			deps = "Install";
 			$scope.sendMessage("Missing Dependencies", "NoDogSplash must first be installed before you can use Evil Portal");
+			$scope.dependencies = false;
 		} else {
 			deps = "Uninstall";
+			$scope.dependencies = true;
 		}
 		if (response.running == false) {
 			running = "Start";

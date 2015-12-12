@@ -20,7 +20,26 @@ class EvilPortal extends Module
 			case 'enableDisable':
 				$this->handleEnable();
 				break;
+
+			case 'portalList':
+				$this->handleGetPortalList();
+				break;
 		}
+	}
+
+	public function handleGetPortalList() {
+		if (!file_exists("/root/portals"))
+			mkdir("/root/portals");
+
+		$all_portals = array();
+		$root_portals = preg_grep('/^([^.])/', scandir("/root/portals"));
+
+		foreach ($root_portals as $portal) {
+			$obj = array("title" => $portal, "location" => "/root/portals");
+			array_push($all_portals, $obj);
+		}
+
+		$this->response = $all_portals;
 	}
 
 	public function handleEnable() {

@@ -3,13 +3,13 @@
 	<div class="col-md-3">
 		<div class="panel panel-default">
 			<div class="panel-header text-muted text-center">
-				<a href="javascript:;" data-toggle="collapse" data-target="#collapseControls"><h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /><h4></a>
+				<a href="javascript:;" data-toggle="collapse" data-target="#collapseControls"><h4>Controls <img src="/img/throbber.gif" ng-show="throbber" /></h4></a>
 			</div>
 			<div id="collapseControls" class="panel-collapse collapse in">
 				<div class="panel-body">
 					<table style="width:100%">
 						<tr ng-repeat="control in controls" ng-show="control.visible">
-							<td style="padding-bottom: .5em;">{{ control.title }}</td>
+							<td style="padding-bottom: .5em;" class="text-muted">{{ control.title }}</td>
 							<!--<td style="text-align:right">{{ control.status }}</td>-->
 							<td style="text-align:right;padding-bottom: .5em;">
 								<button class="btn btn-primary btn-sm" style="width:75px" ng-click="handleControl(control)" ng-hide="control.throbber">{{ control.status }}</button>
@@ -22,11 +22,11 @@
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-header text-muted text-center">
-				<a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages"><h4>Evil Portal Messages<h4></a>
+				<a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages"><h4>Evil Portal Messages</h4></a>
 			</div>
 			<div id="collapseMessages" class="panel-collapse collapse in">
 				<div class="panel-body">
-					<p ng-show="(messages.length == 0)" class="text-muted"><i>No Messages</i></p>
+					<p ng-show="(messages.length == 0)" class="text-muted text-center"><i>No Messages</i></p>
 					<a ng-hide="(messages.length < 2)" ng-click="messages = []" class="pull-right" href="javascript:;">Clear All</a>
 					<table style="width:100%" ng-hide="(messages.length == 0)">
 						<tr ng-repeat="message in messages">
@@ -42,7 +42,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-9">
+	<!--<div class="col-md-9">
 		<div class="panel panel-default">
 			<div ng-controller="EvilPortalTabController">
 
@@ -64,142 +64,142 @@
 
 			</div>
 		</div>
-	</div>
+	</div>-->
 
-	<!-- The Portal tab view -->
-	<script type="text/ng-template" id="evilportal.portals.html">
-		
-		<div ng-show="dependencies">
-			<div class="panel-group" id="accordion">
-				<div class="col-md-12">
-					<!-- Library panel -->
-					<div class="panel panel-default" ng-show="portals.length > 0">
-						<div class="panel-header text-muted text-center">
-							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLibrary">Library</a><h5>
-						</div>
-						<div id="collapseLibrary" class="panel-collapse collapse in">
-							<div class="panel-body">
-								<div ng-show="portals.length > 0">
-									<table class="table-striped text-center table-responsive" style="width:100%">
+	<!--<div ng-show="dependencies">-->
+	<div class="panel-group" id="accordion" ng-show="dependencies">
+		<div class="col-md-9">
+			<!-- Library panel -->
+			<div class="panel panel-default">
+				<div class="panel-header text-muted text-center">
+					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLibrary">Library</a></h5>
+				</div>
+				<div id="collapseLibrary" class="panel-collapse collapse in">
+					<div class="panel-body">
+						<div ng-show="portals.length > 0">
+							<div class="table-responsive">
+								<table class="table table-striped" align="center">
+									<thead>
+										<th>File Name</th>
+										<th>Location</th>
+										<th>Edit</th>
+										<th>Delete</th>
+										<th>Active</th>
+									</thead>
+									<tbody>
 										<tr ng-repeat="portal in portals">
 											<td>{{ portal.title }}</td>
-											<td><a href="">Edit</a></td>
-											<td><a href="">Delete</a></td>
-											<td><a href="">Activate</a></td>
+											<td class="text-muted"><i>{{ portal.storage }}</i></td>
+											<td><a href="javascript:;" ng-click="editPortal(portal)" data-toggle="collapse" data-parent="#accordion" data-target="#collapseWorkshop">Edit</a></td>
+											<td><a href="javascript:;" ng-click="deletePortal(portal)" ng-hide="portal.storage == 'active'">Delete</a></td>
+											<td><a href="javascript:;" ng-click="activatePortal(portal)" ng-hide="portal.storage == 'active'">Activate</a></td>
 										</tr>
-									</table>
-								</div>
+									</tbody>
+								</table>
+							</div>
+						</div>
 
-								<div ng-hide="portals.length > 0">
-									<p class="text-muted"><i>No Portals in Library to Display.</i></p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-12">
-					<!-- Create Portal Panel -->
-					<div class="panel panel-default">
-						<div class="panel-header text-muted text-center">
-							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseCreater">Create New Portal</a><h5>
-						</div>
-						<div id="collapseCreater" class="panel-collapse collapse">
-							<div class="panel-body">
-								<form class="form-horizontal">
-									<div class="form-group">
-										<label class="control-label">Portal Name</label>
-										<input type="text" class="form-control" placeholder="BookStore.html">
-									</div>
-									<div class="form-group">
-										<label class="control-label">Portal HTML</label>
-										<textarea class="form-control" rows="10" placeholder="<HTML><p>Hello World!</p></HTML>"></textarea>
-									</div>
-									<div class="form-group">
-										<button type="submit" class="btn btn-primary btn-sm">Create</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-12">
-					<!-- Edit Active Portal Panel -->
-					<div class="panel panel-default">
-						<div class="panel-header text-muted text-center">
-							<h5><a href="javascript:;" ng-click="getActivePortalCode()" data-toggle="collapse" data-parent="#accordion" data-target="#collapseEditor">Edit Active Portal</a><h5>
-						</div>
-						<div id="collapseEditor" class="panel-collapse collapse">
-							<div class="panel-body">
-								<form class="form-horizontal">
-									<div class="form-group">
-										<label class="control-label">Portal HTML</label>
-										<textarea class="form-control" rows="10" placeholder="<HTML><p>Hello World!</p></HTML>" ng-model="landingPage"></textarea>
-									</div>
-									<div class="form-group">
-										<button type="submit" ng-click="updateActivePortal()" class="btn btn-primary btn-sm">Save</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-12">
-					<!-- Live Preview Panel -->
-					<div class="panel panel-default" ng-show="running">
-						<div class="panel-header text-muted text-center">
-							<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapsePreview">View Live Preview</a><h5>
-						</div>
-						<div id="collapsePreview" class="panel-collapse collapse">
-							<div class="panel-body">
-								<div ng-show="running">
-									<iframe src="http://172.16.42.1:2050" style="width:100%;height:300px;border:none;"></iframe>
-								</div>
-								<div ng-hide="running">
-									<p class="text-muted"><i>NoDogSplash Must Be Started First.</i></p>
-								</div>
-							</div>
+						<div ng-hide="portals.length > 0">
+							<p class="text-muted text-center"><i>No Portals in Library to Display.</i></p>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<div ng-hide="dependencies">
-			<p class="text-muted"><i>Dependencies must be installed first.</i></p>
-		</div>
-
-	</script>
-
-	<!-- The Config tab view -->
-	<script type="text/ng-template" id="evilportal.config.html">
-		
-		<div ng-show="dependencies">
-			<form class="form-horizontal">
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Gateway Name: </label>
-					<div class="col-sm-3">
-						<input type="text" class="form-control">
+			<!-- Create Portal Panel -->
+			<div class="panel panel-default">
+				<div class="panel-header text-muted text-center">
+					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseWorkshop">Portal Workshop</a></h5>
+				</div>
+				<div id="collapseWorkshop" class="panel-collapse collapse">
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="control-label">Portal Name</label>
+								<input type="text" class="form-control" ng-model="workshopPortal.name" placeholder="BookStore.html">
+							</div>
+							<div class="form-group">
+								<label class="control-label">Portal HTML</label> <a href="javascript:;" ng-click="workshopPortal.code = ''">Clear</a>
+								<textarea class="form-control" rows="10" ng-model="workshopPortal.code" placeholder="<HTML><p>Hello World!</p></HTML>"></textarea>
+							</div>
+							<div class="form-group">
+								<button type="submit" ng-click="createNewPortal()" class="btn btn-primary btn-sm">Save</button>
+							</div>
+						</form>
 					</div>
 				</div>
-			</form>
-		</div>
-
-		<div ng-hide="dependencies">
-			<p class="text-muted"><i>Dependencies must be installed first.</i></p>
-		</div>
-
-	</script>
-
-	<!-- The Change Log view -->
-	<script type="text/ng-template" id="evilportal.change.html">
+			</div>
 		
-		<ul>
-			<li><b>1.0</b></li>
-			<ul>
-				<li>Initial Pineapple Nano Release</li>
-			</ul>
-		</ul>
+			<!-- Live Preview Panel -->
+			<div class="panel panel-default">
+				<div class="panel-header text-muted text-center">
+					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapsePreview" ng-click="refreshLivePreview()">View Live Preview</a></h5>
+				</div>
+				<div id="collapsePreview" class="panel-collapse collapse">
+					<div class="panel-body">
+						<div ng-show="running">
+							<iframe src="http://172.16.42.1:2050" style="width:100%;height:300px;border:none;" id="livePreviewIframe"></iframe>
+							<button type="submit" ng-click="refreshLivePreview()" class="btn btn-primary btn-sm">Refresh</button>
+						</div>
+						<div ng-hide="running">
+							<p class="text-muted text-center"><i>NoDogSplash Must Be Started First.</i></p>
+						</div>
+					</div>
+				</div>
+			</div>
 
-	</script>
+			<!-- NoDogSplash Configuration Panel -->
+			<!-- This will be out in the next release because I am to lazy to get it working -->
+			<!--<div class="panel panel-default">
+				<div class="panel-header text-muted text-center">
+					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseConfigure">Configure NoDogSplash</a></h5>
+				</div>
+				<div id="collapseConfigure" class="panel-collapse collapse">
+					<div class="panel-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Gateway Name: </label>
+								<div class="col-sm-3">
+									<input type="text" class="form-control">
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>-->
+
+			<!-- Change Log Pannel -->
+			<div class="panel panel-default">
+				<div class="panel-header text-muted text-center">
+					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseChangelog">Evil Portal Change Log</a></h5>
+				</div>
+				<div id="collapseChangelog" class="panel-collapse collapse">
+					<div class="panel-body">
+						<ul>
+							<li><b>1.0</b></li>
+							<ul>
+								<li class="text-muted">Initial Pineapple Nano Release</li>
+							</ul>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--</div>-->
+
+	<div class="col-md-9" ng-hide="dependencies">
+		<div class="panel panel-default">
+			<div class="panel-header text-muted text-center">
+				<h4>Evil Portal Dependencies</h4>
+			</div>
+			<div class="panel-body">
+				<p class="text-muted text-center">Evil Portal is built ontop of NoDogSplash and needs it to be installed to run.</p>
+			</div>
+		</div>
+	</div>
+	<!--<div ng-hide="dependencies">
+		<p class="text-muted"><i>Dependencies must be installed first.</i></p>
+	</div>-->
 
 </div>

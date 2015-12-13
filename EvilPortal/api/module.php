@@ -25,35 +25,113 @@ class EvilPortal extends Module
 				$this->handleGetPortalList();
 				break;
 
-			case 'activePortalCode':
-				$this->getActivePortalCode();
+			case 'submitPortalCode':
+				$this->submitPortalCode();
 				break;
 
-			case 'updateActivePortal':
-				$this->updateActivePortal();
+			case 'deletePortal':
+				$this->handleDeletePortal();
+				break;
+
+			case 'activatePortal':
+				$this->activatePortal();
+				break;
+
+			case 'getPortalCode':
+				$this->getPortalCode();
 				break;
 		}
 	}
 
-	public function updateActivePortal() {
-		$data = $this->request->portalCode;
-		file_put_contents("/etc/nodogsplash/htdocs/splash.html", $data);
-		$this->response = array(
-				"message" => "Updated Active Portal."
-			);
-	}
+	public function getPortalCode() {
+		$portalName = $this->request->name;
+		$storage = $this->request->storage;
 
-	public function getActivePortalCode() {
-		$portalCode = "";
-		$portalExists = false;
-		if (file_exists("/etc/nodogsplash/htdocs/splash.html")) {
-			$portalExists = true;
-			$portalCode = file_get_contents("/etc/nodogsplash/htdocs/splash.html");
+		if ($storage != "active")
+			$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+		else
+			$dir = "/etc/nodogsplash/htdocs/";
+
+		$message = "";
+		$code = "";
+
+		if (file_exists($dir . $portalName)) {
+			$code = file_get_contents($dir . $portalName);
+			$message = $portalName . " is ready for editting.";
+		} else {
+			$message = "Error finding " . $portalName . ".";
 		}
 
+		$this->response = array("message" => $message, "code" => $code);
+
+	}
+
+	public function activatePortal() {
+		$portalName = $this->request->name;
+		$storage = $this->request->storage;
+
+		if ($storage != "active")
+			$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+		else
+			$dir = "/etc/nodogsplash/htdocs/";
+
+		$message = "";
+		if (file_exists($dir . $portalName)) {
+			unlink("/etc/nodogsplash/htdocs/splash.html");
+			$portalName = escapeshellarg($portalName);
+			exec("ln -s " . $dir . $portalName . " /etc/nodogsplash/htdocs/splash.html");
+			$message = $portalName . " is now active.";
+		} else {
+			$message = "Couldn't find " . $portalName . ".";
+		}
+
+		$this->response = array("message" => $message);
+
+	}
+
+	public function handleDeletePortal() {
+		$portalName = $this->request->name;
+		$storage = $this->request->storage;
+
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+
+		unlink($dir . $portalName);
+
+		$message = "";
+
+		if (!file_exists($dir . $portalName)) {
+			$message = "Deleted " . $portalName;
+		} else {
+			$message = "Error deleting " . $portalName;
+		}
+
+		$this->response = array("message" => $message);
+
+	}
+
+	public function submitPortalCode() {
+		$code = $this->request->portalCode;
+		$storage = $this->request->storage;
+		$portalName = $this->request->name;
+
+		if ($storage != "active")
+			$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+		else
+			$dir = "/etc/nodogsplash/htdocs/";
+
+		$message = "";
+
+		if (!file_exists($dir . $portalName)) {
+			file_put_contents($dir . $portalName, $code);
+			$message = "Created " . $portalName;
+		} else {
+			file_put_contents($dir . $portalName, $code);
+			$message = "Updated " . $portalName;
+		}
+		
+
 		$this->response = array(
-				"exists" => $portalExists,
-				"portalCode" => $portalCode
+				"message" => $message
 			);
 
 	}
@@ -66,9 +144,12 @@ class EvilPortal extends Module
 		$root_portals = preg_grep('/^([^.])/', scandir("/root/portals"));
 
 		foreach ($root_portals as $portal) {
-			$obj = array("title" => $portal, "location" => "/root/portals");
+			$obj = array("title" => $portal, "location" => "internal");
 			array_push($all_portals, $obj);
 		}
+
+		$active = array("title" => "splash.html", "location" => "active");
+		array_push($all_portals, $active);
 
 		$this->response = $all_portals;
 	}

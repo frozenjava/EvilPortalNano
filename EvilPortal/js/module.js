@@ -1,28 +1,3 @@
-registerController("EvilPortalTabController", ['$api', '$scope', function($api, $scope) {
-
-	$scope.tabs = [{
-		title: "Portals",
-		url: "evilportal.portals.html"
-	}, {
-		title: "Configuration",
-		url: "evilportal.config.html"
-	}, {
-		title: "Changes",
-		url: "evilportal.change.html"
-	}];
-
-	$scope.currentTab = "evilportal.portals.html";
-
-	$scope.onClickTab = function(tab) {
-		$scope.currentTab = tab.url;
-	}
-
-	$scope.isActiveTab = function(tabUrl) {
-		return tabUrl == $scope.currentTab;
-	}
-
-}]);
-
 registerController("EvilPortalController", ['$api', '$scope', function($api, $scope) {
 
 	getControls();
@@ -33,8 +8,7 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	$scope.throbber = true;
 	$scope.dependencies = false;
 	$scope.running = false;
-	$scope.activePortalCode = "";
-	$scope.landingPage = '';
+	$scope.workshopPortal = {name: "", code: "", storage: "internal"};
 
 	$scope.handleControl = function(control) {
 		control.throbber = true;
@@ -58,6 +32,7 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 					getControls();
 					control.throbber = false;
 					$scope.sendMessage(control.title, response.control_message);
+					$scope.refreshLivePreview()
 				});
 				break;
 
@@ -104,11 +79,10 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 			module: "EvilPortal",
 			action: "portalList"
 		}, function(response) {
-			//alert(response[0].title);
-			//$scope.portals = response;
+			$scope.portals = [];
 			for (var i = 0; i < response.length; i++) {
-				$scope.portals.unshift({title: response[i].title, location: response[i].location});
-				console.log({title: response[i].title, location: response[i].location});
+				$scope.portals.unshift({title: response[i].title, storage: response[i].location});
+				console.log({title: response[i].title, storage: response[i].location});
 			}
 		});
 	}
@@ -160,25 +134,62 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		$scope.throbber = false;
 	}
 
-	$scope.getActivePortalCode = function() {
+	$scope.createNewPortal = function() {
+		console.log($scope.workshopPortal.name);
+		console.log($scope.workshopPortal.code);
 		$api.request({
 			module: "EvilPortal",
-			action: "activePortalCode"
-		}, function(response){
-			//$scope.activePortalCode = response.portalCode;
+			action: "submitPortalCode",
+			portalCode: $scope.workshopPortal.code,
+			storage: $scope.workshopPortal.storage,
+			name: $scope.workshopPortal.name
+		}, function(response) {
+			$scope.sendMessage("Create New Portal", response.message);
+			getPortals();
 		});
 	}
 
-	$scope.updateActivePortal = function() {
-		console.log($scope.landingPage);
-		/*$api.request({
+	$scope.deletePortal = function(portal) {
+		console.log(portal.storage);
+		console.log(portal.title);
+		$api.request({
 			module: "EvilPortal",
-			action: "updateActivePortal",
-			portalCode: $scope.activePortalCode
-		}, function(response){
-			console.log($scope.activePortalCode);
-			$scope.sendMessage("Saving Active Portal", response.message);
-		});*/
+			action: "deletePortal",
+			storage: portal.storage,
+			name: portal.title
+		}, function(response) {
+			$scope.sendMessage("Delete Portal", response.message);
+			getPortals();
+		});
+	}
+
+	$scope.activatePortal = function(portal) {
+		$api.request({
+			module: "EvilPortal",
+			action: "activatePortal",
+			storage: portal.storage,
+			name: portal.title
+		}, function(response) {
+			$scope.sendMessage("Activate Portal", response.message);
+		});
+	}
+
+	$scope.editPortal = function(portal) {
+		$api.request({
+			module: "EvilPortal",
+			action: "getPortalCode",
+			storage: portal.storage,
+			name: portal.title
+		}, function(response) {
+			$scope.sendMessage("Edit Portal", response.message);
+			$scope.workshopPortal.code = response.code;
+			$scope.workshopPortal.name = portal.title;
+			$scope.workshopPortal.storage = portal.storage;
+		});
+	}
+
+	$scope.refreshLivePreview = function() {
+		window.frames['livePreviewIframe'].src = "http://172.16.42.1:2050";
 	}
 
 }]);

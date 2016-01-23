@@ -157,7 +157,8 @@ class EvilPortal extends Module
 	public function handleEnable() {
 		$response_array = array();
 		if (!$this->checkAutoStart()) {
-			exec("/etc/init.d/nodogsplash enable");
+			exec("/etc/init.d/firewall disable");
+			//exec("/etc/init.d/nodogsplash enable");
 			$enabled = $this->checkAutoStart();
 			$message = "NoDogSplash is now enabled on startup.";
 			if (!$enabled)
@@ -170,6 +171,7 @@ class EvilPortal extends Module
 
 		} else {
 			exec("/etc/init.d/nodogsplash disable");
+			//exec("/etc/init.d/firewall enable");
 			$enabled = !$this->checkAutoStart();
 			$message = "NoDogSplash now disabled on startup.";
 			if (!$enabled)
@@ -193,9 +195,9 @@ class EvilPortal extends Module
 				$message = "Error starting NoDogSplash.";
 
 			$response_array = array(
-					"control_success" => $running,
-					"control_message" => $message
-				);
+				"control_success" => $running,
+				"control_message" => $message
+			);
 		} else {
 			exec("/etc/init.d/nodogsplash stop");
 			sleep(1);
@@ -221,6 +223,7 @@ class EvilPortal extends Module
 			if (!$installed) {
 				$message = "Error installing dependencies.";
 			} else {
+				exec("/etc/init.d/nodogsplash disable");
 				$this->uciSet("nodogsplash.@instance[0].enabled", true);
 				$this->uciAddList("nodogsplash.@instance[0].users_to_router", "allow tcp port 1471");
 			}

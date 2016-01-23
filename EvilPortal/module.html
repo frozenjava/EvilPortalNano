@@ -139,7 +139,7 @@
 					<div class="panel-body">
 						<div ng-show="running">
 							<iframe src="http://172.16.42.1:2050" style="width:100%;height:300px;border:none;" id="livePreviewIframe"></iframe>
-							<button type="submit" ng-click="refreshLivePreview()" class="btn btn-primary btn-sm">Refresh</button>
+							<button type="submit" ng-click="refreshLivePreview()" class="btn btn-default btn-sm">Refresh</button>
 						</div>
 						<div ng-hide="running">
 							<p class="text-muted text-center"><i>NoDogSplash Must Be Started First.</i></p>
@@ -197,7 +197,7 @@
 
 	<div class="col-md-9" ng-hide="dependencies">
 		<div class="panel panel-default">
-			<div class="panel-heading text-muted text-center">
+			<div class="panel-header text-muted text-center">
 				<h5>Evil Portal Dependencies</h5>
 			</div>
 			<div class="panel-body">

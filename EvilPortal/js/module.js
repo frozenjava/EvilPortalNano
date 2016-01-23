@@ -93,7 +93,7 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		var autostart;
 		if (response.dependencies == false) {
 			deps = "Install";
-			$scope.sendMessage("Missing Dependencies", "NoDogSplash must first be installed before you can use Evil Portal");
+			$scope.sendMessage("Missing Dependencies", "NoDogSplash must first be installed before you can use Evil Portal.");
 			$scope.dependencies = false;
 		} else {
 			deps = "Uninstall";

@@ -1,5 +1,6 @@
 {
 	"title": "Evil Portal",
-	"version": "1.0",
-	"author": "newbi3"
+	"version": "1.1",
+	"author": "newbi3",
+	"description": "A UI for NoDogSplash Captive Portal."
 }

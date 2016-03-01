@@ -2,15 +2,17 @@
 
 class EvilPortal extends Module
 {
+
+	// CONSTANTS
+	private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
+	private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
+	// CONSTANTS
+
 	public function route()
 	{
 		switch($this->request->action) {
 			case 'getControlValues':
 				$this->getControlValues();
-				break;
-
-			case 'handleDepends':
-				$this->handleDepends();
 				break;
 
 			case 'startStop':
@@ -185,11 +187,64 @@ class EvilPortal extends Module
 		$this->response = $response_array;
 	}
 
+	public function checkCaptivePortalRunning() {
+		return exec("iptables -t nat -L PREROUTING | grep 172.16.42.1") == '' ? false : true;
+	}
+
+	public function startCaptivePortal() {
+
+		// Delete client tracking file if it exists
+		if (file_exists($this->CLIENTS_FILE)) {
+			unlink($this->CLIENTS_FILE);
+		}
+
+		// Enable forwarding. It should already be enabled on the pineapple but do it anyways just to be safe
+		exec("echo 1 > /proc/sys/net/ipv4/ip_forward");
+
+		// Insert allowed clients into tracking file
+		$allowedClients = file_get_contents($this->ALLOWED_FILE);
+		file_put_contents($this->CLIENTS_FILE, $allowedClients);
+
+		// Configure other rules
+		exec("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337");
+		exec("iptables -A INPUT -p tcp --dport 53 -j ACCEPT");
+
+		// Add rule for each allowed client
+		$lines = file($this->CLIENTS_FILE);
+		foreach ($lines as $client) {
+			exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+		}
+
+		// Drop everything else
+		exec("iptables -A INPUT -j DROP");
+
+		return $this->checkCaptivePortalRunning();
+
+	}
+
+	public function stopCaptivePortal() {
+		if (file_exists($this->CLIENTS_FILE)) {
+			$lines = file($this->CLIENTS_FILE);
+			foreach ($lines as $client) {
+				exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
+			}
+			unlink($this->CLIENTS_FILE);
+		}
+
+		exec("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337");
+		exec("iptables -D INPUT -p tcp --dport 53 -j ACCEPT");
+		exec("iptables -D INPUT -j DROP");
+
+		return $this->checkCaptivePortalRunning();
+
+	}
+
 	public function handleRunning() {
 		$response_array = array();
-		if (!$this->checkRunning("nodogsplash")) {
-			exec("/etc/init.d/nodogsplash start");
-			$running = $this->checkRunning("nodogsplash");
+		if (!$this->checkCaptivePortalRunning()) {
+			//exec("/etc/init.d/nodogsplash start");
+			//$running = $this->checkRunning("nodogsplash");
+			$running = $this->startCaptivePortal();
 			$message = "Started NoDogSplash.";
 			if (!$running)
 				$message = "Error starting NoDogSplash.";
@@ -199,9 +254,10 @@ class EvilPortal extends Module
 				"control_message" => $message
 			);
 		} else {
-			exec("/etc/init.d/nodogsplash stop");
-			sleep(1);
-			$running = !$this->checkRunning("nodogsplash");
+			//exec("/etc/init.d/nodogsplash stop");
+			//sleep(1);
+			//$running = !$this->checkRunning("nodogsplash");
+			$running = !$this->stopCaptivePortal();
 			$message = "Stopped NoDogSplash.";
 			if (!$running)
 				$message = "Error stopping NoDogSplash.";
@@ -215,7 +271,7 @@ class EvilPortal extends Module
 		$this->response = $response_array;
 	}
 
-	public function handleDepends() {
+	/*public function handleDepends() {
 		$response_array = array();
 		if (!$this->checkDependency("nodogsplash")) {
 			$installed = $this->installDependency("nodogsplash");
@@ -247,12 +303,12 @@ class EvilPortal extends Module
 
 		$this->response = $response_array;
 
-	}
+	}*/
 
 	public function getControlValues() {
 		$this->response = array(
-				"dependencies" => $this->checkDependency("nodogsplash"),
-				"running" => $this->checkRunning("nodogsplash"),
+				//"dependencies" => true,
+				"running" => $this->checkCaptivePortalRunning(),
 				"autostart" => $this->checkAutoStart()
 			);
 	}
@@ -265,13 +321,13 @@ class EvilPortal extends Module
 		}
 	}
 
-	public function checkDepends() {
+	/*public function checkDepends() {
 		$splash = true;
 		if (exec("opkg list-installed | grep nodogsplash") == '') {
     		$splash = false;
 		}
-    	return $splash;
-	}
+    	return true;
+	}*/
 
 	public function checkRunning() {
 		if (exec("ps | grep -v grep | grep -o nodogsplash") == '') {

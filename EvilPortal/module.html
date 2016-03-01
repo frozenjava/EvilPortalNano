@@ -67,7 +67,7 @@
 	</div>-->
 
 	<!--<div ng-show="dependencies">-->
-	<div class="panel-group" id="accordion" ng-show="dependencies">
+	<div class="panel-group" id="accordion">
 		<div class="col-md-9">
 			<!-- Library panel -->
 			<div class="panel panel-default">
@@ -130,6 +130,18 @@
 				</div>
 			</div>
 		
+			<!-- EvilPortal Tools Panel -->
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseTools" class="text-muted">EvilPortal Tools</a></h5>
+				</div>
+				<div id="collapseTools" class="panel-collapse collapse">
+					<div class="panel-body">
+						<p>There will be various tools in this panel</p>
+					</div>
+				</div>
+			</div>
+
 			<!-- Live Preview Panel -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -178,8 +190,8 @@
 						<ul>
 							<li><b>1.1</b></li>
 							<ul>
-								<li class="text-muted">Fixed NoDogSplash Configuration Issue</li>
-								<li class="text-muted">Made panels look more consistant with the rest of the UI</li>
+								<li class="text-muted">Captive Portal is purely iptables</li>
+								<li class="text-muted">No more NoDogSplash</li>
 							</ul>
 						</ul>
 						<ul>
@@ -194,19 +206,5 @@
 		</div>
 	</div>
 	<!--</div>-->
-
-	<div class="col-md-9" ng-hide="dependencies">
-		<div class="panel panel-default">
-			<div class="panel-header text-muted text-center">
-				<h5>Evil Portal Dependencies</h5>
-			</div>
-			<div class="panel-body">
-				<p class="text-muted text-center">Evil Portal is built ontop of NoDogSplash and needs it to be installed to run.</p>
-			</div>
-		</div>
-	</div>
-	<!--<div ng-hide="dependencies">
-		<p class="text-muted"><i>Dependencies must be installed first.</i></p>
-	</div>-->
 
 </div>

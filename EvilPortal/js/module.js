@@ -6,25 +6,14 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	$scope.portals = [];
 	$scope.messages = [];
 	$scope.throbber = true;
-	$scope.dependencies = false;
 	$scope.running = false;
 	$scope.workshopPortal = {name: "", code: "", storage: "internal"};
 
 	$scope.handleControl = function(control) {
 		control.throbber = true;
 		switch (control.title) {
-			case "Dependencies":
-				$api.request({
-					module: "EvilPortal",
-					action: "handleDepends"
-				}, function(response) {
-					getControls();
-					control.throbber = false;
-					$scope.sendMessage(control.title, response.control_message);
-				});
-				break;
 
-			case "NoDogSplash":
+			case "CaptivePortal":
 				$api.request({
 					module: "EvilPortal",
 					action: "startStop"
@@ -88,17 +77,8 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	}
 
 	function updateControls(response) {
-		var deps;
 		var running;
 		var autostart;
-		if (response.dependencies == false) {
-			deps = "Install";
-			$scope.sendMessage("Missing Dependencies", "NoDogSplash must first be installed before you can use Evil Portal.");
-			$scope.dependencies = false;
-		} else {
-			deps = "Uninstall";
-			$scope.dependencies = true;
-		}
 		if (response.running == false) {
 			running = "Start";
 			$scope.running = false;
@@ -111,24 +91,17 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		} else {
 			autostart = "Disable";
 		}
-		//alert(deps);
 		$scope.controls = [
 		{
-			title: "Dependencies",
-			status: deps,
-			visible: true,
-			throbber: false
-		},
-		{
-			title: "NoDogSplash",
+			title: "CaptivePortal",
 			status: running,
-			visible: response.dependencies,
+			visible: true,
 			throbber: false
 		},
 		{
 			title: "Auto Start",
 			status: autostart,
-			visible: response.dependencies,
+			visible: true,
 			throbber: false
 		}];
 		$scope.throbber = false;

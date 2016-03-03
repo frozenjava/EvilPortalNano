@@ -42,30 +42,6 @@
 		</div>
 	</div>
 
-	<!--<div class="col-md-9">
-		<div class="panel panel-default">
-			<div ng-controller="EvilPortalTabController">
-
-				<div class="panel-header">
-					<nav class="navback navbar-default">
-			    		<ul class="nav nav-tabs">
-			        		<li ng-repeat="tab in tabs"
-			        			ng-class="{active:isActiveTab(tab.url)}"
-			        			ng-click="onClickTab(tab)"><a>{{ tab.title }}</a></li>
-			    		</ul>
-					</nav>
-				</div>
-
-				<div class="panel-body">
-					<div id="mainView">
-				    	<div ng-include="currentTab"></div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>-->
-
 	<!--<div ng-show="dependencies">-->
 	<div class="panel-group" id="accordion">
 		<div class="col-md-9">
@@ -130,55 +106,65 @@
 				</div>
 			</div>
 		
-			<!-- EvilPortal Tools Panel -->
+			<!-- EvilPortal White List Panel -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseTools" class="text-muted">EvilPortal Tools</a></h5>
+					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseWhiteList" class="text-muted" ng-click="getList('whiteList')">White List</a></h5>
 				</div>
-				<div id="collapseTools" class="panel-collapse collapse">
+				<div id="collapseWhiteList" class="panel-collapse collapse">
 					<div class="panel-body">
-						<p>There will be various tools in this panel</p>
-					</div>
+		                <p>
+		                    <textarea class="form-control" rows="15" ng-model="whiteList" readonly></textarea>
+		                </p>
+		                <div class="input-group">
+		                    <input type="text" class="form-control" placeholder="IP Address" name="ipaddress" ng-model="whiteListInput">
+		                    <span class="input-group-btn">
+		                        <button class="btn btn-default" type="button" ng-click="addWhiteListClient()">Add</button>
+		                        <button class="btn btn-default" type="button" ng-click="removeWhiteListClient()">Remove</button>
+		                    </span>
+		                </div>
+		            </div>
+				</div>
+			</div>
+
+			<!-- EvilPortal Authorized Clients Panel -->
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAuthorizedClients" class="text-muted" ng-click="getList('accessList')">Authorized Clients</a></h5>
+				</div>
+				<div id="collapseAuthorizedClients" class="panel-collapse collapse">
+					<div class="panel-body">
+		                <p>
+		                    <textarea class="form-control" rows="15" ng-model="accessList" readonly></textarea>
+		                </p>
+		                <div class="input-group">
+		                    <input type="text" class="form-control" placeholder="IP Address" name="ipaddress" ng-model="accessListInput">
+		                    <span class="input-group-btn">
+		                        <button class="btn btn-default" type="button" ng-click="authorizeClient()">Authorize</button>
+		                        <button class="btn btn-default" type="button" ng-click="revokeClient()">Revoke</button>
+		                    </span>
+		                </div>
+		            </div>
 				</div>
 			</div>
 
 			<!-- Live Preview Panel -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapsePreview" ng-click="refreshLivePreview()" class="text-muted">View Live Preview</a></h5>
+					<h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapsePreview" ng-click="refreshLivePreview()" class="text-muted">Live Preview</a></h5>
 				</div>
 				<div id="collapsePreview" class="panel-collapse collapse">
 					<div class="panel-body">
 						<div ng-show="running">
-							<iframe src="http://172.16.42.1:2050" style="width:100%;height:300px;border:none;" id="livePreviewIframe"></iframe>
+							<iframe src="http://172.16.42.1:1337" style="width:100%;height:300px;border:none;" id="livePreviewIframe"></iframe>
 							<button type="submit" ng-click="refreshLivePreview()" class="btn btn-default btn-sm">Refresh</button>
 						</div>
 						<div ng-hide="running">
-							<p class="text-muted text-center"><i>NoDogSplash Must Be Started First.</i></p>
+							<p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<!-- NoDogSplash Configuration Panel -->
-			<!-- This will be out in the next release because I am to lazy to get it working -->
-			<!--<div class="panel panel-default">
-				<div class="panel-header text-muted text-center">
-					<h5><a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseConfigure">Configure NoDogSplash</a></h5>
-				</div>
-				<div id="collapseConfigure" class="panel-collapse collapse">
-					<div class="panel-body">
-						<form class="form-horizontal">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">Gateway Name: </label>
-								<div class="col-sm-3">
-									<input type="text" class="form-control">
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>-->
 
 			<!-- Change Log Pannel -->
 			<div class="panel panel-default">

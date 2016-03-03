@@ -7,6 +7,10 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	$scope.messages = [];
 	$scope.throbber = true;
 	$scope.running = false;
+	$scope.whiteList = '';
+	$scope.whiteListInput = '';
+	$scope.accessList = '';
+	$scope.accessListInput = '';
 	$scope.workshopPortal = {name: "", code: "", storage: "internal"};
 
 	$scope.handleControl = function(control) {
@@ -164,5 +168,94 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	$scope.refreshLivePreview = function() {
 		window.frames['livePreviewIframe'].src = "http://172.16.42.1:2050";
 	}
+
+	$scope.getList = function(listToGet) {
+		$api.request({
+			module: "EvilPortal",
+			action: "getList",
+			listName: listToGet
+		}, function(response) {
+			if (response.list_success) {
+				if (listToGet == "whiteList") {
+					$scope.whiteList = response.list_contents;
+				} else if (listToGet == "accessList") {
+					$scope.accessList = response.list_contents;
+				}
+			} else {
+				$scope.sendMessage("List Data Error", response.list_message);
+				console.log(response);
+			}
+		});
+	}
+
+	$scope.addWhiteListClient = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "addToList",
+			listName: "whiteList",
+			clientIP: $scope.whiteListInput
+		}, function(response) {
+			if (response.add_success) {
+				$scope.whiteListInput = '';
+				$scope.getList("whiteList");
+			} else {
+				$scope.sendMessage("White List", response.add_message);
+				console.log(response);
+			}
+		});
+	}
+
+	$scope.removeWhiteListClient = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "removeFromList",
+			listName: "whiteList",
+			clientIP: $scope.whiteListInput
+		}, function(response) {
+			if (response.remove_success) {
+				$scope.whiteListInput = '';
+				$scope.getList("whiteList");
+			} else {
+				$scope.sendMessage("White List", response.remove_message);
+				console.log(response);
+			}
+		});
+	}
+
+	$scope.authorizeClient = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "addToList",
+			listName: "accessList",
+			clientIP: $scope.accessListInput
+		}, function(response) {
+			if (response.add_success) {
+				$scope.accessListInput = '';
+				$scope.getList("accessList");
+			} else {
+				$scope.sendMessage("Access List", response.add_message);
+				console.log(response);
+			}
+		});
+	}
+
+	$scope.revokeClient = function() {
+		$api.request({
+			module: "EvilPortal",
+			action: "removeFromList",
+			listName: "accessList",
+			clientIP: $scope.accessListInput
+		}, function(response) {
+			if (response.remove_success) {
+				$scope.accessListInput = '';
+				$scope.getList("accessList");
+			} else {
+				$scope.sendMessage("Access List", response.remove_message);
+				console.log(response);
+			}
+		});
+	}
+
+
 
 }]);

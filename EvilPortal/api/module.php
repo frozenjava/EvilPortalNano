@@ -42,6 +42,18 @@ class EvilPortal extends Module
 			case 'getPortalCode':
 				$this->getPortalCode();
 				break;
+
+			case 'getList':
+				$this->getList();
+				break;
+
+			case 'addToList':
+				$this->addToList();
+				break;
+
+			case 'removeFromList':
+				$this->removeFromList();
+				break;
 		}
 	}
 
@@ -212,7 +224,8 @@ class EvilPortal extends Module
 		// Add rule for each allowed client
 		$lines = file($this->CLIENTS_FILE);
 		foreach ($lines as $client) {
-			exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+			$this->authorizeClient($client);
+			//exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
 		}
 
 		// Drop everything else
@@ -222,11 +235,21 @@ class EvilPortal extends Module
 
 	}
 
+	private function authorizeClient($client) {
+		exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+	}
+
+	private function revokeClient($client) {
+		exec("iptables -t nat -D PREROUTING -s {$client}");
+		exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
+	}
+
 	public function stopCaptivePortal() {
 		if (file_exists($this->CLIENTS_FILE)) {
 			$lines = file($this->CLIENTS_FILE);
 			foreach ($lines as $client) {
-				exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
+				$this->revokeClient($client);
+				//exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
 			}
 			unlink($this->CLIENTS_FILE);
 		}
@@ -245,9 +268,9 @@ class EvilPortal extends Module
 			//exec("/etc/init.d/nodogsplash start");
 			//$running = $this->checkRunning("nodogsplash");
 			$running = $this->startCaptivePortal();
-			$message = "Started NoDogSplash.";
+			$message = "Started EvilPortal.";
 			if (!$running)
-				$message = "Error starting NoDogSplash.";
+				$message = "Error starting EvilPortal.";
 
 			$response_array = array(
 				"control_success" => $running,
@@ -258,9 +281,9 @@ class EvilPortal extends Module
 			//sleep(1);
 			//$running = !$this->checkRunning("nodogsplash");
 			$running = !$this->stopCaptivePortal();
-			$message = "Stopped NoDogSplash.";
+			$message = "Stopped EvilPortal.";
 			if (!$running)
-				$message = "Error stopping NoDogSplash.";
+				$message = "Error stopping EvilPortal.";
 
 			$response_array = array(
 					"control_success" => $running,
@@ -271,39 +294,96 @@ class EvilPortal extends Module
 		$this->response = $response_array;
 	}
 
-	/*public function handleDepends() {
+	public function getList() {
 		$response_array = array();
-		if (!$this->checkDependency("nodogsplash")) {
-			$installed = $this->installDependency("nodogsplash");
-			$message = "Successfully installed dependencies.";
-			if (!$installed) {
-				$message = "Error installing dependencies.";
-			} else {
-				exec("/etc/init.d/nodogsplash disable");
-				$this->uciSet("nodogsplash.@instance[0].enabled", true);
-				$this->uciAddList("nodogsplash.@instance[0].users_to_router", "allow tcp port 1471");
-			}
+		$contents = null;
+		$message = "Successful";
+		switch ($this->request->listName) {
+			case "whiteList":
+				if (!file_exists($this->ALLOWED_FILE)) {
+					$message = "White List file doesn't exist.";
+				} else {
+					$contents = file_get_contents($this->ALLOWED_FILE);
+					$contents = ($contents == null) ? "No White Listed Clients" : $contents;
+				}
+				break;
+
+			case "accessList":
+				if (!file_exists($this->CLIENTS_FILE)) {
+					$message = "Authorized Clients file doesnt exist. Is Evil Portal running?";
+				} else {
+					$contents = file_get_contents($this->CLIENTS_FILE);
+					$contents = ($contents == null) ? "No Authorized Clients." : $contents;
+				}
+				break;
+		}
+
+		if ($contents != null) {
 			$response_array = array(
-					"control_success" => $installed,
-					"control_message" => $message
+					"list_success" => true,
+					"list_contents" => $contents,
+					"list_message" => $message
 				);
-			
 		} else {
-			exec("opkg remove nodogsplash");
-			$removed = !$this->checkDependency("nodogsplash");
-			$message = "Successfully removed dependencies.";
-			if ($installed) {
-				$message = "Error removing dependencies.";
-			}
-			$response_array = array(
-					"control_success" => $removed,
-					"control_message" => $message
-				);
+			$response_array = array("list_success" => false, "list_contents" => "", "list_message" => $message);
 		}
 
 		$this->response = $response_array;
+	}
 
-	}*/
+	public function addToList() {
+		$valid = preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $this->request->clientIP);
+		if ($valid) {
+			switch ($this->request->listName) {
+				case "whiteList":
+					file_put_contents($this->ALLOWED_FILE, $this->request->clientIP . "\n", FILE_APPEND);
+					$this->response = array("add_success" => true, "add_message" => "Successful");
+					break;
+
+				case "accessList":
+					file_put_contents($this->CLIENTS_FILE, $this->request->clientIP . "\n", FILE_APPEND);
+					$this->authorizeClient($this->request->clientIP);
+					$this->response = array("add_success" => true, "add_message" => "Successful");
+					break;
+
+				default:
+					$this->response = array("add_success" => false, "add_message" => "Unkown list.");
+					break;
+			}
+		} else {
+			$this->response = array("add_success" => false, "add_message" => "Invalid IP Address.");
+		}
+		
+	}
+
+	public function removeFromList() {
+		$valid = preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $this->request->clientIP);
+		if ($valid) {
+			switch ($this->request->listName) {
+				case "whiteList":
+					$data = file_get_contents($this->ALLOWED_FILE);
+					$data = str_replace($this->request->clientIP . "\n", '', $data);
+					file_put_contents($this->ALLOWED_FILE, $data);
+					$this->response = array("remove_success" => true, "remove_message" => "Successful");
+					break;
+
+				case "accessList":
+					$data = file_get_contents($this->CLIENTS_FILE);
+					$data = str_replace($this->request->clientIP . "\n", '', $data);
+					file_put_contents($this->CLIENTS_FILE, $data);
+					$this->revokeClient($this->request->clientIP);
+					$this->response = array("remove_success" => true, "remove_message" => "Successful");
+					break;
+
+				default:
+					$this->response = array("remove_success" => false, "remove_message" => "Unkown list.");
+					break;
+
+			}
+		} else {
+			$this->response = array("remove_success" => false, "remove_message" => "Invalid IP Address.");
+		}
+	}
 
 	public function getControlValues() {
 		$this->response = array(
@@ -320,14 +400,6 @@ class EvilPortal extends Module
 			return true;
 		}
 	}
-
-	/*public function checkDepends() {
-		$splash = true;
-		if (exec("opkg list-installed | grep nodogsplash") == '') {
-    		$splash = false;
-		}
-    	return true;
-	}*/
 
 	public function checkRunning() {
 		if (exec("ps | grep -v grep | grep -o nodogsplash") == '') {

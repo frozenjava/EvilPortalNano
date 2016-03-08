@@ -3,21 +3,25 @@
 class MyPortal extends Portal
 {
 
-	public function route()
-	{
+    public function handleAuthorization()
+    {
+        if (isset($this->request->target)) {
+            $this->authorizeClient($_SERVER['REMOTE_ADDR']);
+            $this->showSuccess();
+        } else {
+            $this->showError();
+        }
+    }
 
-		switch($this->request->action) {
-			case 'authorize':
-				$this->handleAuthorization();
-				break;
-		}
+    public function showSuccess()
+    {
+        //Calls default function, override here
+        parent::showSuccess();
+    }
 
-	}
-
-	private function handleAuthorization()
-	{
-		$success = $this->authorizeClient($_SERVER['REMOTE_ADDR']);
-		$this->response = array("authorized" => $success);
-	}
-
+    public function showError()
+    {
+        //Calls default function, override here
+        parent::showError();
+    }
 }

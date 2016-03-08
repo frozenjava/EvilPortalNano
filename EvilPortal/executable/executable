@@ -64,7 +64,7 @@ def stop_evilportal():
 		os.remove(CLIENTS_FILE)
 
 	# Stop HTTP Redirection
-	os.system("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337")
+	os.system("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80")
 
 	# Remove DNS Policy
 	os.system("iptables -D INPUT -p tcp --dport 53 -j ACCEPT")
@@ -91,8 +91,8 @@ def start_evilportal():
 		f.write(client + "\n")
 	f.close()
 
-	# Redirect all web traffic to port 1337 on the pineapple
-	os.system("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337")
+	# Redirect all web traffic to port 80 on the pineapple
+	os.system("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80")
 
 	# Accept dns
 	os.system("iptables -A INPUT -p tcp --dport 53 -j ACCEPT")

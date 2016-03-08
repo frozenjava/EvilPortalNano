@@ -27,20 +27,32 @@ class EvilPortal extends Module
 				$this->handleGetPortalList();
 				break;
 
-			case 'submitPortalCode':
-				$this->submitPortalCode();
+			case 'portalFiles':
+				$this->getPortalFiles();
 				break;
 
 			case 'deletePortal':
 				$this->handleDeletePortal();
 				break;
 
+			case 'deletePortalFile':
+				$this->deletePortalFile();
+				break;
+
 			case 'activatePortal':
 				$this->activatePortal();
 				break;
 
+			case 'deactivatePortal':
+				$this->deactivatePortal();
+				break;
+
 			case 'getPortalCode':
 				$this->getPortalCode();
+				break;
+
+			case 'submitPortalCode':
+				$this->submitPortalCode();
 				break;
 
 			case 'getList':
@@ -54,11 +66,16 @@ class EvilPortal extends Module
 			case 'removeFromList':
 				$this->removeFromList();
 				break;
+
+			case 'createNewPortal':
+				$this->handleCreateNewPortal();
+				break;
 		}
 	}
 
 	public function getPortalCode() {
 		$portalName = $this->request->name;
+		$portalFile = $this->request->portalFile;
 		$storage = $this->request->storage;
 
 		if ($storage != "active")
@@ -69,14 +86,47 @@ class EvilPortal extends Module
 		$message = "";
 		$code = "";
 
-		if (file_exists($dir . $portalName)) {
-			$code = file_get_contents($dir . $portalName);
-			$message = $portalName . " is ready for editting.";
+		if (file_exists($dir . $portalName . "/" . $portalFile)) {
+			$code = file_get_contents($dir . $portalName . "/" . $portalFile);
+			$message = $portalFile . " is ready for editting.";
 		} else {
-			$message = "Error finding " . $portalName . ".";
+			$message = "Error finding " . $dir . $portalName . "/" . $portalFile . ".";
 		}
 
 		$this->response = array("message" => $message, "code" => $code);
+
+	}
+
+	public function getPortalFiles() {
+		$portalName = $this->request->name;
+		$storage = $this->request->storage;
+
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+		$allFiles = array();
+		if (file_exists($dir . $portalName)) {
+			$portal_files = scandir($dir . $portalName);
+			foreach($portal_files as $file) {
+				if (is_file($dir . $portalName . "/" . $file) && !$this->endsWith($file, ".ep")) {
+					array_push($allFiles, $file);
+				}
+			}
+		}
+		$this->response = array("portalFiles" => $allFiles);
+	}
+
+	public function deletePortalFile() {
+		$portalName = $this->request->name;
+		$storage = $this->request->stroage;
+		$fileName = $this->request->portalFile;
+
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+		$message = "Unable to delete file.";
+		if (file_exists($dir . $portalName . "/" . $fileName)) {
+			unlink($dir . $portalName . "/" . $fileName);
+			$message = "Successfully deleted " . $dir . $portalName . "/" . $fileName;
+		}
+
+		$this->response = array("deleteMessage" => $message);
 
 	}
 
@@ -84,23 +134,56 @@ class EvilPortal extends Module
 		$portalName = $this->request->name;
 		$storage = $this->request->storage;
 
-		if ($storage != "active")
-			$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
-		else
-			$dir = "/etc/nodogsplash/htdocs/";
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
 
 		$message = "";
+		$portalPath = escapeshellarg($dir . $portalName);
 		if (file_exists($dir . $portalName)) {
-			unlink("/etc/nodogsplash/htdocs/splash.html");
-			$portalName = escapeshellarg($portalName);
-			exec("ln -s " . $dir . $portalName . " /etc/nodogsplash/htdocs/splash.html");
+			$portal_files = scandir($dir . $portalName);
+			foreach($portal_files as $file) {
+				if (file_exists("/www/{$file}"))
+					rename("/www/{$file}", "/www/{$file}.ep_backup");
+				exec("ln -s {$portalPath}/{$file} /www/{$file}");
+			}
 			$message = $portalName . " is now active.";
 		} else {
-			$message = "Couldn't find " . $portalName . ".";
+			$message = "Couldn't find " . $portalPath . ".";
 		}
 
 		$this->response = array("message" => $message);
 
+	}
+
+	public function deactivatePortal() {
+		$portalName = $this->request->name;
+		$storage = $this->request->storage;
+
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+
+		$message = "Couldn't find " . $portalName;
+		$deactivateSuccess = false;
+		if (file_exists($dir . $portalName)) {
+			$portal_files = scandir($dir . $portalName);
+			foreach($portal_files as $file) {
+				unlink("/www/{$file}");
+			}
+			$www_files = scandir("/www/");
+			foreach($www_files as $file) {
+				if($this->endsWith($file, ".ep_backup")) {
+					rename("/www/{$file}", "/www/" . str_replace(".ep_backup", "", $file));
+				}
+			}
+			$message = "Deactivated {$portalName}.";
+			$deactivateSuccess = true;
+		}
+
+		$this->response = array("message" => $message, "deactivateSuccess" => $deactivateSuccess);
+
+	}
+
+	/* Credits to SteveRusin at http://php.net/manual/en/ref.strings.php */
+	private function endsWith( $str, $sub ) {
+	   return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
 	}
 
 	public function handleDeletePortal() {
@@ -109,7 +192,7 @@ class EvilPortal extends Module
 
 		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
 
-		unlink($dir . $portalName);
+		exec("rm -rf " . escapeshellarg($dir . $portalName));
 
 		$message = "";
 
@@ -127,19 +210,17 @@ class EvilPortal extends Module
 		$code = $this->request->portalCode;
 		$storage = $this->request->storage;
 		$portalName = $this->request->name;
+		$fileName = $this->request->fileName;
 
-		if ($storage != "active")
-			$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
-		else
-			$dir = "/etc/nodogsplash/htdocs/";
+		$dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
 
 		$message = "";
 
-		if (!file_exists($dir . $portalName)) {
-			file_put_contents($dir . $portalName, $code);
+		if (!file_exists($dir . $portalName . "/" . $fileName)) {
+			file_put_contents($dir . $portalName . "/" . $fileName, $code);
 			$message = "Created " . $portalName;
 		} else {
-			file_put_contents($dir . $portalName, $code);
+			file_put_contents($dir . $portalName . "/" . $fileName, $code);
 			$message = "Updated " . $portalName;
 		}
 		
@@ -158,14 +239,37 @@ class EvilPortal extends Module
 		$root_portals = preg_grep('/^([^.])/', scandir("/root/portals"));
 
 		foreach ($root_portals as $portal) {
-			$obj = array("title" => $portal, "location" => "internal");
-			array_push($all_portals, $obj);
+			if (!is_file($portal)) {
+				$active = (file_exists("/www/{$portal}.ep"));
+				$obj = array("title" => $portal, "location" => "internal", "active" => $active);
+				array_push($all_portals, $obj);
+			}
 		}
 
-		$active = array("title" => "splash.html", "location" => "active");
-		array_push($all_portals, $active);
+		//$active = array("title" => "splash.html", "location" => "active");
+		//$active = array();
+		//array_push($all_portals, $active);
 
 		$this->response = $all_portals;
+	}
+
+	public function handleCreateNewPortal() {
+		$portalName = $this->request->portalName;
+		$portalPath = "/root/portals/";
+		if (!file_exists($portalPath))
+			mkdir($portalPath);
+
+		if (file_exists($portalPath . $portalName)) {
+			$this->response = array("create_success" => false, "create_message" => "A portal named {$portalName} already exists.");
+			return;
+		}
+
+		mkdir($portalPath . $portalName);
+		exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+		file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "DO NOT DELETE THIS");
+
+		$this->response = array("create_success" => true, "create_message" => "Created {$portalName}");
+
 	}
 
 	public function handleEnable() {
@@ -218,7 +322,7 @@ class EvilPortal extends Module
 		file_put_contents($this->CLIENTS_FILE, $allowedClients);
 
 		// Configure other rules
-		exec("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337");
+		exec("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
 		exec("iptables -A INPUT -p tcp --dport 53 -j ACCEPT");
 
 		// Add rule for each allowed client
@@ -254,7 +358,7 @@ class EvilPortal extends Module
 			unlink($this->CLIENTS_FILE);
 		}
 
-		exec("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:1337");
+		exec("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
 		exec("iptables -D INPUT -p tcp --dport 53 -j ACCEPT");
 		exec("iptables -D INPUT -j DROP");
 

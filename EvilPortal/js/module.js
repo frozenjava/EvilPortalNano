@@ -5,13 +5,16 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 
 	$scope.portals = [];
 	$scope.messages = [];
+	$scope.newPortalName = '';
 	$scope.throbber = true;
 	$scope.running = false;
+	$scope.library = true;
 	$scope.whiteList = '';
 	$scope.whiteListInput = '';
 	$scope.accessList = '';
 	$scope.accessListInput = '';
-	$scope.workshopPortal = {name: "", code: "", storage: "internal"};
+	$scope.workshopPortal = {name: "", files: [], storage: "internal"};
+	$scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
 
 	$scope.handleControl = function(control) {
 		control.throbber = true;
@@ -67,19 +70,6 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 		});
 	}
 
-	function getPortals() {
-		$api.request({
-			module: "EvilPortal",
-			action: "portalList"
-		}, function(response) {
-			$scope.portals = [];
-			for (var i = 0; i < response.length; i++) {
-				$scope.portals.unshift({title: response[i].title, storage: response[i].location});
-				console.log({title: response[i].title, storage: response[i].location});
-			}
-		});
-	}
-
 	function updateControls(response) {
 		var running;
 		var autostart;
@@ -112,17 +102,17 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	}
 
 	$scope.createNewPortal = function() {
-		console.log($scope.workshopPortal.name);
-		console.log($scope.workshopPortal.code);
 		$api.request({
 			module: "EvilPortal",
-			action: "submitPortalCode",
-			portalCode: $scope.workshopPortal.code,
-			storage: $scope.workshopPortal.storage,
-			name: $scope.workshopPortal.name
+			action: "createNewPortal",
+			portalName: $scope.newPortalName
 		}, function(response) {
-			$scope.sendMessage("Create New Portal", response.message);
-			getPortals();
+			if (response.create_success) {
+				getPortals();
+				$scope.newPortalName = '';
+			} else {
+				$scope.sendMessage("Error Creating Portal", response.create_message);
+			}
 		});
 	}
 
@@ -148,20 +138,75 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 			name: portal.title
 		}, function(response) {
 			$scope.sendMessage("Activate Portal", response.message);
+			getPortals();
 		});
 	}
 
-	$scope.editPortal = function(portal) {
+	$scope.deactivatePortal = function(portal) {
+		$api.request({
+			module: "EvilPortal",
+			action: "deactivatePortal",
+			storage: portal.storage,
+			name: portal.title
+		}, function(response) {
+			$scope.sendMessage("Deactivate Portal", response.message);
+			getPortals();
+		});
+	}
+
+	$scope.editPortal = function(portal, file) {
 		$api.request({
 			module: "EvilPortal",
 			action: "getPortalCode",
 			storage: portal.storage,
-			name: portal.title
+			name: portal.name,
+			portalFile: file
 		}, function(response) {
 			$scope.sendMessage("Edit Portal", response.message);
-			$scope.workshopPortal.code = response.code;
+			$scope.editPortalFile.code = response.code;
+			$scope.editPortalFile.file = file;
+			$scope.editPortalFile.portalName = portal.name;
+			$scope.editPortalFile.storage = portal.storage;
+		});
+	}
+
+	$scope.savePortalCode = function(editFile) {
+		$api.request({
+			module: "EvilPortal",
+			action: "submitPortalCode",
+			storage: editFile.storage,
+			portalCode: editFile.code,
+			name: editFile.portalName,
+			fileName: editFile.file
+		}, function(response) {
+			$scope.sendMessage("Edit File", response.message);
+		});
+	}
+
+	$scope.getPortalFiles = function(portal) {
+		$api.request({
+			module: "EvilPortal",
+			action: "portalFiles",
+			storage: portal.storage,
+			name: portal.title
+		}, function(response) {
 			$scope.workshopPortal.name = portal.title;
 			$scope.workshopPortal.storage = portal.storage;
+			$scope.workshopPortal.files = response.portalFiles;
+			$scope.library = false;
+		});
+	}
+
+	function getPortals() {
+		$api.request({
+			module: "EvilPortal",
+			action: "portalList"
+		}, function(response) {
+			$scope.portals = [];
+			for (var i = 0; i < response.length; i++) {
+				$scope.portals.unshift({title: response[i].title, storage: response[i].location, active: response[i].active});
+				console.log({title: response[i].title, storage: response[i].location, active: response[i].active});
+			}
 		});
 	}
 

@@ -7,10 +7,7 @@ class API
 
     public function __construct()
     {
-        $this->request = @json_decode(file_get_contents('php://input'));
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->error = 'Invalid JSON';
-        }
+        $this->request = (object)$_POST;
     }
 
     public function route()

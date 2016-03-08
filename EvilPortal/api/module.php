@@ -139,6 +139,7 @@ class EvilPortal extends Module
 		$message = "";
 		$portalPath = escapeshellarg($dir . $portalName);
 		if (file_exists($dir . $portalName)) {
+			exec("ln -s /pineapple/modules/EvilPortal/includes/api /www/evilportal");
 			$portal_files = scandir($dir . $portalName);
 			foreach($portal_files as $file) {
 				if (file_exists("/www/{$file}"))
@@ -316,6 +317,7 @@ class EvilPortal extends Module
 
 		// Enable forwarding. It should already be enabled on the pineapple but do it anyways just to be safe
 		exec("echo 1 > /proc/sys/net/ipv4/ip_forward");
+		exec("ln -s /pineapple/modules/EvilPortal/includes/api /www/evilportal");
 
 		// Insert allowed clients into tracking file
 		$allowedClients = file_get_contents($this->ALLOWED_FILE);

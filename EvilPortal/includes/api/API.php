@@ -45,6 +45,5 @@ class API
     public function go()
     {
         $this->route();
-        return $this->finalize();
     }
 }

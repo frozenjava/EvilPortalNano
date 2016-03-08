@@ -5,25 +5,21 @@ class MyPortal extends Portal
 
     public function handleAuthorization()
     {
-        if (isset($this->request->target)) {
-            $this->authorizeClient($_SERVER['REMOTE_ADDR']);
-            $this->showSuccess();
-        } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
-            $this->showSuccess();
-        } else {
-            $this->showError();
-        }
+        // Call parent to handle basic authorization first
+        parent::handleAuthorization();
+
+        // Check for other form data here
     }
 
     public function showSuccess()
     {
-        //Calls default function, override here
+        // Calls default success message
         parent::showSuccess();
     }
 
     public function showError()
     {
-        //Calls default function, override here
+        // Calls default error message
         parent::showError();
     }
 }

@@ -211,7 +211,7 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 	}
 
 	$scope.refreshLivePreview = function() {
-		window.frames['livePreviewIframe'].src = "http://172.16.42.1:2050";
+		window.frames['livePreviewIframe'].src = "http://172.16.42.1";
 	}
 
 	$scope.getList = function(listToGet) {

@@ -74,7 +74,7 @@
 											<td class="text-muted"><i>{{ portal.storage }}</i></td>
 											<td ng-hide="portal.active"><a href="javascript:;" ng-click="activatePortal(portal)" >Activate</a></td>
 											<td ng-show="portal.active"><a href="javascript:;" ng-click="deactivatePortal(portal)">Deactivate</a></td>
-											<td><a href="javascript:;" ng-click="deletePortal(portal)" ng-hide="portal.storage == 'active'">Delete</a></td>
+											<td ng-hide="portal.active"><a href="javascript:;" ng-click="deletePortal(portal)" ng-hide="portal.storage == 'active'">Delete</a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -177,10 +177,9 @@
 				<div id="collapseChangelog" class="panel-collapse collapse">
 					<div class="panel-body">
 						<ul>
-							<li><b>1.1</b></li>
+							<li><b>2.0</b></li>
 							<ul>
-								<li class="text-muted">Captive Portal is purely iptables</li>
-								<li class="text-muted">No more NoDogSplash</li>
+								<li class="text-muted">Captive Portal is now purely iptables (because F*** NoDogSplash)</li>
 							</ul>
 						</ul>
 						<ul>

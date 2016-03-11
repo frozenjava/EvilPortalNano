@@ -1,9 +1,8 @@
 # EvilPortalNano
 Evil Portal for the new pineapple interface
 
-### Version 1.1
-* Fixed NoDogSplash Configuration Issue
-* Made panels look more consistant with the rest of the UI
+### Version 2.0
+* Captive Portal is now purely iptables (because F*** NoDogSplash)
 
 ### Version 1.0
 * Install/Remove NoDogSplash

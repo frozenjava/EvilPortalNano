@@ -91,13 +91,13 @@ registerController("EvilPortalController", ['$api', '$scope', function($api, $sc
 			status: running,
 			visible: true,
 			throbber: false
-		},
+		}/*,
 		{
 			title: "Auto Start",
 			status: autostart,
 			visible: true,
 			throbber: false
-		}];
+		}*/];
 		$scope.throbber = false;
 	}
 

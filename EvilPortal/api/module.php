@@ -354,7 +354,7 @@ class EvilPortal extends Module
         }
 
         // Drop everything else
-        exec("iptables -A INPUT -j DROP");
+        exec("iptables -I INPUT -p tcp --dport 443 -j DROP");
 
         return $this->checkCaptivePortalRunning();
 

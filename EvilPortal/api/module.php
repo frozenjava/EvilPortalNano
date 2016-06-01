@@ -6,6 +6,7 @@ class EvilPortal extends Module
     // CONSTANTS
     private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
     private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
+
     // CONSTANTS
 
     public function route()
@@ -192,7 +193,7 @@ class EvilPortal extends Module
     /* Credits to SteveRusin at http://php.net/manual/en/ref.strings.php */
     private function endsWith($str, $sub)
     {
-        return (substr($str, strlen($str) - strlen($sub)) === $sub );
+        return (substr($str, strlen($str) - strlen($sub)) === $sub);
     }
 
     public function handleDeletePortal()
@@ -234,11 +235,11 @@ class EvilPortal extends Module
             file_put_contents($dir . $portalName . "/" . $fileName, $code);
             $message = "Updated " . $portalName;
         }
-        
+
 
         $this->response = array(
-                "message" => $message
-            );
+            "message" => $message
+        );
 
     }
 
@@ -300,9 +301,9 @@ class EvilPortal extends Module
             }
 
             $response_array = array(
-                    "control_success" => $enabled,
-                    "control_message" => $message
-                );
+                "control_success" => $enabled,
+                "control_message" => $message
+            );
 
         } else {
             exec("/etc/init.d/nodogsplash disable");
@@ -314,9 +315,9 @@ class EvilPortal extends Module
             }
 
             $response_array = array(
-                    "control_success" => $enabled,
-                    "control_message" => $message
-                );
+                "control_success" => $enabled,
+                "control_message" => $message
+            );
         }
         $this->response = $response_array;
     }
@@ -417,9 +418,9 @@ class EvilPortal extends Module
             }
 
             $response_array = array(
-                    "control_success" => $running,
-                    "control_message" => $message
-                );
+                "control_success" => $running,
+                "control_message" => $message
+            );
         }
 
         $this->response = $response_array;
@@ -452,10 +453,10 @@ class EvilPortal extends Module
 
         if ($contents != null) {
             $response_array = array(
-                    "list_success" => true,
-                    "list_contents" => $contents,
-                    "list_message" => $message
-                );
+                "list_success" => true,
+                "list_contents" => $contents,
+                "list_message" => $message
+            );
         } else {
             $response_array = array("list_success" => false, "list_contents" => "", "list_message" => $message);
         }
@@ -486,7 +487,7 @@ class EvilPortal extends Module
         } else {
             $this->response = array("add_success" => false, "add_message" => "Invalid IP Address.");
         }
-        
+
     }
 
     public function removeFromList()
@@ -522,10 +523,10 @@ class EvilPortal extends Module
     public function getControlValues()
     {
         $this->response = array(
-                //"dependencies" => true,
-                "running" => $this->checkCaptivePortalRunning(),
-                "autostart" => $this->checkAutoStart()
-            );
+            //"dependencies" => true,
+            "running" => $this->checkCaptivePortalRunning(),
+            "autostart" => $this->checkAutoStart()
+        );
     }
 
     public function checkAutoStart()

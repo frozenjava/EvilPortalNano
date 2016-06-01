@@ -1,3 +1,5 @@
 .DS_Store
 EvilPortal/.DS_Store
 EvilPortal/sftp-config.json
+/EvilPortal.tar.gz
+/sftp-config.json

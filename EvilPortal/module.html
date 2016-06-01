@@ -138,6 +138,9 @@
                 </div>
                 <div id="collapseWhiteList" class="panel-collapse collapse">
                     <div class="panel-body">
+                        <p class="text-muted">
+                            <i>This is a list of clients who are allowed to connect to the internet without ever viewing the captive portal.</i>
+                        </p>
                         <p>
                             <textarea class="form-control" rows="15" ng-model="whiteList" readonly></textarea>
                         </p>
@@ -164,10 +167,13 @@
                 </div>
                 <div id="collapseAuthorizedClients" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <p>
+                        <p class="text-muted" ng-show="running">
+                            <i>This is a list of clients who have been authorized through the captive portal.</i>
+                        </p>
+                        <p ng-show="running">
                             <textarea class="form-control" rows="15" ng-model="accessList" readonly></textarea>
                         </p>
-                        <div class="input-group">
+                        <div class="input-group" ng-show="running">
                             <input type="text" class="form-control" placeholder="IP Address" name="ipaddress"
                                    ng-model="accessListInput">
 		                    <span class="input-group-btn">
@@ -175,6 +181,9 @@
                                         ng-click="authorizeClient()">Authorize</button>
 		                        <button class="btn btn-default" type="button" ng-click="revokeClient()">Revoke</button>
 		                    </span>
+                        </div>
+                        <div ng-hide="running">
+                            <p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
                         </div>
                     </div>
                 </div>

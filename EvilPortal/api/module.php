@@ -443,7 +443,7 @@ class EvilPortal extends Module
 
             case "accessList":
                 if (!file_exists($this->CLIENTS_FILE)) {
-                    $message = "Authorized Clients file doesnt exist. Is Evil Portal running?";
+                    $contents = "No Authorized Clients.";
                 } else {
                     $contents = file_get_contents($this->CLIENTS_FILE);
                     $contents = ($contents == null) ? "No Authorized Clients." : $contents;

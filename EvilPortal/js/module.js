@@ -137,7 +137,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             storage: portal.storage,
             name: portal.title
         }, function (response) {
-            $scope.sendMessage("Activate Portal", response.message);
+            //$scope.sendMessage("Activate Portal", response.message);
             getPortals();
         });
     };
@@ -149,7 +149,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             storage: portal.storage,
             name: portal.title
         }, function (response) {
-            $scope.sendMessage("Deactivate Portal", response.message);
+            //$scope.sendMessage("Deactivate Portal", response.message);
             getPortals();
         });
     };
@@ -162,7 +162,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             name: portal.name,
             portalFile: file
         }, function (response) {
-            $scope.sendMessage("Edit Portal", response.message);
+            //$scope.sendMessage("Edit Portal", response.message);
             $scope.editPortalFile.code = response.code;
             $scope.editPortalFile.file = file;
             $scope.editPortalFile.portalName = portal.name;
@@ -209,7 +209,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                     storage: response[i].location,
                     active: response[i].active
                 });
-                console.log({title: response[i].title, storage: response[i].location, active: response[i].active});
+                //console.log({title: response[i].title, storage: response[i].location, active: response[i].active});
             }
         });
     }

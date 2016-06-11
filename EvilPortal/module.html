@@ -64,7 +64,7 @@
                             <input type="text" class="form-control" placeholder="PortalName" name="portalName"
                                    ng-model="newPortalName">
 		                    <span class="input-group-btn">
-		                        <button class="btn btn-default" type="button" ng-click="createNewPortal()">Create New Portal</button>
+		                        <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal()">Create New Portal</button>
 		                    </span>
                         </div>
                         <hr ng-show="library"/>

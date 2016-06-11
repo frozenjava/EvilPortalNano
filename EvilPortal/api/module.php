@@ -226,17 +226,9 @@ class EvilPortal extends Module
 
         $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
 
-        $message = "";
-
-        if (!file_exists($dir . $portalName . "/" . $fileName)) {
-            file_put_contents($dir . $portalName . "/" . $fileName, $code);
-            $message = "Created " . $portalName;
-        } else {
-            file_put_contents($dir . $portalName . "/" . $fileName, $code);
-            $message = "Updated " . $portalName;
-        }
-
-
+        file_put_contents($dir . $portalName . "/" . $fileName, $code);
+        $message = (!file_exists($dir . $portalName . "/" . $fileName)) ? "Created " . $portalName : "Updated " . $portalName;
+        
         $this->response = array(
             "message" => $message
         );
@@ -269,7 +261,7 @@ class EvilPortal extends Module
 
     public function handleCreateNewPortal()
     {
-        $portalName = $this->request->portalName;
+        $portalName = str_replace(' ', '_', $this->request->portalName);
         $portalPath = "/root/portals/";
         if (!file_exists($portalPath)) {
             mkdir($portalPath);

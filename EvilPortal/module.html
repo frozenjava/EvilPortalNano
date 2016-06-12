@@ -88,8 +88,9 @@
                                         <td ng-show="portal.active"><a href="javascript:;"
                                                                        ng-click="deactivatePortal(portal)">Deactivate</a>
                                         </td>
-                                        <td ng-hide="portal.active"><a href="javascript:;"
-                                                                       ng-click="deletePortal(portal)"
+                                        <td ng-hide="portal.active"><a href="javascript:;" data-toggle="modal"
+                                                                       data-target="#deleteModal"
+                                                                       ng-click="deletePortalRequest(portal)"
                                                                        ng-hide="portal.storage == 'active'">Delete</a>
                                         </td>
                                     </tr>
@@ -298,6 +299,30 @@
                     <button type="button" class="btn btn-default pull-right" data-dismiss="modal"
                             ng-click="editPortalFile = {}">Cancel
                     </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Delete file Modal -->
+    <div id="deleteModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">&times;</button>
+                    <h4 class="modal-title">Delete Portal {{ portalToDelete.title }}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to delete {{ portalToDelete.title }} on {{ portalToDelete.storage }} storage. Once you do this it can not be undone.</p>
+                    <p><b>Type the name of the portal you are trying to delete to continue.</b></p>
+                    <input type="text" class="form-control" placeholder="PortalName" name="portalName" ng-model="portalDeleteValidation">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">Cancel</button>
+                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(portalToDelete)" ng-disabled="portalDeleteValidation != portalToDelete.title">Delete</button>
                 </div>
             </div>
         </div>

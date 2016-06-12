@@ -4,6 +4,8 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     getPortals();
 
     $scope.portals = [];
+    $scope.portalToDelete = null;
+    $scope.portalDeleteValidation = '';
     $scope.messages = [];
     $scope.newPortalName = '';
     $scope.throbber = true;
@@ -116,9 +118,16 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    $scope.deletePortalRequest = function(portal) {
+        $scope.portalToDelete = portal;
+        console.log(portal);
+    };
+
     $scope.deletePortal = function (portal) {
         console.log(portal.storage);
         console.log(portal.title);
+        $scope.portalToDelete = null;
+        $scope.portalDeleteValidation = null
         $api.request({
             module: "EvilPortal",
             action: "deletePortal",

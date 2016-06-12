@@ -284,12 +284,15 @@ class EvilPortal extends Module
     {
         $response_array = array();
         if (!$this->checkAutoStart()) {
-            exec("/etc/init.d/firewall disable");
+            //exec("/etc/init.d/firewall disable");
             //exec("/etc/init.d/nodogsplash enable");
+            copy("/pineapple/modules/EvilPortal/includes/evilportal.sh", "/etc/init.d/evilportal");
+            chmod("/etc/init.d/evilportal", 0755);
+            exec("/etc/init.d/evilportal enable");
             $enabled = $this->checkAutoStart();
-            $message = "NoDogSplash is now enabled on startup.";
+            $message = "EvilPortal is now enabled on startup.";
             if (!$enabled) {
-                $message = "Error enabling NoDogSplash on startup.";
+                $message = "Error enabling EvilPortal on startup.";
             }
 
             $response_array = array(
@@ -298,12 +301,12 @@ class EvilPortal extends Module
             );
 
         } else {
-            exec("/etc/init.d/nodogsplash disable");
+            exec("/etc/init.d/evilportal disable");
             //exec("/etc/init.d/firewall enable");
             $enabled = !$this->checkAutoStart();
-            $message = "NoDogSplash now disabled on startup.";
+            $message = "EvilPortal now disabled on startup.";
             if (!$enabled) {
-                $message = "Error disabling NoDogSplash on startup.";
+                $message = "Error disabling EvilPortal on startup.";
             }
 
             $response_array = array(
@@ -523,19 +526,11 @@ class EvilPortal extends Module
 
     public function checkAutoStart()
     {
-        if (exec("ls /etc/rc.d/ | grep nodogsplash") == '') {
+        if (exec("ls /etc/rc.d/ | grep evilportal") == '') {
             return false;
         } else {
             return true;
         }
     }
 
-    public function checkRunning()
-    {
-        if (exec("ps | grep -v grep | grep -o nodogsplash") == '') {
-            return false;
-        } else {
-            return true;
-        }
-    }
 }

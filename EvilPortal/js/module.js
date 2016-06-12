@@ -29,7 +29,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 }, function (response) {
                     getControls();
                     control.throbber = false;
-                    $scope.sendMessage(control.title, response.control_message);
+                    if (!response.control_success) {
+                        $scope.sendMessage(control.title, response.control_message);
+                    }
                     $scope.refreshLivePreview()
                 });
                 break;
@@ -41,7 +43,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 }, function (response) {
                     getControls();
                     control.throbber = false;
-                    $scope.sendMessage(control.title, response.control_message);
+                    if (!response.control_success) {
+                        $scope.sendMessage(control.title, response.control_message);
+                    }
                 });
                 break;
         }
@@ -93,13 +97,13 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 status: running,
                 visible: true,
                 throbber: false
-            }/*,
+            },
              {
              title: "Auto Start",
              status: autostart,
              visible: true,
              throbber: false
-             }*/];
+             }];
         $scope.throbber = false;
     }
 

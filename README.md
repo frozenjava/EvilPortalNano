@@ -7,11 +7,11 @@ Evil Portal is a captive portal module for the Wifi Pineapple. This is the repos
 * Create auto-start functionality
 * Figure out how to redirect clients going to HTTPS sites
 * Create portal templates for users to choose from
-* Make tab key indent in the editor instead of change elements
-* Add confirmation dialogue box when deleting a portal
 
 ### Done
 * Remove un-needed verbosity
+* Make tab key indent in the editor instead of change elements
+* Add confirmation dialogue box when deleting a portal
 
 ## Release History
 

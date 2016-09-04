@@ -6,6 +6,9 @@ require_once('helper.php');
 <HTML>
     <HEAD>
         <title>Evil Portal</title>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
         <script type="text/javascript">
             function redirect() { setTimeout(function(){window.location = "/captiveportal/index.php";},100);} 
         </script>

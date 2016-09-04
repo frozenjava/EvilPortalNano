@@ -1,5 +1,6 @@
 <?php
 $destination = "http://". $_SERVER['HTTP_HOST'] . $_SERVER['HTTP_URI'] . "";
+require_once('helper.php');
 ?>
 
 <HTML>
@@ -13,7 +14,10 @@ $destination = "http://". $_SERVER['HTTP_HOST'] . $_SERVER['HTTP_URI'] . "";
     <BODY>
         <center>
             <h1>Evil Portal</h1>
-            <p>This is the default Evil Portal page</p>
+            <p>This is the default Evil Portal page.</p>
+            <p>The SSID you are connected to is <?=getClientSSID($_SERVER['REMOTE_ADDR']);?></p>
+            <p>Your MAC Address is <?=getClientMac($_SERVER['REMOTE_ADDR']);?></p>
+            <p>Your internal IP address is <?=$_SERVER['REMOTE_ADDR'];?></p>
 
             <form method="POST" action="/captiveportal/index.php" onsubmit="redirect()">
                 <input type="hidden" name="target" value="<?=$destination?>">

@@ -6,6 +6,10 @@ Evil Portal is a captive portal module for the Wifi Pineapple. This is the repos
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
 * Create portal templates for users to choose from
+* Get SSID of connected client by IP address
+* Add ability to route clients to different portals based upon some identifier [ssid, mac vender, ip, etc...]
+
+### DONE
 
 ## Release History
 

@@ -1,5 +1,5 @@
 <?php
-$destination = "http://". $_SERVER['HTTP_HOST'] . $_SERVER['HTTP_URI'] . "";
+$destination = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['HTTP_URI'] . "";
 require_once('helper.php');
 ?>
 
@@ -15,10 +15,11 @@ require_once('helper.php');
     </HEAD>
 
     <BODY>
-        <center>
+        <div style="text-align: center;">
             <h1>Evil Portal</h1>
             <p>This is the default Evil Portal page.</p>
             <p>The SSID you are connected to is <?=getClientSSID($_SERVER['REMOTE_ADDR']);?></p>
+            <p>Your host name is <?=getClientHostName($_SERVER['REMOTE_ADDR']);?></p>
             <p>Your MAC Address is <?=getClientMac($_SERVER['REMOTE_ADDR']);?></p>
             <p>Your internal IP address is <?=$_SERVER['REMOTE_ADDR'];?></p>
 
@@ -27,7 +28,7 @@ require_once('helper.php');
                 <button type="submit">Authorize</button>
             </form>
 
-        </center>
+        </div>
 
     </BODY>
 

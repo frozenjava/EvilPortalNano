@@ -61,11 +61,19 @@
                 <div id="collapseLibrary" class="panel-collapse collapse in">
                     <div class="panel-body">
                         <div class="input-group" ng-show="library">
-                            <input type="text" class="form-control" placeholder="PortalName" name="portalName"
-                                   ng-model="newPortalName">
-		                    <span class="input-group-btn">
-		                        <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal()">Create New Portal</button>
-		                    </span>
+
+                            <span class="input-group-btn">
+                                <select class="form-control" style="width:80px" ng-model="newPortalType">
+                                    <option value="basic">Basic</option>
+                                    <option value="targeted">Targeted</option>
+                                </select>
+                            </span>
+
+                            <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortalName">
+
+                            <span class="input-group-btn">
+                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal()">Create New Portal</button>
+                            </span>
                         </div>
                         <hr ng-show="library"/>
                         <div ng-show="portals.length > 0 && library == true">

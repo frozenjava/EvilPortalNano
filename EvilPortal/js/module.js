@@ -8,6 +8,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.portalDeleteValidation = '';
     $scope.messages = [];
     $scope.newPortalName = '';
+    $scope.newPortalType = 'basic';
     $scope.throbber = true;
     $scope.running = false;
     $scope.library = true;
@@ -111,11 +112,13 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         $api.request({
             module: "EvilPortal",
             action: "createNewPortal",
-            portalName: $scope.newPortalName
+            portalName: $scope.newPortalName,
+            portalType: $scope.newPortalType
         }, function (response) {
             if (response.create_success) {
                 getPortals();
                 $scope.newPortalName = '';
+                $scope.newPortalType = 'basic';
             } else {
                 $scope.sendMessage("Error Creating Portal", response.create_message);
             }

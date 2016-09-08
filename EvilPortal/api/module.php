@@ -262,6 +262,7 @@ class EvilPortal extends Module
     public function handleCreateNewPortal()
     {
         $portalName = str_replace(' ', '_', $this->request->portalName);
+        $portalType = $this->request->portalType;
         $portalPath = "/root/portals/";
         if (!file_exists($portalPath)) {
             mkdir($portalPath);
@@ -273,7 +274,16 @@ class EvilPortal extends Module
         }
 
         mkdir($portalPath . $portalName);
-        exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+
+        switch ($portalType) {
+            case 'basic':
+                exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+                break;
+            case 'targeted':
+                exec("cp /pineapple/modules/EvilPortal/includes/routed_skeleton/* {$portalPath}{$portalName}/");
+                break;
+        }
+
         file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "DO NOT DELETE THIS");
 
         $this->response = array("create_success" => true, "create_message" => "Created {$portalName}");

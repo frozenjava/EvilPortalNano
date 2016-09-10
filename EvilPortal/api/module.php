@@ -280,7 +280,7 @@ class EvilPortal extends Module
                 exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
                 break;
             case 'targeted':
-                exec("cp /pineapple/modules/EvilPortal/includes/routed_skeleton/* {$portalPath}{$portalName}/");
+                exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
                 break;
         }
 

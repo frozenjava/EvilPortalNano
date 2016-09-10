@@ -223,7 +223,8 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 $scope.portals.unshift({
                     title: response[i].title,
                     storage: response[i].location,
-                    active: response[i].active
+                    active: response[i].active,
+                    type: response[i].type
                 });
                 //console.log({title: response[i].title, storage: response[i].location, active: response[i].active});
             }

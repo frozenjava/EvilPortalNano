@@ -81,6 +81,7 @@
                                 <table class="table table-striped" align="center">
                                     <thead>
                                     <th>Portal Name</th>
+                                    <th>Portal Type</th>
                                     <th>Location</th>
                                     <th>Activate</th>
                                     <th>Delete</th>
@@ -89,6 +90,7 @@
                                     <tr ng-repeat="portal in portals">
                                         <td><a href="javascript:;" ng-click="getPortalFiles(portal)"><b>{{ portal.title
                                             }}</b></a></td>
+                                        <td class="text-muted"><i>{{ portal.type }}</i></td>
                                         <td class="text-muted"><i>{{ portal.storage }}</i></td>
                                         <td ng-hide="portal.active"><a href="javascript:;"
                                                                        ng-click="activatePortal(portal)">Activate</a>

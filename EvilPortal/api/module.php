@@ -247,7 +247,8 @@ class EvilPortal extends Module
         foreach ($root_portals as $portal) {
             if (!is_file($portal)) {
                 $active = (file_exists("/www/{$portal}.ep"));
-                $obj = array("title" => $portal, "location" => "internal", "active" => $active);
+                $portalType = (trim(file_get_contents("/root/portals/" . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                $obj = array("title" => $portal, "location" => "internal", "active" => $active, "type" => $portalType);
                 array_push($all_portals, $obj);
             }
         }
@@ -278,13 +279,13 @@ class EvilPortal extends Module
         switch ($portalType) {
             case 'basic':
                 exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "basic");
                 break;
             case 'targeted':
                 exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
+                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "targeted");
                 break;
         }
-
-        file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "DO NOT DELETE THIS");
 
         $this->response = array("create_success" => true, "create_message" => "Created {$portalName}");
 

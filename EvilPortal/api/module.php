@@ -107,11 +107,31 @@ class EvilPortal extends Module
 
         $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
         $allFiles = array();
+        $nonDeletableBasicFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js");
+        $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php", "route.json");
         if (file_exists($dir . $portalName)) {
             $portal_files = scandir($dir . $portalName);
+            $targeted = (file_get_contents($dir . $portalName . "/" . $portalName . ".ep") == "targeted") ? true : false;
             foreach ($portal_files as $file) {
                 if (is_file($dir . $portalName . "/" . $file) && !$this->endsWith($file, ".ep")) {
-                    array_push($allFiles, $file);
+                    if ($targeted) {
+                        if (in_array($file, $nonDeletableTargetedFiles)) {
+                            $a = array("name" => $file, "deletable" => false);
+                            array_push($allFiles, $a);
+                        } else {
+                            $a = array("name" => $file, "deletable" => true);
+                            array_push($allFiles, $a);
+                        }
+                    } else {
+                        if (in_array($file, $nonDeletableBasicFiles)) {
+                            $a = array("name" => $file, "deletable" => false);
+                            array_push($allFiles, $a);
+                        } else {
+                            $a = array("name" => $file, "deletable" => true);
+                            array_push($allFiles, $a);
+                        }
+                    }
+                    //array_push($allFiles, $file);
                 }
             }
         }
@@ -120,18 +140,18 @@ class EvilPortal extends Module
 
     public function deletePortalFile()
     {
-        $portalName = $this->request->name;
+        $portalName = $this->request->portal;
         $storage = $this->request->stroage;
-        $fileName = $this->request->portalFile;
+        $fileName = $this->request->name;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = ($storage == "sd") ? "/sd/portals/" : "/root/portals/";
         $message = "Unable to delete file.";
         if (file_exists($dir . $portalName . "/" . $fileName)) {
             unlink($dir . $portalName . "/" . $fileName);
-            $message = "Successfully deleted " . $dir . $portalName . "/" . $fileName;
+            $message = "Successfully deleted " . $fileName;
         }
 
-        $this->response = array("deleteMessage" => $message);
+        $this->response = array("message" => $message);
 
     }
 
@@ -226,11 +246,12 @@ class EvilPortal extends Module
 
         $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
 
-        file_put_contents($dir . $portalName . "/" . $fileName, $code);
         $message = (!file_exists($dir . $portalName . "/" . $fileName)) ? "Created " . $portalName : "Updated " . $portalName;
+        file_put_contents($dir . $portalName . "/" . $fileName, $code);
         
         $this->response = array(
-            "message" => $message
+            "message" => $message,
+            "fullPath" => $dir . $portalName . "/" . $fileName
         );
 
     }
@@ -277,13 +298,14 @@ class EvilPortal extends Module
         mkdir($portalPath . $portalName);
 
         switch ($portalType) {
-            case 'basic':
-                exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
-                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "basic");
-                break;
             case 'targeted':
                 exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
                 file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "targeted");
+                break;
+
+            default:
+                exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "basic");
                 break;
         }
 

@@ -18,6 +18,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.accessListInput = '';
     $scope.workshopPortal = {name: "", files: [], storage: "internal"};
     $scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
+    $scope.deleteFile = {};
 
     $scope.handleControl = function (control) {
         control.throbber = true;
@@ -134,7 +135,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         console.log(portal.storage);
         console.log(portal.title);
         $scope.portalToDelete = null;
-        $scope.portalDeleteValidation = null
+        $scope.portalDeleteValidation = null;
         $api.request({
             module: "EvilPortal",
             action: "deletePortal",
@@ -143,6 +144,23 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         }, function (response) {
             $scope.sendMessage("Delete Portal", response.message);
             getPortals();
+        });
+    };
+
+    $scope.requestDeleteFile = function(file, portal) {
+        $scope.deleteFile = {name: file, portal: portal.title, storage: portal.storage};
+    };
+
+    $scope.sendDeleteFile = function() {
+        $api.request({
+            module: "EvilPortal",
+            action: "deletePortalFile",
+            portal: $scope.deleteFile.portal,
+            storage: $scope.deleteFile.storage,
+            name: $scope.deleteFile.name
+        }, function(response) {
+            $scope.sendMessage("Delete File", response.message);
+            $scope.getPortalFiles($scope.workshopPortal);
         });
     };
 
@@ -175,14 +193,14 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             module: "EvilPortal",
             action: "getPortalCode",
             storage: portal.storage,
-            name: portal.name,
+            name: portal.title,
             portalFile: file
         }, function (response) {
-            //$scope.sendMessage("Edit Portal", response.message);
             $scope.editPortalFile.code = response.code;
             $scope.editPortalFile.file = file;
-            $scope.editPortalFile.portalName = portal.name;
+            $scope.editPortalFile.portalName = portal.title;
             $scope.editPortalFile.storage = portal.storage;
+            $scope.editPortalFile.updating = true;
         });
     };
 
@@ -195,7 +213,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             name: editFile.portalName,
             fileName: editFile.file
         }, function (response) {
+            $scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
             $scope.sendMessage("Edit File", response.message);
+            $scope.getPortalFiles($scope.workshopPortal);
         });
     };
 
@@ -206,8 +226,10 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             storage: portal.storage,
             name: portal.title
         }, function (response) {
-            $scope.workshopPortal.name = portal.title;
+            console.log(response);
+            $scope.workshopPortal.title = portal.title;
             $scope.workshopPortal.storage = portal.storage;
+            $scope.workshopPortal.type = portal.type;
             $scope.workshopPortal.files = response.portalFiles;
             $scope.library = false;
         });

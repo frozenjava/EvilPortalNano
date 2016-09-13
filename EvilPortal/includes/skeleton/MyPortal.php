@@ -5,10 +5,11 @@ class MyPortal extends Portal
 
     public function handleAuthorization()
     {
+        // handle form input or other extra things there
+
         // Call parent to handle basic authorization first
         parent::handleAuthorization();
 
-        // Check for other form data here
     }
 
     public function showSuccess()

@@ -6,6 +6,7 @@ class EvilPortal extends Module
     // CONSTANTS
     private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
     private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
+    private $STORAGE_LOCATIONS = array("sd" => "/sd/portals/", "internal" => "/root/portals/");
 
     // CONSTANTS
 
@@ -70,6 +71,10 @@ class EvilPortal extends Module
 
             case 'createNewPortal':
                 $this->handleCreateNewPortal();
+                break;
+
+            case 'getPortalRules':
+                $this->getPortalRules();
                 break;
         }
     }
@@ -253,6 +258,31 @@ class EvilPortal extends Module
             "message" => $message,
             "fullPath" => $dir . $portalName . "/" . $fileName
         );
+
+    }
+
+    public function getPortalRules()
+    {
+        $portalName = $this->request->name;
+        $path = $this->STORAGE_LOCATIONS[$this->request->storage];
+
+        if ($path == null) {
+            $this->response = array("message" => "Invalid portal storage", "success" => false);
+            return;
+        }
+
+        if (is_file($path . $portalName . '/route.json')) {
+            $file_contents = json_decode(file_get_contents($path . $portalName . '/route.json'), true);
+            $this->response = array(
+                "message" => "Found portal rules",
+                "data" => $file_contents,
+                "success" => true
+            );
+            return;
+        } else {
+            $this->response = array("message" => "Unable to find portal.", "success" => false);
+            return;
+        }
 
     }
 

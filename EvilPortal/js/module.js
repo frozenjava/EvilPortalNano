@@ -19,6 +19,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.workshopPortal = {name: "", files: [], storage: "internal"};
     $scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
     $scope.deleteFile = {};
+    $scope.portalRules = {};
 
     $scope.handleControl = function (control) {
         control.throbber = true;
@@ -234,6 +235,44 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             $scope.library = false;
         });
     };
+
+    $scope.getPortalRules = function(portal) {
+        $api.request({
+            module: "EvilPortal",
+            "action": "getPortalRules",
+            storage: portal.storage,
+            name: portal.title
+        }, function(response) {
+            console.log(response);
+            if (response.success) {
+                $scope.portalRules = response.data;
+            } else {
+                $scope.sendMessage("Error", response.message)
+            }
+        });
+    };
+
+    $scope.removePortalRule = function(rule, specifier, key, value) {
+        $scope.portalRules.rules[rule][specifier].push({key: value});
+        console.log($scope.portalRules.rules[rule][specifier]);
+    };
+
+    $scope.newPortalRule = function(rule, specifier) {
+        $scope.portalRules.rules[rule][specifier][''] = '';
+        console.log($scope.portalRules.rules);
+    };
+
+    $scope.commitPortalRule = function (rule, specifier, key, value) {
+        var original_key = document.getElementById(key).value;
+        console.log(original_key);
+        delete $scope.portalRules.rules[rule][specifier][original_key];
+
+        $scope.portalRules.rules[rule][specifier][key] = value;
+
+        console.log($scope.portalRules.rules[rule][specifier]);
+    };
+
+
 
     function getPortals() {
         $api.request({

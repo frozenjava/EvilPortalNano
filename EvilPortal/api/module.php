@@ -76,6 +76,10 @@ class EvilPortal extends Module
             case 'getPortalRules':
                 $this->getPortalRules();
                 break;
+
+            case 'savePortalRules':
+                $this->savePortalRules();
+                break;
         }
     }
 
@@ -276,6 +280,31 @@ class EvilPortal extends Module
             $this->response = array(
                 "message" => "Found portal rules",
                 "data" => $file_contents,
+                "success" => true
+            );
+            return;
+        } else {
+            $this->response = array("message" => "Unable to find portal.", "success" => false);
+            return;
+        }
+
+    }
+
+    public function savePortalRules()
+    {
+        $portalName = $this->request->portal;
+        $path = $this->STORAGE_LOCATIONS[$this->request->storage];
+        $rules = $this->request->rules;
+
+        if ($path == null) {
+            $this->response = array("message" => "Invalid portal storage", "success" => false);
+            return;
+        }
+
+        if (is_file($path . $portalName . '/route.json')) {
+            file_put_contents($path . $portalName . '/route.json', $rules);
+            $this->response = array(
+                "message" => "Saved portal rules",
                 "success" => true
             );
             return;

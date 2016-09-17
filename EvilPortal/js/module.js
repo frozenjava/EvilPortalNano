@@ -20,6 +20,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
     $scope.deleteFile = {};
     $scope.portalRules = {};
+    $scope.workingPortalRules = {};
 
     $scope.handleControl = function (control) {
         control.throbber = true;
@@ -246,33 +247,91 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             console.log(response);
             if (response.success) {
                 $scope.portalRules = response.data;
+                $scope.workingPortalRules = {"rules": {}};
+
+                // welcome to the realm of loops. I will be your guide
+                // We have to turn each rule into a keyed set of rules with a rule index represented by var index
+                // this is because we need a constant key for each rule when editing on the web interface
+                // the index must be removed later before savign the results to the routes.json file
+                // if you have a better way to do this you are my hero. Email me n3rdcav3@gmail.com or fork the repo :)
+
+                // This first loop loops over each rule categories such as "mac", "ssid" and so on
+                for (var key in response.data['rules']) {
+                    // we then create the a object with that key name in our workingData object
+                    $scope.workingPortalRules['rules'][key] = {};
+                    // Now its time to loop over each category specifier such as "exact" and "regex"
+                    for (var specifier in response.data['rules'][key]) {
+                        var index = 0;
+                        // We then create that specifier in our workingData
+                        $scope.workingPortalRules['rules'][key][specifier] = {};
+                        // finally we loop over the specific rules defined in the specifier
+                        for (var r in response.data['rules'][key][specifier]) {
+                            var obj = {};
+                            obj[r] = response.data['rules'][key][specifier][r];
+                            $scope.workingPortalRules['rules'][key][specifier][index] = obj;
+                        }
+                        // increment index
+                        index++;
+                    }
+                }
+                console.log($scope.workingPortalRules);
             } else {
                 $scope.sendMessage("Error", response.message)
             }
         });
     };
 
-    $scope.removePortalRule = function(rule, specifier, key, value) {
-        $scope.portalRules.rules[rule][specifier].push({key: value});
-        console.log($scope.portalRules.rules[rule][specifier]);
+    $scope.removePortalRule = function(rule, specifier, index) {
+        delete $scope.workingPortalRules['rules'][rule][specifier][index];
     };
 
     $scope.newPortalRule = function(rule, specifier) {
-        $scope.portalRules.rules[rule][specifier][''] = '';
-        console.log($scope.portalRules.rules);
+        var highest = 0;
+        // get the highest index
+        for (var i in $scope.workingPortalRules['rules'][rule][specifier]) {
+            if (parseInt(i) >= highest) {
+                highest = i + 1;
+            }
+        }
+
+        $scope.workingPortalRules['rules'][rule][specifier][highest] = {"": ""};
+
     };
 
-    $scope.commitPortalRule = function (rule, specifier, key, value) {
-        var original_key = document.getElementById(key).value;
-        console.log(original_key);
-        delete $scope.portalRules.rules[rule][specifier][original_key];
-
-        $scope.portalRules.rules[rule][specifier][key] = value;
-
-        console.log($scope.portalRules.rules[rule][specifier]);
+    $scope.commitPortalRule = function (rule, specifier, index, key, value) {
+        var obj = {};
+        obj[key] = value;
+        $scope.workingPortalRules['rules'][rule][specifier][index] = obj;
     };
 
+    $scope.savePortalRules = function(portal) {
+        // build the rules
+        for (var key in $scope.portalRules.rules) {
+            for (var specifier in $scope.portalRules.rules[key]) {
+                var obj = {};
+                for (var i in $scope.workingPortalRules['rules'][key][specifier]) {
+                    for (var r in $scope.workingPortalRules['rules'][key][specifier][i]) {
+                        obj[r] = $scope.workingPortalRules['rules'][key][specifier][i][r];
+                    }
+                }
+                $scope.portalRules['rules'][key][specifier] = obj;
+            }
+        }
 
+        console.log(JSON.stringify($scope.portalRules));
+
+        $api.request({
+            module: "EvilPortal",
+            action: "savePortalRules",
+            portal: portal.title,
+            storage: portal.storage,
+            rules: JSON.stringify($scope.portalRules)
+        }, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error", response.message);
+            }
+        });
+    };
 
     function getPortals() {
         $api.request({

@@ -392,23 +392,39 @@
                     <h4 class="modal-title">Editing Rules for {{ workshopPortal.title }}</h4>
                 </div>
                 <div class="modal-body">
-                    {{ portalRules.rules }}
                     <div ng-repeat="(key, data) in portalRules.rules">
-                        <h4>{{ key }}</h4>
-                        <div ng-repeat="(specifier, values) in data">
-                            <h5>{{ specifier }} - <button ng-click="newPortalRule(key, specifier);">New</button></h5>
-                            <div ng-repeat="(k, v) in values">
-                                <input type="text" placeholder="Key Value" ng-model="k" id="{{ k }}">
-                                <input type="text" placeholder="Destination.php" ng-model="v">
-                                <button ng-click="commitPortalRule(key, specifier, k, v)">Commit</button>
+                        <fieldset>
+                            <legend style="text-transform: uppercase">{{ key }}</legend>
+                            <div ng-repeat="(specifier, values) in data">
+                                <h5 style="text-transform: capitalize">{{ specifier }} <button ng-click="newPortalRule(key, specifier);">Add Rule</button></h5>
+                                <div ng-repeat="(i, rules) in workingPortalRules.rules[key][specifier]">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" align="center">
+                                            <thead>
+                                            <th>Rule Key</th>
+                                            <th>Destination</th>
+                                            <th>Commit</th>
+                                            <th>Remove</th>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="(k, v) in rules">
+                                                <td><input type="text" placeholder="Key Value" ng-model="k"></td>
+                                                <td><input type="text" placeholder="Destination.php" ng-model="v"></td>
+                                                <td><a href="javascript:;" data-target="#" ng-click="commitPortalRule(key, specifier, i, k, v)">Commit</a></td>
+                                                <td><a href="javascript:;" data-target="#" ng-click="removePortalRule(key, specifier, i)">Remove</a></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <hr />
+                        </fieldset>
+                        <br />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="">Cancel</button>
-                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal" >Save</button>
+                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal" ng-click="savePortalRules(workshopPortal)" >Save</button>
                 </div>
             </div>
         </div>

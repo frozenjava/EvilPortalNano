@@ -257,17 +257,22 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
 
                 // This first loop loops over each rule categories such as "mac", "ssid" and so on
                 for (var key in response.data['rules']) {
+
                     // we then create the a object with that key name in our workingData object
                     $scope.workingPortalRules['rules'][key] = {};
+
                     // Now its time to loop over each category specifier such as "exact" and "regex"
                     for (var specifier in response.data['rules'][key]) {
                         var index = 0;
+
                         // We then create that specifier in our workingData
                         $scope.workingPortalRules['rules'][key][specifier] = {};
+
                         // finally we loop over the specific rules defined in the specifier
                         for (var r in response.data['rules'][key][specifier]) {
                             var obj = {};
-                            obj[r] = response.data['rules'][key][specifier][r];
+                            obj['key'] = r;
+                            obj['destination'] = response.data['rules'][key][specifier][r];
                             $scope.workingPortalRules['rules'][key][specifier][index] = obj;
                         }
                         // increment index
@@ -286,7 +291,13 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     };
 
     $scope.newPortalRule = function(rule, specifier) {
+        // make sure the specifier is set
+        if ($scope.workingPortalRules['rules'][rule][specifier] == undefined) {
+            $scope.workingPortalRules['rules'][rule][specifier] = {};
+        }
+
         var highest = 0;
+
         // get the highest index
         for (var i in $scope.workingPortalRules['rules'][rule][specifier]) {
             if (parseInt(i) >= highest) {
@@ -300,7 +311,8 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
 
     $scope.commitPortalRule = function (rule, specifier, index, key, value) {
         var obj = {};
-        obj[key] = value;
+        obj['key'] = key;
+        obj['destination'] = value;
         $scope.workingPortalRules['rules'][rule][specifier][index] = obj;
     };
 
@@ -310,9 +322,10 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             for (var specifier in $scope.portalRules.rules[key]) {
                 var obj = {};
                 for (var i in $scope.workingPortalRules['rules'][key][specifier]) {
-                    for (var r in $scope.workingPortalRules['rules'][key][specifier][i]) {
-                        obj[r] = $scope.workingPortalRules['rules'][key][specifier][i][r];
-                    }
+                    //for (var r in $scope.workingPortalRules['rules'][key][specifier][i]) {
+                    //    obj[r] = $scope.workingPortalRules['rules'][key][specifier][i]['destination'];
+                    //}
+                    obj[$scope.workingPortalRules['rules'][key][specifier][i]['key']] = $scope.workingPortalRules['rules'][key][specifier][i]['destination'];
                 }
                 $scope.portalRules['rules'][key][specifier] = obj;
             }
@@ -331,6 +344,10 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 $scope.sendMessage("Error", response.message);
             }
         });
+    };
+
+    $scope.isObjectEmpty = function(obj) {
+        return (Object.keys(obj).length === 0);
     };
 
     function getPortals() {

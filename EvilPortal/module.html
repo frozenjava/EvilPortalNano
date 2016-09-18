@@ -63,7 +63,7 @@
                         <div class="input-group" ng-show="library">
 
                             <span class="input-group-btn">
-                                <select class="form-control" style="width:80px" ng-model="newPortalType">
+                                <select class="form-control ng-pristine ng-valid ng-touched" style="width:80px" ng-model="newPortalType">
                                     <option value="basic">Basic</option>
                                     <option value="targeted">Targeted</option>
                                 </select>
@@ -142,8 +142,8 @@
                                     <tbody>
                                     <tr ng-repeat="file in workshopPortal.files">
                                         <td>{{ file.name }}</td>
-                                        <td><a href="javascript:;" ng-click="editPortal(workshopPortal, file.name)" data-toggle="modal" data-target="#fileModal">Edit</a></td>
-                                        <td><a href="javascript:;" ng-click="requestDeleteFile(file.name, workshopPortal)" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable">Delete</a></td>
+                                        <td><button href="javascript:;" ng-click="editPortal(workshopPortal, file.name)" data-toggle="modal" data-target="#fileModal" class="btn btn-sm btn-default">Edit</button></td>
+                                        <td><button href="javascript:;" ng-click="requestDeleteFile(file.name, workshopPortal)" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable" class="btn btn-sm btn-danger">Delete</button></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -396,26 +396,24 @@
                         <fieldset>
                             <legend style="text-transform: uppercase">{{ key }}</legend>
                             <div ng-repeat="(specifier, values) in data">
-                                <h5 style="text-transform: capitalize">{{ specifier }} <button ng-click="newPortalRule(key, specifier);">Add Rule</button></h5>
-                                <div ng-repeat="(i, rules) in workingPortalRules.rules[key][specifier]">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" align="center">
-                                            <thead>
-                                            <th>Rule Key</th>
-                                            <th>Destination</th>
-                                            <th>Commit</th>
-                                            <th>Remove</th>
-                                            </thead>
-                                            <tbody>
-                                            <tr ng-repeat="(k, v) in rules">
-                                                <td><input type="text" placeholder="Key Value" ng-model="k"></td>
-                                                <td><input type="text" placeholder="Destination.php" ng-model="v"></td>
-                                                <td><a href="javascript:;" data-target="#" ng-click="commitPortalRule(key, specifier, i, k, v)">Commit</a></td>
-                                                <td><a href="javascript:;" data-target="#" ng-click="removePortalRule(key, specifier, i)">Remove</a></td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <h5 style="text-transform: capitalize">{{ specifier }} <a href="javascript:;" data-target="#" ng-click="newPortalRule(key, specifier);">Add Rule</a></h5>
+                                <div class="table-responsive" ng-hide="isObjectEmpty(workingPortalRules.rules[key][specifier])">
+                                    <table class="table table-striped" align="center">
+                                        <thead>
+                                        <th>Rule Key</th>
+                                        <th>Destination</th>
+                                        <!--<th>Commit</th>-->
+                                        <th>Remove</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="(i, rules) in workingPortalRules.rules[key][specifier]">
+                                            <td><input type="text" placeholder="Key Value" ng-model="rules.key"></td>
+                                            <td><input type="text" placeholder="Destination.php" ng-model="rules.destination"></td>
+                                            <!--<td><a href="javascript:;" data-target="#" ng-click="commitPortalRule(key, specifier, i, rules.key, rules.destination)">Commit</a></td>-->
+                                            <td><button ng-click="removePortalRule(key, specifier, i)" class="btn btn-sm btn-danger">Remove</button></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </fieldset>

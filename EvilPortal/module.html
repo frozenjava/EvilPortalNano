@@ -88,10 +88,9 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="portal in portals">
-                                        <td><a href="javascript:;" ng-click="getPortalFiles(portal)"><b>{{ portal.title
-                                            }}</b></a></td>
-                                        <td class="text-muted"><i>{{ portal.type }}</i></td>
-                                        <td class="text-muted"><i>{{ portal.storage }}</i></td>
+                                        <td><a href="javascript:;" ng-click="getPortalFiles(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
+                                        <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.type }}</i></td>
+                                        <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
                                         <td ng-hide="portal.active"><a href="javascript:;"
                                                                        ng-click="activatePortal(portal)">Activate</a>
                                         </td>
@@ -119,12 +118,12 @@
                             <!-- Editor Buttons -->
                             <div class="row-fluid">
                                 <span class="pull-left">
-                                    <button type="submit" class="btn btn-primary btn-sm" ng-click="library = true; workshopPortal = {}">Back To Library</button>
+                                    <button type="submit" class="btn btn-default btn-sm" ng-click="library = true; workshopPortal = {}">Back To Library</button>
                                 </span>
                                 <span class="pull-right">
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="editPortalFile.portalName = workshopPortal.title; editPortalFile.storage = workshopPortal.storage;">New File</button>
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshopPortal.type == 'targeted'" ng-click="getPortalRules(workshopPortal);">Rule Editor</button>
-                                    <button type="submit" class="btn btn-info btn-sm" ng-click="getPortalFiles(workshopPortal)">Refresh</button>
+                                    <button type="submit" class="btn btn-default btn-sm" ng-click="getPortalFiles(workshopPortal)">Refresh</button>
                                 </span>
                             </div>
 
@@ -142,8 +141,8 @@
                                     <tbody>
                                     <tr ng-repeat="file in workshopPortal.files">
                                         <td>{{ file.name }}</td>
-                                        <td><button href="javascript:;" ng-click="editPortal(workshopPortal, file.name)" data-toggle="modal" data-target="#fileModal" class="btn btn-sm btn-default">Edit</button></td>
-                                        <td><button href="javascript:;" ng-click="requestDeleteFile(file.name, workshopPortal)" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable" class="btn btn-sm btn-danger">Delete</button></td>
+                                        <td><a href="javascript:;" ng-click="editPortal(workshopPortal, file.name)" data-toggle="modal" data-target="#fileModal">Edit</a></td>
+                                        <td><a href="javascript:;" ng-click="requestDeleteFile(file.name, workshopPortal)" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable">Delete</a></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -326,8 +325,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" ng-click="savePortalCode(editPortalFile);" class="btn btn-success pull-left" data-dismiss="modal" ng-disabled="editPortalFile.file == ''">Save</button>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal"
+                    <button type="button" ng-click="savePortalCode(editPortalFile);" class="btn btn-success pull-right" data-dismiss="modal" ng-disabled="editPortalFile.file == ''">Save</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal"
                             ng-click="editPortalFile = {}">Cancel
                     </button>
                 </div>
@@ -352,8 +351,8 @@
                     <input type="text" class="form-control" placeholder="PortalName" name="portalName" ng-model="portalDeleteValidation">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">Cancel</button>
-                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(portalToDelete); portalToDelete = {}" ng-disabled="portalDeleteValidation != portalToDelete.title">Delete</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">Cancel</button>
+                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(portalToDelete); portalToDelete = {}" ng-disabled="portalDeleteValidation.toLowerCase() != portalToDelete.title.toLowerCase()">Delete</button>
                 </div>
             </div>
         </div>
@@ -374,7 +373,7 @@
                     <p><b>Are you absolutely sure you want to delete <i>{{ deleteFile.name }}</i>?</b></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="deleteFile = {}">Cancel</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="deleteFile = {}">Cancel</button>
                     <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="sendDeleteFile()">Delete {{ deleteFile.name }}</button>
                 </div>
             </div>
@@ -421,7 +420,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="">Cancel</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="">Cancel</button>
                     <button type="button" class="btn btn-success pull-right" data-dismiss="modal" ng-click="savePortalRules(workshopPortal)" >Save</button>
                 </div>
             </div>

@@ -342,7 +342,7 @@ class EvilPortal extends Module
 
     public function handleCreateNewPortal()
     {
-        $portalName = str_replace(' ', '_', $this->request->portalName);
+        $portalName = strtolower(str_replace(' ', '_', $this->request->portalName));
         $portalType = $this->request->portalType;
         $portalPath = "/root/portals/";
         if (!file_exists($portalPath)) {

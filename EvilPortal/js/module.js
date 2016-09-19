@@ -115,7 +115,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         $api.request({
             module: "EvilPortal",
             action: "createNewPortal",
-            portalName: $scope.newPortalName,
+            portalName: $scope.newPortalName.toLowerCase(),
             portalType: $scope.newPortalType
         }, function (response) {
             if (response.create_success) {

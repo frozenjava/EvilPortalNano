@@ -24,6 +24,7 @@
                 </div>
             </div>
         </div>
+
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages" class="text-muted"><h4
@@ -72,7 +73,8 @@
                             <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortalName">
 
                             <span class="input-group-btn">
-                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal()">Create New Portal</button>
+                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('internal')">Create New Portal</button>
+                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('sd')" ng-show="sdAvailable">Create On SD Card</button>
                             </span>
                         </div>
                         <hr ng-show="library"/>

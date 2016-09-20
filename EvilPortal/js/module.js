@@ -10,6 +10,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.newPortalName = '';
     $scope.newPortalType = 'basic';
     $scope.throbber = true;
+    $scope.sdAvailable = false;
     $scope.running = false;
     $scope.library = true;
     $scope.whiteList = '';
@@ -108,15 +109,17 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
              visible: true,
              throbber: false
              }];
+        $scope.sdAvailable = response.sdAvailable;
         $scope.throbber = false;
     }
 
-    $scope.createNewPortal = function () {
+    $scope.createNewPortal = function (storage) {
         $api.request({
             module: "EvilPortal",
             action: "createNewPortal",
             portalName: $scope.newPortalName.toLowerCase(),
-            portalType: $scope.newPortalType
+            portalType: $scope.newPortalType,
+            storage: storage
         }, function (response) {
             if (response.create_success) {
                 getPortals();

@@ -87,22 +87,16 @@ class EvilPortal extends Module
     {
         $portalName = $this->request->name;
         $portalFile = $this->request->portalFile;
-        $storage = $this->request->storage;
-
-        if ($storage != "active") {
-            $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
-        } else {
-            $dir = "/etc/nodogsplash/htdocs/";
-        }
+        $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "";
         $code = "";
 
-        if (file_exists($dir . $portalName . "/" . $portalFile)) {
-            $code = file_get_contents($dir . $portalName . "/" . $portalFile);
+        if (file_exists($storage . $portalName . "/" . $portalFile)) {
+            $code = file_get_contents($storage . $portalName . "/" . $portalFile);
             $message = $portalFile . " is ready for editting.";
         } else {
-            $message = "Error finding " . $dir . $portalName . "/" . $portalFile . ".";
+            $message = "Error finding " . $storage . $portalName . "/" . $portalFile . ".";
         }
 
         $this->response = array("message" => $message, "code" => $code);
@@ -112,9 +106,8 @@ class EvilPortal extends Module
     public function getPortalFiles()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $allFiles = array();
         $nonDeletableBasicFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js");
         $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php", "route.json");
@@ -150,10 +143,9 @@ class EvilPortal extends Module
     public function deletePortalFile()
     {
         $portalName = $this->request->portal;
-        $storage = $this->request->stroage;
         $fileName = $this->request->name;
 
-        $dir = ($storage == "sd") ? "/sd/portals/" : "/root/portals/";
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $message = "Unable to delete file.";
         if (file_exists($dir . $portalName . "/" . $fileName)) {
             unlink($dir . $portalName . "/" . $fileName);
@@ -167,9 +159,8 @@ class EvilPortal extends Module
     public function activatePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "";
         $portalPath = escapeshellarg($dir . $portalName);
@@ -194,9 +185,8 @@ class EvilPortal extends Module
     public function deactivatePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "Couldn't find " . $portalName;
         $deactivateSuccess = false;
@@ -228,9 +218,8 @@ class EvilPortal extends Module
     public function handleDeletePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         exec("rm -rf " . escapeshellarg($dir . $portalName));
 
@@ -249,11 +238,10 @@ class EvilPortal extends Module
     public function submitPortalCode()
     {
         $code = $this->request->portalCode;
-        $storage = $this->request->storage;
         $portalName = $this->request->name;
         $fileName = $this->request->fileName;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = (!file_exists($dir . $portalName . "/" . $fileName)) ? "Created " . $portalName : "Updated " . $portalName;
         file_put_contents($dir . $portalName . "/" . $fileName, $code);
@@ -366,6 +354,12 @@ class EvilPortal extends Module
         $portalName = strtolower(str_replace(' ', '_', $this->request->portalName));
         $portalType = $this->request->portalType;
         $portalPath = $this->STORAGE_LOCATIONS[$this->request->storage];
+
+        if ($portalPath == $this->STORAGE_LOCATIONS['sd'] && !$this->isSDAvailable()) {
+            $this->response = array("create_success" => false, "create_message" => "There is no SD card inserted");
+            return;
+        }
+
         if (!file_exists($portalPath)) {
             mkdir($portalPath);
         }

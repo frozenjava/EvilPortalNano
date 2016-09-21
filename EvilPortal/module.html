@@ -38,10 +38,11 @@
                     <table style="width:100%" ng-hide="(messages.length == 0)">
                         <tr ng-repeat="message in messages">
                             <td>
-                                <hr/>
-                                <h5><b>{{ message.title }}</b> <a ng-click="dismissMessage($index)" href="javascript:;"
-                                                                  class="pull-right">Dismiss</a></h5>
+                                <fieldset>
+                                <legend><h5><b>{{ message.title }}</b> <a ng-click="dismissMessage($index)" href="javascript:;"
+                                                                  class="pull-right">Dismiss</a></h5></legend>
                                 <p class="text-muted"><i>{{ message.msg }}</i></p>
+                                </fieldset>
                             </td>
                         </tr>
                     </table>

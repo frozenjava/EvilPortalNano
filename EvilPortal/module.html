@@ -86,6 +86,7 @@
                                     <th>Portal Name</th>
                                     <th>Portal Type</th>
                                     <th>Location</th>
+                                    <th ng-show="sdAvailable">Move</th>
                                     <th>Activate</th>
                                     <th>Delete</th>
                                     </thead>
@@ -94,6 +95,8 @@
                                         <td><a href="javascript:;" ng-click="getPortalFiles(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.type }}</i></td>
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
+                                        <td ng-show="sdAvailable && portal.storage == 'internal'"><a href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a></td>
+                                        <td ng-show="sdAvailable && portal.storage == 'sd'"><a href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a></td>
                                         <td ng-hide="portal.active"><a href="javascript:;"
                                                                        ng-click="activatePortal(portal)">Activate</a>
                                         </td>

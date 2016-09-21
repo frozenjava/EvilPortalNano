@@ -152,6 +152,27 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    $scope.movePortal = function(portal, new_location) {
+        console.log({
+            module: "EvilPortal",
+            "action": "movePortal",
+            "name": portal.title,
+            "storage": portal.storage,
+            "newStorage": new_location
+        });
+        console.log(portal);
+        $api.request({
+            module: "EvilPortal",
+            "action": "movePortal",
+            "name": portal.title,
+            "storage": portal.storage,
+            "newStorage": new_location
+        }, function(response) {
+            $scope.sendMessage("Move Portal", response.message);
+            getPortals();
+        });
+    };
+
     $scope.requestDeleteFile = function(file, portal) {
         $scope.deleteFile = {name: file, portal: portal.title, storage: portal.storage};
     };

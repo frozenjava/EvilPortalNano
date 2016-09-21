@@ -80,6 +80,10 @@ class EvilPortal extends Module
             case 'savePortalRules':
                 $this->savePortalRules();
                 break;
+
+            case 'movePortal':
+                $this->handleMovePortal();
+                break;
         }
     }
 
@@ -385,6 +389,24 @@ class EvilPortal extends Module
 
         $this->response = array("create_success" => true, "create_message" => "Created {$portalName}");
 
+    }
+
+    public function handleMovePortal()
+    {
+        $portalName = $this->request->name;
+        $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
+        $newStorage = $this->STORAGE_LOCATIONS[$this->request->newStorage];
+
+        if (file_exists($storage . $portalName)) {
+            if (!file_exists($newStorage . $portalName)) {
+                rename($storage . $portalName, $newStorage . $portalName);
+                $this->response = array("success" => true, "message" => "Moved $portalName to $newStorage!");
+            } else {
+                $this->response = array("success" => false, "message" => "A $newStorage portal already exists with that name.");
+            }
+        } else {
+            $this->response = array("success" => false, "message" => "Unable to find a portal named $portalName");
+        }
     }
 
     public function handleEnable()

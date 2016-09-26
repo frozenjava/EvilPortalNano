@@ -172,10 +172,10 @@
                             <i>This is a list of clients who are allowed to connect to the internet without ever viewing the captive portal.</i>
                         </p>
                         <p>
-                            <textarea class="form-control" rows="15" ng-model="whiteList" readonly></textarea>
+                            <textarea id="whiteListPool" class="form-control" rows="15" ng-mouseup="getClickedClient('whiteListPool', 'whiteListInput');" ng-model="whiteList" readonly></textarea>
                         </p>
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="IP Address" name="ipaddress"
+                            <input type="text" class="form-control" placeholder="IP Address" name="whiteListInput"
                                    ng-model="whiteListInput">
 		                    <span class="input-group-btn">
 		                        <button class="btn btn-default" type="button"
@@ -201,10 +201,10 @@
                             <i>This is a list of clients who have been authorized through the captive portal.</i>
                         </p>
                         <p ng-show="running">
-                            <textarea class="form-control" rows="15" ng-model="accessList" readonly></textarea>
+                            <textarea id='authorizedPool' class="form-control" rows="15" ng-mouseup="getClickedClient('authorizedPool', 'accessListInput');" ng-model="accessList" readonly></textarea>
                         </p>
                         <div class="input-group" ng-show="running">
-                            <input type="text" class="form-control" placeholder="IP Address" name="ipaddress"
+                            <input type="text" class="form-control" placeholder="IP Address" name="accessListInput"
                                    ng-model="accessListInput">
 		                    <span class="input-group-btn">
 		                        <button class="btn btn-default" type="button"

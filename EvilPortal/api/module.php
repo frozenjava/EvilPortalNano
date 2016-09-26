@@ -573,7 +573,7 @@ class EvilPortal extends Module
                     $message = "White List file doesn't exist.";
                 } else {
                     $contents = file_get_contents($this->ALLOWED_FILE);
-                    $contents = ($contents == null) ? "No White Listed Clients" : $contents;
+                    //$contents = ($contents == null) ? "" : $contents;
                 }
                 break;
 
@@ -582,20 +582,17 @@ class EvilPortal extends Module
                     $contents = "No Authorized Clients.";
                 } else {
                     $contents = file_get_contents($this->CLIENTS_FILE);
-                    $contents = ($contents == null) ? "No Authorized Clients." : $contents;
+                    //$contents = $contents;
                 }
                 break;
         }
 
-        if ($contents != null) {
-            $response_array = array(
-                "list_success" => true,
-                "list_contents" => $contents,
-                "list_message" => $message
-            );
-        } else {
-            $response_array = array("list_success" => false, "list_contents" => "", "list_message" => $message);
-        }
+        $response_array = array(
+            "list_success" => true,
+            "list_contents" => $contents,
+            "list_message" => $message
+        );
+
 
         $this->response = $response_array;
     }

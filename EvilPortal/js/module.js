@@ -449,6 +449,13 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    $scope.getClickedClient = function(textareaId, inputname) {
+        var textarea = $('#' + textareaId);
+        var lineNumber = textarea.val().substr(0, textarea[0].selectionStart).split('\n').length;
+        var ssid = textarea.val().split('\n')[lineNumber-1].trim();
+        $("input[name='" + inputname + "']").val(ssid).trigger('input');
+    };
+
     $scope.authorizeClient = function () {
         $api.request({
             module: "EvilPortal",

@@ -246,35 +246,71 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion"
-                                               data-target="#collapseChangelog" class="text-muted">Evil Portal Change
-                        Log</a></h5>
+                                               data-target="#collapseChangelog" class="text-muted">Evil Portal Info</a></h5>
                 </div>
                 <div id="collapseChangelog" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <ul>
-                            <li><b>2.1</b></li>
+                        <fieldset>
+                            <legend>Disclaimer</legend>
+                            <p><b>Evil Portal and all of its components are intended for professional use only. No one associated with this project is an anyway liable for your actions.</b></p>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Help</legend>
+                            <h5>Summary</h5>
+                            <p>Evil Portal is a captive portal program that enables you to easily create a captive portal for whatever your needs are. There are two kinds of portals Basic and Targeted.
+                            Basic portals are just a simple page that gets served to all clients. Targeted portals allow you to serve a unique page to different clients based on a given rule.</p>
+                            <h5>Basic Portals</h5>
+                            <p>A Basic Portal is a one-size serves all kind of portal. These portals are designed to be a single page that all clients will land on. This is the traditional way
+                            that captive portals work and the way Evil Portal as been doing things from the beginning.</p>
+                            <h5>Targeted Portals</h5>
+                            <p>A Targeted Portal allows you to serve a different page on a per-client basis based on a condition. This can be something like their mac address, user-agent, etc...
+                            Targeted Portals give you a whole new dynamic to what Evil Portal can do, if you want clients who are connected to the SSID "Coffee Shop" to see a "Coffee Shop" branded portal
+                            while at the same time clients with Android phones seeing an Android branded portal then this is what you want.</p>
+                            <h5>Useful Links</h5>
+                            <a href="https://forums.hak5.org/index.php?/topic/37874-official-evilportal/">Hak5 Forum Thread</a>
+                            <br />
+                            <a href="https://github.com/frozenjava/EvilPortalNano">GitHub Project</a>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Change Log</legend>
                             <ul>
-                                <li class="text-muted">Removed un-needed verbosity</li>
-                                <li class="text-muted">Made tab key indent in the editor instead of change elements</li>
-                                <li class="text-muted">Added confirmation dialogue box when deleting a portal</li>
-                                <li class="text-muted">Created auto-start feature</li>
-                                <li class="text-muted">Various other quality of life updates</li>
+                                <li><b>3.0</b></li>
+                                <ul>
+                                    <li class="text-muted">Added ability to route clients to different portals based upon some identifier [ssid, mac vendor, ip, etc...]</li>
+                                    <li class="text-muted">Updated the work bench so users can choose between targeted and non-targeted portals</li>
+                                    <li class="text-muted">Created easy-to-use interface for creating targeting rules</li>
+                                    <li class="text-muted">Created some consistency throughout the UI</li>
+                                    <li class="text-muted">Added ability to create portals on an SD card and move between SD and Internal storage easily</li>
+                                    <li class="text-muted">Made white listed and authorized clients IP addresses clickable like SSIDs in PineAP</li>
+                                    <li class="text-muted">Created helper functions getClientMac, getClientSSID, getClientHostName</li>
+                                    <li class="text-muted">Various quality of life improvements</li>
+                                </ul>
                             </ul>
-                        </ul>
-                        <ul>
-                            <li><b>2.0</b></li>
                             <ul>
-                                <li class="text-muted">Captive Portal is now purely iptables (because F***
-                                    NoDogSplash)
-                                </li>
+                                <li><b>2.1</b></li>
+                                <ul>
+                                    <li class="text-muted">Removed un-needed verbosity</li>
+                                    <li class="text-muted">Made tab key indent in the editor instead of change elements</li>
+                                    <li class="text-muted">Added confirmation dialogue box when deleting a portal</li>
+                                    <li class="text-muted">Created auto-start feature</li>
+                                    <li class="text-muted">Various other quality of life updates</li>
+                                </ul>
                             </ul>
-                        </ul>
-                        <ul>
-                            <li><b>1.0</b></li>
                             <ul>
-                                <li class="text-muted">Initial Pineapple Nano Release</li>
+                                <li><b>2.0</b></li>
+                                <ul>
+                                    <li class="text-muted">Captive Portal is now purely iptables (because F***
+                                        NoDogSplash)
+                                    </li>
+                                </ul>
                             </ul>
-                        </ul>
+                            <ul>
+                                <li><b>1.0</b></li>
+                                <ul>
+                                    <li class="text-muted">Initial Pineapple Nano Release</li>
+                                </ul>
+                            </ul>
+                        </fieldset>
                     </div>
                 </div>
             </div>

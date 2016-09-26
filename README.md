@@ -15,7 +15,6 @@ Targeted Portals allow you to create different portals to target a specific devi
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
 * Write up some helpful information so people can just start using the module
-* Make white listed and authorized clients IP addresses clickable like SSIDs in PineAP
 
 ### DONE
 * Get SSID of connected client by IP address
@@ -24,6 +23,7 @@ Targeted Portals allow you to create different portals to target a specific devi
 * Create easy-to-use interface for creating targeting rules
 * Create some consistency throughout the UI
 * Add ability to create portals on an SD card and move between SD and Internal storage easily
+* Make white listed and authorized clients IP addresses clickable like SSIDs in PineAP
 
 ## Release History
 

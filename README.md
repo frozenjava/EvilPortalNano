@@ -9,12 +9,34 @@ Basic Portals allow you to create a simple captive portal page that is the same 
 ### Targeted Portals
 Targeted Portals allow you to create different portals to target a specific device or groups of devices based upon your pre-defined conditions. This is incredibly useful if you want all android devices to go to one android themed portal and all clients who are connected to "some-coffee-shop-wifi" go to a different portal all together. Targeted portals currently let you create targeting rules based on mac addresses, ssids, hostnames, and http useragents all on a per-client basis. You can either specify exact string matches or regex matches.
 
+## Manual Installation
+
+First clone the repo and checkout the development branch
+
+```
+git clone https://github.com/frozenjava/EvilPortalNano.git
+git checkout -b development origin/development
+git pull
+```
+
+Next change directory to EvilPortalNano
+
+```
+cd EvilPortalNano
+```
+
+Finally, with your Wifi Pineapple connected upload the EvilPortal directory to the Wifi Pineapple to the /pineapple/modules directory.
+
+```
+scp -r EvilPortal root@172.16.42.1:/pineapple/modules/
+```
+
+Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal module. You're all done!
 
 ## Upcoming Releases
 
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
-* Write up some helpful information so people can just start using the module
 
 ### DONE
 * Get SSID of connected client by IP address
@@ -24,6 +46,7 @@ Targeted Portals allow you to create different portals to target a specific devi
 * Create some consistency throughout the UI
 * Add ability to create portals on an SD card and move between SD and Internal storage easily
 * Make white listed and authorized clients IP addresses clickable like SSIDs in PineAP
+* Write up some helpful information so people can just start using the module
 
 ## Release History
 

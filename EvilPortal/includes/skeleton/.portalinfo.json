@@ -1,0 +1,37 @@
+{
+  "name": null,
+  "type": "targeted",
+  "enable_commands": [],
+  "disable_commands": [],
+  "targeted_rules": {
+    "default": "default.php",
+    "rule_order": ["mac", "ssid", "hostname", "useragent"],
+
+    "rules": {
+      "mac": {
+        "exact": {
+        },
+        "regex": {
+        }
+      },
+      "ssid": {
+        "exact": {
+        },
+        "regex": {
+        }
+      },
+      "hostname": {
+        "exact": {
+        },
+        "regex": {
+        }
+      },
+      "useragent": {
+        "exact": {
+        },
+        "regex": {
+        }
+      }
+    }
+  }
+}

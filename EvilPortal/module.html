@@ -128,7 +128,8 @@
                                 </span>
                                 <span class="pull-right">
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="editPortalFile.portalName = workshopPortal.title; editPortalFile.storage = workshopPortal.storage;">New File</button>
-                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshopPortal.type == 'targeted'" ng-click="getPortalRules(workshopPortal);">Rule Editor</button>
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal">Portal Info Editor</button>
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshopPortal.type == 'targeted'" ng-click="getPortalRules(workshopPortal);">Target Rule Editor</button>
                                     <button type="submit" class="btn btn-default btn-sm" ng-click="getPortalFiles(workshopPortal)">Refresh</button>
                                 </span>
                             </div>

@@ -37,6 +37,8 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
+* Add ability to program commands to run when a portal is enabled/disabled
+* Consolidate all portal info into a single portal_name.json file
 
 ### DONE
 * Get SSID of connected client by IP address

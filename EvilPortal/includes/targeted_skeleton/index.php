@@ -1,6 +1,15 @@
 <?php
 require_once('helper.php');
 
+/**
+ *
+ * DO NOT MODIFY THIS FILE
+ * I highly recommend against modifying this file unless you know what you are doing!
+ *
+ * This file handles determining the destination file a client should see based on the conditions set in the json.
+ *
+ */
+
 // Get the information about the client and map
 // it to the rule key specified in the route.json file
 $MAPPED_RULES = [

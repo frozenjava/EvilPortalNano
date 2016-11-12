@@ -33,13 +33,17 @@ scp -r EvilPortal root@172.16.42.1:/pineapple/modules/
 
 Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal module. You're all done!
 
+## Useful Links
+[Official Hak5 Forum Thread](https://forums.hak5.org/index.php?/topic/37874-official-evilportal/)
+[Official Youtube Playlist](https://www.youtube.com/playlist?list=PLW7RuuSaPPzDgrZINbNkt4ujR7RDTUCMB)
+[My website: frozendevelopment.net](http://frozendevelopment.net/)
+
 ## Upcoming Releases
 
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
 * Add ability to program commands to run when a portal is enabled/disabled
 * Make sure that portals from previous versions can be seamlessly migrated to the new version
-* Disable the button to move a portal while it is activated
 * Add doc strings to all methods in module.php and functions in module.js
 
 ### DONE
@@ -52,6 +56,7 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 * Make white listed and authorized clients IP addresses clickable like SSIDs in PineAP
 * Write up some helpful information so people can just start using the module
 * Consolidate all portal info into a single portal_name.json file
+* Disable the button to move a portal while it is activated
 
 ## Release History
 

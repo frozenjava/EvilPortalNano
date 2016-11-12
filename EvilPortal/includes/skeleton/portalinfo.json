@@ -1,8 +1,8 @@
 {
   "name": null,
   "type": "targeted",
-  "enable_commands": [],
-  "disable_commands": [],
+  "on_enable_commands": [],
+  "on_disable_commands": [],
   "targeted_rules": {
     "default": "default.php",
     "rule_order": ["mac", "ssid", "hostname", "useragent"],

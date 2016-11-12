@@ -10,6 +10,11 @@ require_once('helper.php');
  *
  */
 
+// The value for this variable needs to be set when an new instance of a portal is created
+// EvilPortal does this automatically when a targeted portal is created by running:
+// sed -i 's/"portal_name_here"/"{portalName}"/g' index.php
+$PORTAL_NAME = "portal_name_here";
+
 // Get the information about the client and map
 // it to the rule key specified in the route.json file
 $MAPPED_RULES = [
@@ -20,7 +25,7 @@ $MAPPED_RULES = [
 ];
 
 // Read the json
-$routeData = json_decode(file_get_contents("route.json"), true);
+$routeData = json_decode(file_get_contents("{$PORTAL_NAME}.ep"), true);
 
 // This variable represents the page to include
 $includePage = null;

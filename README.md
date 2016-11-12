@@ -38,7 +38,6 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
 * Add ability to program commands to run when a portal is enabled/disabled
-* Consolidate all portal info into a single portal_name.json file
 * Make sure that portals from previous versions can be seamlessly migrated to the new version
 * Disable the button to move a portal while it is activated
 * Add doc strings to all methods in module.php and functions in module.js
@@ -52,6 +51,7 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 * Add ability to create portals on an SD card and move between SD and Internal storage easily
 * Make white listed and authorized clients IP addresses clickable like SSIDs in PineAP
 * Write up some helpful information so people can just start using the module
+* Consolidate all portal info into a single portal_name.json file
 
 ## Release History
 

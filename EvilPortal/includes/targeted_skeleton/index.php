@@ -16,7 +16,7 @@ require_once('helper.php');
 $PORTAL_NAME = "portal_name_here";
 
 // Get the information about the client and map
-// it to the rule key specified in the route.json file
+// it to the rule key specified in the {$PORTAL_NAME}.ep file
 $MAPPED_RULES = [
     "mac" => getClientMac($_SERVER['REMOTE_ADDR']),
     "ssid" => getClientSSID($_SERVER['REMOTE_ADDR']),

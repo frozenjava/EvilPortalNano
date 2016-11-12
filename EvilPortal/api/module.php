@@ -114,7 +114,7 @@ class EvilPortal extends Module
         $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $allFiles = array();
         $nonDeletableBasicFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js");
-        $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php", "route.json");
+        $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php");
         if (file_exists($dir . $portalName)) {
             $portal_files = scandir($dir . $portalName);
             $targeted = (file_get_contents($dir . $portalName . "/" . $portalName . ".ep") == "targeted") ? true : false;
@@ -294,7 +294,6 @@ class EvilPortal extends Module
         }
 
         if (is_file("{$path}{$portalName}/{$portalName}.ep")) {
-            //file_put_contents($path . $portalName . '/route.json', $rules);
             $this->updateJSONFile(array("targeted_rules" => json_decode($rules)), "{$path}{$portalName}/{$portalName}.ep")["targeted_rules"];
             $this->response = array(
                 "message" => "Saved portal rules",

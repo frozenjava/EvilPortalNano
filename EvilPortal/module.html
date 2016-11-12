@@ -92,21 +92,25 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="portal in portals">
+                                        <!-- Open portal work shop -->
                                         <td><a href="javascript:;" ng-click="getPortalFiles(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
+                                        <!-- Portal type -->
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.type }}</i></td>
+                                        <!-- What storage device the portal is on -->
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
-                                        <td ng-show="sdAvailable && portal.storage == 'internal'"><a href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a></td>
-                                        <td ng-show="sdAvailable && portal.storage == 'sd'"><a href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a></td>
-                                        <td ng-hide="portal.active"><a href="javascript:;"
-                                                                       ng-click="activatePortal(portal)">Activate</a>
+                                        <!-- change storage -->
+                                        <td>
+                                            <a ng-show="(sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
+                                            <a ng-show="(sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
                                         </td>
-                                        <td ng-show="portal.active"><a href="javascript:;"
-                                                                       ng-click="deactivatePortal(portal)">Deactivate</a>
+                                        <!-- activate/deactivate -->
+                                        <td>
+                                            <a ng-hide="portal.active" href="javascript:;" ng-click="activatePortal(portal)">Activate</a>
+                                            <a ng-show="portal.active" href="javascript:;" ng-click="deactivatePortal(portal)">Deactivate</a>
                                         </td>
-                                        <td ng-hide="portal.active"><a href="javascript:;" data-toggle="modal"
-                                                                       data-target="#deleteModal"
-                                                                       ng-click="deletePortalRequest(portal)"
-                                                                       ng-hide="portal.storage == 'active'">Delete</a>
+                                        <!-- delete portal button -->
+                                        <td>
+                                            <a ng-hide="portal.active" href="javascript:;" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortalRequest(portal)">Delete</a>
                                         </td>
                                     </tr>
                                     </tbody>

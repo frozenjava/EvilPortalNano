@@ -383,6 +383,7 @@ class EvilPortal extends Module
                 exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
                 exec("mv {$portalPath}{$portalName}/portalinfo.json {$portalPath}{$portalName}/{$portalName}.ep");
                 $this->updateJSONFile(array("name" => $portalName, "type" => "targeted"), "{$portalPath}{$portalName}/{$portalName}.ep");
+                exec("sed -i 's/\"portal_name_here\"/\"{$portalName}\"/g' {$portalPath}{$portalName}/index.php");
                 break;
 
             default:

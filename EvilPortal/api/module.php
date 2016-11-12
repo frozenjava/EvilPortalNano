@@ -267,11 +267,11 @@ class EvilPortal extends Module
             return;
         }
 
-        if (is_file($path . $portalName . '/route.json')) {
-            $file_contents = json_decode(file_get_contents($path . $portalName . '/route.json'), true);
+        if (is_file("{$path}{$portalName}/{$portalName}.ep")) {
+            $rules = $this->getValueFromJSONFile(array("targeted_rules"), "{$path}{$portalName}/{$portalName}.ep")["targeted_rules"];
             $this->response = array(
                 "message" => "Found portal rules",
-                "data" => $file_contents,
+                "data" => $rules,
                 "success" => true
             );
             return;
@@ -293,8 +293,9 @@ class EvilPortal extends Module
             return;
         }
 
-        if (is_file($path . $portalName . '/route.json')) {
-            file_put_contents($path . $portalName . '/route.json', $rules);
+        if (is_file("{$path}{$portalName}/{$portalName}.ep")) {
+            //file_put_contents($path . $portalName . '/route.json', $rules);
+            $this->updateJSONFile(array("targeted_rules" => json_decode($rules)), "{$path}{$portalName}/{$portalName}.ep")["targeted_rules"];
             $this->response = array(
                 "message" => "Saved portal rules",
                 "success" => true

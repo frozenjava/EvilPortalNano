@@ -39,6 +39,9 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 * Figure out how to redirect clients going to HTTPS sites
 * Add ability to program commands to run when a portal is enabled/disabled
 * Consolidate all portal info into a single portal_name.json file
+* Make sure that portals from previous versions can be seamlessly migrated to the new version
+* Disable the button to move a portal while it is activated
+* Add doc strings to all methods in module.php and functions in module.js
 
 ### DONE
 * Get SSID of connected client by IP address

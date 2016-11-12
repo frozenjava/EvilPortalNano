@@ -327,7 +327,8 @@ class EvilPortal extends Module
         foreach ($root_portals as $portal) {
             if (!is_file($portal)) {
                 $active = (file_exists("/www/{$portal}.ep"));
-                $portalType = (trim(file_get_contents($internal_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                //$portalType = (trim(file_get_contents($internal_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                $portalType = $this->getValueFromJSONFile(array("type"), "{$internal_path}{$portal}/{$portal}.ep")["type"];
                 $obj = array("title" => $portal, "location" => "internal", "active" => $active, "type" => $portalType);
                 array_push($all_portals, $obj);
             }
@@ -339,7 +340,8 @@ class EvilPortal extends Module
             foreach ($sd_portals as $portal) {
                 if (!is_file($portal)) {
                     $active = (file_exists("/www/{$portal}.ep"));
-                    $portalType = (trim(file_get_contents($sd_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                    //$portalType = (trim(file_get_contents($sd_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                    $portalType = $this->getValueFromJSONFile(array("type"), "{$sd_path}{$portal}/{$portal}.ep")["type"];
                     $obj = array("title" => $portal, "location" => "sd", "active" => $active, "type" => $portalType);
                     array_push($all_portals, $obj);
                 }
@@ -378,12 +380,14 @@ class EvilPortal extends Module
         switch ($portalType) {
             case 'targeted':
                 exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
-                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "targeted");
+                exec("mv {$portalPath}{$portalName}/portalinfo.json {$portalPath}{$portalName}/{$portalName}.ep");
+                $this->updateJSONFile(array("name" => $portalName, "type" => "targeted"), "{$portalPath}{$portalName}/{$portalName}.ep");
                 break;
 
             default:
                 exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
-                file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "basic");
+                exec("mv {$portalPath}{$portalName}/portalinfo.json {$portalPath}{$portalName}/{$portalName}.ep");
+                $this->updateJSONFile(array("name" => $portalName, "type" => "basic"), "{$portalPath}{$portalName}/{$portalName}.ep");
                 break;
         }
 
@@ -397,6 +401,13 @@ class EvilPortal extends Module
         $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
         $newStorage = $this->STORAGE_LOCATIONS[$this->request->newStorage];
 
+        // check if the portal is active
+        if (file_exists("/www/{$portalName}.ep")) {
+            $this->response = array("success" => false, "message" => "You can not move an active portal!");
+            return;
+        }
+
+        // make sure that the SD card is available
         if (($storage == $this->STORAGE_LOCATIONS['sd'] || $newStorage == $this->STORAGE_LOCATIONS['sd']) && !$this->isSDAvailable()) {
             $this->response = array("success" => false, "message" => "There is no SD card inserted");
             return;
@@ -671,5 +682,27 @@ class EvilPortal extends Module
             return true;
         }
     }
+
+    private function updateJSONFile($keyValueArray, $file) {
+        $data = json_decode(file_get_contents($file), true);
+        foreach ($data as $key => $value) {
+            if (isset($keyValueArray[$key])) {
+                $data[$key] = $keyValueArray[$key];
+            }
+        }
+        file_put_contents($file, json_encode($data));
+    }
+
+    private function getValueFromJSONFile($keys, $file) {
+        $data = json_decode(file_get_contents($file), true);
+        $values = array();
+        foreach ($data as $key => $value) {
+            if (in_array($key, $keys)) {
+                $values[$key] = $value;
+            }
+        }
+        return $values;
+    }
+
 
 }

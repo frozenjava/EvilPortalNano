@@ -486,11 +486,31 @@
                 </div>
                 <div class="modal-body">
                     <fieldset>
-                        <legend>On Activation</legend>
+                        <legend>On Activation - <a>Save</a></legend>
+                        <div class="center-block">
+                            <span class="center-block">
+                                <button type="submit" class="btn btn-link btn-sm">Enable PineAP</button>
+                                <button type="submit" class="btn btn-link btn-sm">Enable Karma Associations</button>
+                                <button type="submit" class="btn btn-link btn-sm">Enable Beacon Response</button>
+                            </span>
+                        </div>
+                        <textarea style="width:100%;" rows="10"></textarea>
                     </fieldset>
                     <fieldset>
-                        <legend>On Deactivation</legend>
+                        <legend>On Deactivation - <a>Save</a></legend>
+                        <div class="row-fluid">
+                            <span class="center-block">
+                                <button type="submit" class="btn btn-link btn-sm">Disable PineAP</button>
+                                <button type="submit" class="btn btn-link btn-sm">Disable Karma Associations</button>
+                                <button type="submit" class="btn btn-link btn-sm">Disable Beacon Response</button>
+                            </span>
+                        </div>
+                        <textarea style="width:100%;" rows="10"></textarea>
                     </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="">Cancel</button>
+                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal">Save All</button>
                 </div>
             </div>
         </div>

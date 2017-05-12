@@ -7,103 +7,69 @@ class EvilPortal extends Module
     private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
     private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
     private $STORAGE_LOCATIONS = array("sd" => "/sd/portals/", "internal" => "/root/portals/");
-
     // CONSTANTS
 
     public function route()
     {
         switch ($this->request->action) {
-            case 'getControlValues':
-                $this->getControlValues();
+            case 'getFileContent':
+                $this->getFileContents($this->request->filePath);
                 break;
 
-            case 'startStop':
-                $this->handleRunning();
-                break;
-
-            case 'enableDisable':
-                $this->handleEnable();
-                break;
-
-            case 'portalList':
-                $this->handleGetPortalList();
-                break;
-
-            case 'portalFiles':
-                $this->getPortalFiles();
-                break;
-
-            case 'deletePortal':
-                $this->handleDeletePortal();
-                break;
-
-            case 'deletePortalFile':
-                $this->deletePortalFile();
-                break;
-
-            case 'activatePortal':
-                $this->activatePortal();
-                break;
-
-            case 'deactivatePortal':
-                $this->deactivatePortal();
-                break;
-
-            case 'getPortalCode':
-                $this->getPortalCode();
-                break;
-
-            case 'submitPortalCode':
-                $this->submitPortalCode();
-                break;
-
-            case 'getList':
-                $this->getList();
-                break;
-
-            case 'addToList':
-                $this->addToList();
-                break;
-
-            case 'removeFromList':
-                $this->removeFromList();
-                break;
-
-            case 'createNewPortal':
-                $this->handleCreateNewPortal();
-                break;
-
-            case 'getPortalRules':
-                $this->getPortalRules();
-                break;
-
-            case 'savePortalRules':
-                $this->savePortalRules();
-                break;
-
-            case 'movePortal':
-                $this->handleMovePortal();
+            case 'getDirectoryContent':
+                $this->getDirectoryContents($this->request->directory);
                 break;
         }
     }
 
-    public function getPortalCode()
+    /**
+     * Get the contents of a specified file.
+     *
+     * If this method is being called as the result of an HTTP request, make sure that "file" is specified as a
+     * parameter of the request and includes the full path to the file that should have its contents returned.
+     *
+     * @param $file: The file to get contents of
+     */
+    private function getFileContents($file)
     {
-        $portalName = $this->request->name;
-        $portalFile = $this->request->portalFile;
-        $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
 
-        $message = "";
-        $code = "";
-
-        if (file_exists($storage . $portalName . "/" . $portalFile)) {
-            $code = file_get_contents($storage . $portalName . "/" . $portalFile);
-            $message = $portalFile . " is ready for editting.";
+        if (file_exists("{$file}")) {
+            $contents = file_get_contents("{$file}");
+            $message = "{$file} is ready for editing.";
+            $success = true;
         } else {
-            $message = "Error finding " . $storage . $portalName . "/" . $portalFile . ".";
+            $message = "Error finding {$file}.";
+            $contents = null;
+            $success = false;
+        }
+        $this->response = array("success" => $success, "message" => $message, "content" => $contents);
+    }
+
+    /**
+     * Get contents of a specified directory
+     *
+     * If this method is being called as the result of an HTTP request to the API, make sure that "directory" is
+     * specified as a parameter to the request and includes the full path to the directory that should have its
+     * contents returned.
+     *
+     * @param $directory: The directory to get contents of
+     */
+    private function getDirectoryContents($directory)
+    {
+        $success = false;
+        $contents = array();
+        if (file_exists($directory)) {
+            foreach (preg_grep('/^([^.])/', scandir($directory)) as $file) {
+                $obj = array("name" => $file, "directory" => is_dir("{$directory}/{$file}"),
+                    "path" => realpath("{$directory}/{$file}"),
+                    "permissions" => substr(sprintf('%o', fileperms("{$directory}/{$file}")), -4),
+                    "size" => filesize("{$directory}/{$file}"));
+                array_push($contents, $obj);
+            }
+            $success = true;
         }
 
-        $this->response = array("message" => $message, "code" => $code);
+        $this->response = array("success" => $success, "contents" => $contents, "directory" => $directory);
 
     }
 
@@ -113,31 +79,21 @@ class EvilPortal extends Module
 
         $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $allFiles = array();
-        $nonDeletableBasicFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js");
-        $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php");
+        $nonDeletableFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "onenable", "ondisable");
+        $nonDeletableBasicFiles = $nonDeletableFiles; // these are the same until I have something for basic portals
+        $nonDeletableTargetedFiles = array_merge($nonDeletableFiles, array("default.php"));
         if (file_exists($dir . $portalName)) {
             $portal_files = scandir($dir . $portalName);
-            $targeted = (file_get_contents($dir . $portalName . "/" . $portalName . ".ep") == "targeted") ? true : false;
+            $targeted = ($this->getValueFromJSONFile(array("type"), "{$dir}{$portalName}/{$portalName}.ep")["type"] == "targeted");
             foreach ($portal_files as $file) {
                 if (is_file($dir . $portalName . "/" . $file) && !$this->endsWith($file, ".ep")) {
                     if ($targeted) {
-                        if (in_array($file, $nonDeletableTargetedFiles)) {
-                            $a = array("name" => $file, "deletable" => false);
-                            array_push($allFiles, $a);
-                        } else {
-                            $a = array("name" => $file, "deletable" => true);
-                            array_push($allFiles, $a);
-                        }
+                        array_push($allFiles, array("name" => $file,
+                            "deletable" => !(in_array($file, $nonDeletableTargetedFiles))));
                     } else {
-                        if (in_array($file, $nonDeletableBasicFiles)) {
-                            $a = array("name" => $file, "deletable" => false);
-                            array_push($allFiles, $a);
-                        } else {
-                            $a = array("name" => $file, "deletable" => true);
-                            array_push($allFiles, $a);
-                        }
+                        array_push($allFiles, array("name" => $file,
+                            "deletable" => !(in_array($file, $nonDeletableBasicFiles))));
                     }
-                    //array_push($allFiles, $file);
                 }
             }
         }
@@ -391,6 +347,10 @@ class EvilPortal extends Module
                 $this->updateJSONFile(array("name" => $portalName, "type" => "basic"), "{$portalPath}{$portalName}/{$portalName}.ep");
                 break;
         }
+
+        // make these scripts executable
+        exec("chmod +x {$portalPath}{$portalName}/onenable");
+        exec("chmod +x {$portalPath}{$portalName}/ondisable");
 
         $this->response = array("create_success" => true, "create_message" => "Created {$portalName}");
 

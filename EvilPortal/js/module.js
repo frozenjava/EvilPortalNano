@@ -19,6 +19,8 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.accessListInput = '';
     $scope.workshopPortal = {name: "", files: [], storage: "internal"};
     $scope.editPortalFile = {portalName: "", storage: "", file: "", code: ""};
+    $scope.enableCommands = {portalName: "", storage: "", file: "onenable", code: ""};
+    $scope.disableCommands = {portalName: "", storage: "", file: "ondisable", code: ""};
     $scope.deleteFile = {};
     $scope.portalRules = {};
     $scope.workingPortalRules = {};
@@ -69,6 +71,41 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.dismissMessage = function ($index) {
         //var index = $scope.messages.indexOf(message);
         $scope.messages.splice($index, 1);
+    };
+
+    $scope.setupToggleCommandsWindow = function() {
+        $api.request({
+            module: "EvilPortal",
+            action: "getPortalCode",
+            storage: $scope.workshopPortal.storage,
+            name: $scope.workshopPortal.title,
+            portalFile: 'onenable'
+        }, function (response) {
+            $scope.enableCommands.code = response.code;
+            $scope.enableCommands.file = 'onenable';
+            $scope.enableCommands.portalName = $scope.workshopPortal.title;
+            $scope.enableCommands.storage = $scope.workshopPortal.storage;
+            $scope.enableCommands.updating = true;
+        });
+
+        $api.request({
+            module: "EvilPortal",
+            action: "getPortalCode",
+            storage: $scope.workshopPortal.storage,
+            name: $scope.workshopPortal.title,
+            portalFile: 'ondisable'
+        }, function (response) {
+            $scope.disableCommands.code = response.code;
+            $scope.disableCommands.file = 'ondisable';
+            $scope.disableCommands.portalName = $scope.workshopPortal.title;
+            $scope.disableCommands.storage = $scope.workshopPortal.storage;
+            $scope.disableCommands.updating = true;
+        });
+    };
+
+    $scope.clearToggledCommands = function() {
+        $scope.endableCommands = {portalName: "", storage: "", file: "onenable", code: ""};
+        $scope.disableCommands = {portalName: "", storage: "", file: "ondisable", code: ""};
     };
 
     function getControls() {
@@ -231,6 +268,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     };
 
     $scope.savePortalCode = function (editFile) {
+        console.log(editFile);
         $api.request({
             module: "EvilPortal",
             action: "submitPortalCode",

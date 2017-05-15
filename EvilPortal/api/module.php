@@ -6,6 +6,7 @@ class EvilPortal extends Module
     // CONSTANTS
     private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
     private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
+    private $STORAGE_LOCATIONS = array("sd" => "/sd/portals/", "internal" => "/root/portals/");
 
     // CONSTANTS
 
@@ -71,6 +72,18 @@ class EvilPortal extends Module
             case 'createNewPortal':
                 $this->handleCreateNewPortal();
                 break;
+
+            case 'getPortalRules':
+                $this->getPortalRules();
+                break;
+
+            case 'savePortalRules':
+                $this->savePortalRules();
+                break;
+
+            case 'movePortal':
+                $this->handleMovePortal();
+                break;
         }
     }
 
@@ -78,22 +91,16 @@ class EvilPortal extends Module
     {
         $portalName = $this->request->name;
         $portalFile = $this->request->portalFile;
-        $storage = $this->request->storage;
-
-        if ($storage != "active") {
-            $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
-        } else {
-            $dir = "/etc/nodogsplash/htdocs/";
-        }
+        $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "";
         $code = "";
 
-        if (file_exists($dir . $portalName . "/" . $portalFile)) {
-            $code = file_get_contents($dir . $portalName . "/" . $portalFile);
+        if (file_exists($storage . $portalName . "/" . $portalFile)) {
+            $code = file_get_contents($storage . $portalName . "/" . $portalFile);
             $message = $portalFile . " is ready for editting.";
         } else {
-            $message = "Error finding " . $dir . $portalName . "/" . $portalFile . ".";
+            $message = "Error finding " . $storage . $portalName . "/" . $portalFile . ".";
         }
 
         $this->response = array("message" => $message, "code" => $code);
@@ -103,15 +110,34 @@ class EvilPortal extends Module
     public function getPortalFiles()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $allFiles = array();
+        $nonDeletableBasicFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js");
+        $nonDeletableTargetedFiles = array("MyPortal.php", "helper.php", "index.php", "jquery-2.2.1.min.js", "default.php");
         if (file_exists($dir . $portalName)) {
             $portal_files = scandir($dir . $portalName);
+            $targeted = (file_get_contents($dir . $portalName . "/" . $portalName . ".ep") == "targeted") ? true : false;
             foreach ($portal_files as $file) {
                 if (is_file($dir . $portalName . "/" . $file) && !$this->endsWith($file, ".ep")) {
-                    array_push($allFiles, $file);
+                    if ($targeted) {
+                        if (in_array($file, $nonDeletableTargetedFiles)) {
+                            $a = array("name" => $file, "deletable" => false);
+                            array_push($allFiles, $a);
+                        } else {
+                            $a = array("name" => $file, "deletable" => true);
+                            array_push($allFiles, $a);
+                        }
+                    } else {
+                        if (in_array($file, $nonDeletableBasicFiles)) {
+                            $a = array("name" => $file, "deletable" => false);
+                            array_push($allFiles, $a);
+                        } else {
+                            $a = array("name" => $file, "deletable" => true);
+                            array_push($allFiles, $a);
+                        }
+                    }
+                    //array_push($allFiles, $file);
                 }
             }
         }
@@ -120,27 +146,25 @@ class EvilPortal extends Module
 
     public function deletePortalFile()
     {
-        $portalName = $this->request->name;
-        $storage = $this->request->stroage;
-        $fileName = $this->request->portalFile;
+        $portalName = $this->request->portal;
+        $fileName = $this->request->name;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
         $message = "Unable to delete file.";
         if (file_exists($dir . $portalName . "/" . $fileName)) {
             unlink($dir . $portalName . "/" . $fileName);
-            $message = "Successfully deleted " . $dir . $portalName . "/" . $fileName;
+            $message = "Successfully deleted " . $fileName;
         }
 
-        $this->response = array("deleteMessage" => $message);
+        $this->response = array("message" => $message);
 
     }
 
     public function activatePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "";
         $portalPath = escapeshellarg($dir . $portalName);
@@ -165,9 +189,8 @@ class EvilPortal extends Module
     public function deactivatePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         $message = "Couldn't find " . $portalName;
         $deactivateSuccess = false;
@@ -199,9 +222,8 @@ class EvilPortal extends Module
     public function handleDeletePortal()
     {
         $portalName = $this->request->name;
-        $storage = $this->request->storage;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
         exec("rm -rf " . escapeshellarg($dir . $portalName));
 
@@ -220,35 +242,109 @@ class EvilPortal extends Module
     public function submitPortalCode()
     {
         $code = $this->request->portalCode;
-        $storage = $this->request->storage;
         $portalName = $this->request->name;
         $fileName = $this->request->fileName;
 
-        $dir = ($storage == "sd" ? "/sd/portals/" : "/root/portals/");
+        $dir = $this->STORAGE_LOCATIONS[$this->request->storage];
 
-        file_put_contents($dir . $portalName . "/" . $fileName, $code);
         $message = (!file_exists($dir . $portalName . "/" . $fileName)) ? "Created " . $portalName : "Updated " . $portalName;
+        file_put_contents($dir . $portalName . "/" . $fileName, $code);
         
         $this->response = array(
-            "message" => $message
+            "message" => $message,
+            "fullPath" => $dir . $portalName . "/" . $fileName
         );
+
+    }
+
+    public function getPortalRules()
+    {
+        $portalName = $this->request->name;
+        $path = $this->STORAGE_LOCATIONS[$this->request->storage];
+
+        if ($path == null) {
+            $this->response = array("message" => "Invalid portal storage", "success" => false);
+            return;
+        }
+
+        if (is_file("{$path}{$portalName}/{$portalName}.ep")) {
+            $rules = $this->getValueFromJSONFile(array("targeted_rules"), "{$path}{$portalName}/{$portalName}.ep")["targeted_rules"];
+            $this->response = array(
+                "message" => "Found portal rules",
+                "data" => $rules,
+                "success" => true
+            );
+            return;
+        } else {
+            $this->response = array("message" => "Unable to find portal.", "success" => false);
+            return;
+        }
+
+    }
+
+    public function savePortalRules()
+    {
+        $portalName = $this->request->portal;
+        $path = $this->STORAGE_LOCATIONS[$this->request->storage];
+        $rules = $this->request->rules;
+
+        if ($path == null) {
+            $this->response = array("message" => "Invalid portal storage", "success" => false);
+            return;
+        }
+
+        if (is_file("{$path}{$portalName}/{$portalName}.ep")) {
+            $this->updateJSONFile(array("targeted_rules" => json_decode($rules)), "{$path}{$portalName}/{$portalName}.ep")["targeted_rules"];
+            $this->response = array(
+                "message" => "Saved portal rules",
+                "success" => true
+            );
+            return;
+        } else {
+            $this->response = array("message" => "Unable to find portal.", "success" => false);
+            return;
+        }
 
     }
 
     public function handleGetPortalList()
     {
-        if (!file_exists("/root/portals")) {
-            mkdir("/root/portals");
+        $internal_path = $this->STORAGE_LOCATIONS['internal'];
+        $sd_path = $this->STORAGE_LOCATIONS['sd'];
+
+        if (!file_exists($internal_path)) {
+            mkdir($internal_path);
+        }
+
+        // create path if it doesn't exist and the SD card is available
+        if (!file_exists($sd_path) && $this->isSDAvailable()) {
+            mkdir($sd_path);
         }
 
         $all_portals = array();
-        $root_portals = preg_grep('/^([^.])/', scandir("/root/portals"));
+        $root_portals = preg_grep('/^([^.])/', scandir($internal_path));
 
         foreach ($root_portals as $portal) {
             if (!is_file($portal)) {
                 $active = (file_exists("/www/{$portal}.ep"));
-                $obj = array("title" => $portal, "location" => "internal", "active" => $active);
+                //$portalType = (trim(file_get_contents($internal_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                $portalType = $this->getValueFromJSONFile(array("type"), "{$internal_path}{$portal}/{$portal}.ep")["type"];
+                $obj = array("title" => $portal, "location" => "internal", "active" => $active, "type" => $portalType);
                 array_push($all_portals, $obj);
+            }
+        }
+
+        // get portals stored on the sd card
+        if ($this->isSDAvailable()) {
+            $sd_portals = preg_grep('/^([^.])/', scandir($sd_path));
+            foreach ($sd_portals as $portal) {
+                if (!is_file($portal)) {
+                    $active = (file_exists("/www/{$portal}.ep"));
+                    //$portalType = (trim(file_get_contents($sd_path . $portal . "/" . $portal . ".ep")) == "targeted") ? "targeted": "basic";
+                    $portalType = $this->getValueFromJSONFile(array("type"), "{$sd_path}{$portal}/{$portal}.ep")["type"];
+                    $obj = array("title" => $portal, "location" => "sd", "active" => $active, "type" => $portalType);
+                    array_push($all_portals, $obj);
+                }
             }
         }
 
@@ -261,8 +357,15 @@ class EvilPortal extends Module
 
     public function handleCreateNewPortal()
     {
-        $portalName = str_replace(' ', '_', $this->request->portalName);
-        $portalPath = "/root/portals/";
+        $portalName = strtolower(str_replace(' ', '_', $this->request->portalName));
+        $portalType = $this->request->portalType;
+        $portalPath = $this->STORAGE_LOCATIONS[$this->request->storage];
+
+        if ($portalPath == $this->STORAGE_LOCATIONS['sd'] && !$this->isSDAvailable()) {
+            $this->response = array("create_success" => false, "create_message" => "There is no SD card inserted");
+            return;
+        }
+
         if (!file_exists($portalPath)) {
             mkdir($portalPath);
         }
@@ -273,11 +376,61 @@ class EvilPortal extends Module
         }
 
         mkdir($portalPath . $portalName);
-        exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
-        file_put_contents($portalPath . $portalName . "/" . $portalName . ".ep", "DO NOT DELETE THIS");
+
+        switch ($portalType) {
+            case 'targeted':
+                exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$portalName}/");
+                exec("mv {$portalPath}{$portalName}/portalinfo.json {$portalPath}{$portalName}/{$portalName}.ep");
+                $this->updateJSONFile(array("name" => $portalName, "type" => "targeted"), "{$portalPath}{$portalName}/{$portalName}.ep");
+                exec("sed -i 's/\"portal_name_here\"/\"{$portalName}\"/g' {$portalPath}{$portalName}/index.php");
+                break;
+
+            default:
+                exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$portalName}/");
+                exec("mv {$portalPath}{$portalName}/portalinfo.json {$portalPath}{$portalName}/{$portalName}.ep");
+                $this->updateJSONFile(array("name" => $portalName, "type" => "basic"), "{$portalPath}{$portalName}/{$portalName}.ep");
+                break;
+        }
 
         $this->response = array("create_success" => true, "create_message" => "Created {$portalName}");
 
+    }
+
+    public function handleMovePortal()
+    {
+        $portalName = $this->request->name;
+        $storage = $this->STORAGE_LOCATIONS[$this->request->storage];
+        $newStorage = $this->STORAGE_LOCATIONS[$this->request->newStorage];
+
+        // check if the portal is active
+        if (file_exists("/www/{$portalName}.ep")) {
+            $this->response = array("success" => false, "message" => "You can not move an active portal!");
+            return;
+        }
+
+        // make sure that the SD card is available
+        if (($storage == $this->STORAGE_LOCATIONS['sd'] || $newStorage == $this->STORAGE_LOCATIONS['sd']) && !$this->isSDAvailable()) {
+            $this->response = array("success" => false, "message" => "There is no SD card inserted");
+            return;
+        }
+
+        if (!file_exists($storage)) {
+            mkdir($storage);
+        }
+
+        if (file_exists($storage . $portalName)) {
+            if (!file_exists($newStorage . $portalName)) {
+                shell_exec("mv " . $storage . $portalName . " " . $newStorage . $portalName);
+                if (file_exists($newStorage . $portalName))
+                    $this->response = array("success" => true, "message" => "Moved $portalName to $newStorage!");
+                else
+                    $this->response = array("success" => false, "message" => "There was an issue moving to portal.");
+            } else {
+                $this->response = array("success" => false, "message" => "A $newStorage portal already exists with that name.");
+            }
+        } else {
+            $this->response = array("success" => false, "message" => "Unable to find a portal named $portalName");
+        }
     }
 
     public function handleEnable()
@@ -432,7 +585,7 @@ class EvilPortal extends Module
                     $message = "White List file doesn't exist.";
                 } else {
                     $contents = file_get_contents($this->ALLOWED_FILE);
-                    $contents = ($contents == null) ? "No White Listed Clients" : $contents;
+                    //$contents = ($contents == null) ? "" : $contents;
                 }
                 break;
 
@@ -441,20 +594,17 @@ class EvilPortal extends Module
                     $contents = "No Authorized Clients.";
                 } else {
                     $contents = file_get_contents($this->CLIENTS_FILE);
-                    $contents = ($contents == null) ? "No Authorized Clients." : $contents;
+                    //$contents = $contents;
                 }
                 break;
         }
 
-        if ($contents != null) {
-            $response_array = array(
-                "list_success" => true,
-                "list_contents" => $contents,
-                "list_message" => $message
-            );
-        } else {
-            $response_array = array("list_success" => false, "list_contents" => "", "list_message" => $message);
-        }
+        $response_array = array(
+            "list_success" => true,
+            "list_contents" => $contents,
+            "list_message" => $message
+        );
+
 
         $this->response = $response_array;
     }
@@ -520,7 +670,8 @@ class EvilPortal extends Module
         $this->response = array(
             //"dependencies" => true,
             "running" => $this->checkCaptivePortalRunning(),
-            "autostart" => $this->checkAutoStart()
+            "autostart" => $this->checkAutoStart(),
+            "sdAvailable" => $this->isSDAvailable()
         );
     }
 
@@ -532,5 +683,27 @@ class EvilPortal extends Module
             return true;
         }
     }
+
+    private function updateJSONFile($keyValueArray, $file) {
+        $data = json_decode(file_get_contents($file), true);
+        foreach ($data as $key => $value) {
+            if (isset($keyValueArray[$key])) {
+                $data[$key] = $keyValueArray[$key];
+            }
+        }
+        file_put_contents($file, json_encode($data));
+    }
+
+    private function getValueFromJSONFile($keys, $file) {
+        $data = json_decode(file_get_contents($file), true);
+        $values = array();
+        foreach ($data as $key => $value) {
+            if (in_array($key, $keys)) {
+                $values[$key] = $value;
+            }
+        }
+        return $values;
+    }
+
 
 }

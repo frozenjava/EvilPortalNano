@@ -194,29 +194,22 @@ class EvilPortal extends Module
             array_push($availableMediums, "sd");
         }
 
-        function get_portal_objects($storageType, $storageLocations)
-        {
-            $found = array();
-            $storageLocation = $storageLocations[$storageType];
+        foreach($availableMediums as $medium) {
+            $storageLocation = $this->STORAGE_LOCATIONS[$medium];
             foreach (preg_grep('/^([^.])/', scandir($storageLocation)) as $object) {
-                if (!is_dir($object))  // skip the object if it is not a directory.
+                if (!is_dir($storageLocation . $object))  // skip the object if it is not a directory.
                     continue;
 
                 $portal = array(
                     "title" => $object,
-                    "type" => $this->getValueFromJSONFile(array("type"), "{$storageLocation}{$object}/{$object}.ep")["type"],
-                    "location" => "{$storageLocation}/{$object}",
-                    "storageType" => ($storageType == "internal") ? "Internal" : "SD",
+                    "portalType" => $this->getValueFromJSONFile(array("type"), "{$storageLocation}{$object}/{$object}.ep")["type"],
+                    "location" => "{$storageLocation}{$object}",
+                    "storage" => $medium,
                     "active" => (file_exists("/www/{$object}.ep"))
                 );
                 // push the portal object to the array of portals found
-                array_push($found, $portal);
+                array_push($portals, $portal);
             }
-            return $found;
-        }
-
-        foreach($availableMediums as $medium) {
-            array_push($portals, get_portal_objects($medium, $this->STORAGE_LOCATIONS));
         }
 
         return array("success" => true, "portals" => $portals);

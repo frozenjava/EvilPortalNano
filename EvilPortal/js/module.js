@@ -1,7 +1,7 @@
 registerController("EvilPortalController", ['$api', '$scope', function ($api, $scope) {
 
     // status information about the module
-    $scope.evilPortal = {"throbber": false, "sdAvailable": false, "running": false, "startOnBoot": false, "debug": true};
+    $scope.evilPortal = {"throbber": false, "sdAvailable": false, "running": false, "startOnBoot": false};
 
     // controls that belong in the Controls pane
     $scope.controls = [
@@ -11,6 +11,14 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
 
     // messages to be displayed in the Messages pane
     $scope.messages = [];
+
+    // all of the portals that could be found
+    $scope.portals = [];
+
+    // a model of a new portal to create
+    $scope.newPortal = {"type": "basic", "name": ""};
+
+    $scope.portalToDelete = null;
 
     /**
      * Push a message to the Evil Portal Messages Pane
@@ -22,7 +30,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         $scope.messages.unshift({title: t, msg: m});
 
         // if there are 4 items in the list remove the 4th item
-        if ($scope.messages.length == 4) {
+        if ($scope.messages.length === 4) {
             $scope.dismissMessage(3);
         }
     };
@@ -35,6 +43,11 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         $scope.messages.splice($index, 1);
     };
 
+    /**
+     * Preform an action for a given control
+     * This can be starting the captive portal or toggle on boot.
+     * @param control: The control to handle
+     */
     $scope.handleControl = function(control) {
         control.throbber = true;
         var actionToPreform = null;
@@ -59,16 +72,58 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 getStatus();
             });
         }
-
     };
 
     /**
-     * Log a given message to the console if debugging is true
-     * @param message: The message to log
+     * Validates the information in the newPortal model and then makes an API request to create a new portal.
+     * @param storage: The storage medium to create the portal on (internal or sd)
      */
-    function debug_log(message) {
-        if ($scope.evilPortal.debug)
-            console.log(message);
+    $scope.createNewPortal = function(storage) {
+        $api.request({
+            module: "EvilPortal",
+            action: "createNewPortal",
+            name: $scope.newPortal.name,
+            type: $scope.newPortal.type,
+            storage: storage
+        }, function(response) {
+            if (!response.success) {
+                $scope.sendMessage('Error Creating Portal', response.message);
+                return;
+            }
+            $scope.newPortal = {"type": "basic", "name": ""};
+            getPortals();
+        });
+    };
+
+    /**
+     * Delete a portal from the wifi pineapple
+     */
+    $scope.deletePortal = function() {
+        if ($scope.portalToDelete === null || $scope.portalToDelete.fullPath === null) {
+            $scope.sendMessage("Unable To Delete Portal", "No portal was set for deletion.");
+            return;
+        }
+        deleteFileOrDirectory($scope.portalToDelete.fullPath, function (response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Deleting Portal", response.message);  // push an error if deletion failed
+            } else {
+                getPortals();  // refresh the library
+            }
+        });
+    };
+
+    /**
+     * Delete a file or directory from the pineapples filesystem.
+     * This is intended to be used for only deleting portals and portal related files but anything can be delete.
+     * @param fileOrDirectory: The path to the file to delete
+     * @param callback: The callback function to handle the API response
+     */
+    function deleteFileOrDirectory(fileOrDirectory, callback) {
+        $api.request({
+            module: "EvilPortal",
+            action: "deleteFile",
+            filePath: fileOrDirectory
+        }, callback(response));
     }
 
     /**
@@ -89,7 +144,6 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 "throbber": false
             }
         ];
-        debug_log($scope.controls);
     }
 
     /**
@@ -101,7 +155,6 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             module: "EvilPortal",
             action: "status"
         }, function (response) {
-            debug_log(response);
             for (var key in response) {
                 if (response.hasOwnProperty(key) && $scope.evilPortal.hasOwnProperty(key)) {
                     $scope.evilPortal[key] = response[key];
@@ -112,6 +165,34 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     }
 
+    /**
+     * Get all of the portals on the Pineapple
+     */
+    function getPortals() {
+        $scope.evilPortal.throbber = true;
+        $api.request({
+            module: "EvilPortal",
+            action: "listAvailablePortals"
+        }, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Listing Portals", "An error occurred while trying to get list of portals.");
+                return;
+            }
+            $scope.portals = [];
+            response.portals.forEach(function(item, index) {
+                $scope.portals.unshift({
+                    title: item.title,
+                    storage: item.storage,
+                    active: item.active,
+                    type: item.portalType,
+                    fullPath: item.location
+                });
+            });
+        });
+    }
+
     getStatus();
+    getPortals();
+
 
 }]);

@@ -1,6 +1,7 @@
 <div class="row" ng-controller="EvilPortalController">
 
     <div class="col-md-3">
+        <!-- Controls Panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="javascript:;" data-toggle="collapse" data-target="#collapseControls" class="text-muted"><h4
@@ -25,6 +26,7 @@
             </div>
         </div>
 
+        <!-- Messages Panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages" class="text-muted"><h4
@@ -51,7 +53,6 @@
         </div>
     </div>
 
-    <!--<div ng-show="dependencies">-->
     <div class="panel-group" id="accordion">
         <div class="col-md-9">
             <!-- Library panel -->
@@ -65,17 +66,17 @@
                         <div class="input-group" ng-show="library">
 
                             <span class="input-group-btn">
-                                <select class="form-control ng-pristine ng-valid ng-touched" style="width:80px" ng-model="newPortalType">
+                                <select class="form-control ng-pristine ng-valid ng-touched" style="width:80px" ng-model="newPortal.type">
                                     <option value="basic">Basic</option>
                                     <option value="targeted">Targeted</option>
                                 </select>
                             </span>
 
-                            <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortalName">
+                            <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortal.name">
 
                             <span class="input-group-btn">
-                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('internal')">Create New Portal</button>
-                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('sd')" ng-show="sdAvailable">Create On SD Card</button>
+                                <button ng-disabled="newPortal.name == ''" class="btn btn-default" type="button" ng-click="createNewPortal('internal')">Create New Portal</button>
+                                <button ng-disabled="newPortal.name == ''" class="btn btn-default" type="button" ng-click="createNewPortal('sd')" ng-show="evilPortal.sdAvailable">Create On SD Card</button>
                             </span>
                         </div>
                         <hr ng-show="library"/>
@@ -86,7 +87,7 @@
                                     <th>Portal Name</th>
                                     <th>Portal Type</th>
                                     <th>Location</th>
-                                    <th ng-show="sdAvailable">Move</th>
+                                    <th ng-show="evilPortal.sdAvailable">Move</th>
                                     <th>Activate</th>
                                     <th>Delete</th>
                                     </thead>
@@ -100,8 +101,8 @@
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
                                         <!-- change storage -->
                                         <td>
-                                            <a ng-show="(sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
-                                            <a ng-show="(sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
+                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
+                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
                                         </td>
                                         <!-- activate/deactivate -->
                                         <td>
@@ -110,7 +111,7 @@
                                         </td>
                                         <!-- delete portal button -->
                                         <td>
-                                            <a ng-hide="portal.active" href="javascript:;" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortalRequest(portal)">Delete</a>
+                                            <a ng-hide="portal.active" href="javascript:;" data-toggle="modal" data-target="#deleteModal" ng-click="portalToDelete = portal">Delete</a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -399,7 +400,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">Cancel</button>
-                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(portalToDelete); portalToDelete = {}" ng-disabled="portalDeleteValidation.toLowerCase() != portalToDelete.title.toLowerCase()">Delete</button>
+                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(); portalToDelete = null" ng-disabled="portalDeleteValidation.toLowerCase() != portalToDelete.name.toLowerCase()">Delete</button>
                 </div>
             </div>
         </div>

@@ -227,8 +227,8 @@ class EvilPortal extends Module
         // force the name of the portal to be lower cased and replace spaces with underscores
         $name = strtolower(str_replace(' ', '_', $name));
 
-        // $type should be equal to "sd" or "internal". If its anything else just make it "internal"
-        $type = ($type == "sd" or $type == "internal") ? $type : "internal";
+        // $storage should be equal to "sd" or "internal". If its anything else just make it "internal"
+        $storage = ($storage == "sd" or $storage == "internal") ? $storage : "internal";
 
         // the path to store the portal
         $portalPath = $this->STORAGE_LOCATIONS[$storage];
@@ -324,6 +324,8 @@ class EvilPortal extends Module
      * If any file with the same name as one of the files being copied to /www already exists in /www
      * then that file will be renamed to {file_name}.ep_backup and restored when the portal is deactivated.
      *
+     * If any portals are currently active when this method is called they will be deactivated.
+     *
      * @param $name: The name of the portal to activate
      * @param $storage: The storage medium the portal is on
      * @return array
@@ -331,6 +333,16 @@ class EvilPortal extends Module
     private function activatePortal($name, $storage)
     {
         $dir = $this->STORAGE_LOCATIONS[$storage];
+
+        // check if there is a currently activate portal and deactivate it.
+        foreach(scandir("/www") as $file) {
+            if (substr($file, strlen($file) - strlen(".ep")) === ".ep") {  // deactivate a portal if needed
+                $realPath = realpath("/www/{$file}");
+                $storage = (substr($realPath, 0, strlen($realPath) === "/root")) ? "internal": "sd";
+                $this->deactivatePortal(rtrim($file, ".ep"), $storage);
+                break;
+            }
+        }
 
         $success = false;
         $portalPath = escapeshellarg($dir . $name);

@@ -18,7 +18,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     // a model of a new portal to create
     $scope.newPortal = {"type": "basic", "name": ""};
 
+    // deleting portal stuff
     $scope.portalToDelete = null;
+    $scope.portalDeleteValidation = null;
 
     /**
      * Push a message to the Evil Portal Messages Pane
@@ -96,9 +98,41 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     };
 
     /**
-     * Delete a portal from the wifi pineapple
+     * Move a given portal between storage mediums if an SD card is present.
+     * @param portal: The portal to move
      */
-    $scope.deletePortal = function() {
+    $scope.movePortal = function(portal) {
+        if (!$scope.evilPortal.sdAvailable) {
+            $scope.sendMessage("No SD Card.", "An SD card must be present to preform this action.");
+            return;
+        }
+
+        $api.request({
+            module: "EvilPortal",
+            action: "movePortal",
+            name: portal.title,
+            storage: portal.storage
+        }, function(response) {
+            if (response.success) {
+                getPortals();
+                $scope.sendMessage("Moved Portal", response.message);
+            } else {
+                $scope.sendMessage("Error Moving " + portal.title, response.message);
+            }
+        });
+    };
+
+    /**
+     * Delete a portal from the wifi pineapple
+     * @param verified: Has the delete request been verified? If so then make the API request otherwise setup
+     * @param portal: The portal to delete
+     */
+    $scope.deletePortal = function(verified, portal) {
+        if (!verified) {  // if the request has not been verified then setup the shits
+            $scope.portalToDelete = portal;
+            return;
+        }
+
         if ($scope.portalToDelete === null || $scope.portalToDelete.fullPath === null) {
             $scope.sendMessage("Unable To Delete Portal", "No portal was set for deletion.");
             return;
@@ -107,7 +141,50 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             if (!response.success) {
                 $scope.sendMessage("Error Deleting Portal", response.message);  // push an error if deletion failed
             } else {
+                $scope.sendMessage("Deleted Portal", "Successfully deleted " + $scope.portalToDelete.title.toUpperCase() + ".");
+                $scope.portalToDelete = null;
+                $scope.portalDeleteValidation = null;
                 getPortals();  // refresh the library
+            }
+        });
+    };
+
+    /**
+     * Activate a portal
+     * @param portal: The portal to activate
+     */
+    $scope.activatePortal = function(portal) {
+        $api.request({
+            module: "EvilPortal",
+            action: "activatePortal",
+            name: portal.title,
+            storage: portal.storage
+        }, function(response) {
+            if (response.success) {
+                getPortals();
+                $scope.sendMessage("Activated Portal", portal.title + " has been activated successfully.");
+            } else {
+                $scope.sendMessage("Error Activating " + portal.title, response.message);
+            }
+        });
+    };
+
+    /**
+     * Deactivate a given portal if its active
+     * @param portal: The portal to deactivate
+     */
+    $scope.deactivatePortal = function(portal) {
+        $api.request({
+            module: "EvilPortal",
+            action: "deactivatePortal",
+            name: portal.title,
+            storage: portal.storage
+        }, function(response) {
+            if (response.success) {
+                getPortals();
+                $scope.sendMessage("Deactivated Portal", portal.title + " has been deactivated successfully.");
+            } else {
+                $scope.sendMessage("Error Deactivating " + portal.title, response.message);
             }
         });
     };
@@ -123,7 +200,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             module: "EvilPortal",
             action: "deleteFile",
             filePath: fileOrDirectory
-        }, callback(response));
+        }, function(response) {
+            callback(response);
+        });
     }
 
     /**
@@ -191,6 +270,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     }
 
+    // The status for the Evil Portal module as well as current portals should be retrieved when the controller loads.
     getStatus();
     getPortals();
 

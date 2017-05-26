@@ -1,7 +1,13 @@
 registerController("EvilPortalController", ['$api', '$scope', function ($api, $scope) {
 
     // status information about the module
-    $scope.evilPortal = {"throbber": false, "sdAvailable": false, "running": false, "startOnBoot": false};
+    $scope.evilPortal = {
+        "throbber": false,
+        "sdAvailable": false,
+        "running": false,
+        "startOnBoot": false,
+        "library": true
+    };
 
     // controls that belong in the Controls pane
     $scope.controls = [
@@ -21,6 +27,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     // deleting portal stuff
     $scope.portalToDelete = null;
     $scope.portalDeleteValidation = null;
+
+    // the portal workshop
+    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {}};
 
     /**
      * Push a message to the Evil Portal Messages Pane
@@ -188,6 +197,54 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             }
         });
     };
+
+    /**
+     * Load portal contents and open it up in the work bench
+     * @param portal: The portal to get the contents of
+     */
+    $scope.loadPortal = function (portal) {
+        getFileOrDirectoryContent(portal.fullPath, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Getting Contents", response.message);
+                return;
+            }
+            $scope.workshop.inRoot = true;
+            $scope.workshop.portal = portal;
+            $scope.workshop.dirContents = response.content;
+            $scope.workshop.rootDirectory = portal.fullPath;
+            $scope.evilPortal.library = false;
+        });
+    };
+
+    /**
+     * Load the contents of a given file.
+     * @param filePath: The path to the file to load
+     */
+    $scope.loadFileContent = function(filePath) {
+        getFileOrDirectoryContent(filePath, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Getting Contents", response.message);
+                return;
+            }
+            $scope.workshop.editFile.content = response.content;
+            $scope.workshop.editFile.path = filePath;
+        });
+    };
+
+    /**
+     * Get the contents of a directory
+     * @param pathToObject: The full path to the file or directory to get the contents of
+     * @param callback: A function that handles the response from the API.
+     */
+    function getFileOrDirectoryContent(pathToObject, callback) {
+        $api.request({
+            module: "EvilPortal",
+            action: "getFileContent",
+            filePath: pathToObject
+        }, function(response) {
+            callback(response);
+        });
+    }
 
     /**
      * Delete a file or directory from the pineapples filesystem.

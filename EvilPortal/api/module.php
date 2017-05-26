@@ -27,10 +27,6 @@ class EvilPortal extends Module
                 );
                 break;
 
-            case 'getFileContent':
-                $this->response = $this->getFileContents($this->request->filePath);
-                break;
-
             case 'writeFileContent':
                 $this->response = $this->writeFileContents($this->request->filePath, $this->request->content, $this->request->append);
                 break;
@@ -42,7 +38,8 @@ class EvilPortal extends Module
                 break;
 
             case 'getDirectoryContent':
-                $this->response =  $this->getDirectoryContents($this->request->directory);
+            case 'getFileContent':
+                $this->response =  $this->getFileOrDirectoryContents($this->request->filePath);
                 break;
 
             case 'listAvailablePortals':
@@ -98,25 +95,40 @@ class EvilPortal extends Module
     }
 
     /**
-     * Get the contents of a specified file.
+     * Get the contents of a specified file or directory
      *
      * If this method is being called as the result of an HTTP request, make sure that "file" is specified as a
      * parameter of the request and includes the full path to the file that should have its contents returned.
      *
-     * @param $file : The file to get contents of
+     * @param $file : The file or directory to get contents of
      * @return array
      */
-    private function getFileContents($file)
+    private function getFileOrDirectoryContents($file)
     {
 
-        if (file_exists("{$file}")) {
-            $contents = file_get_contents("{$file}");
-            $message = "{$file} is ready for editing.";
-            $success = true;
-        } else {
-            $message = "Error finding {$file}.";
+        if (!file_exists($file)) {
+            $message = "No such file or directory {$file}.";
             $contents = null;
             $success = false;
+        } else if (is_file($file)) {
+            $message = "Found file {$file} and retrieved contents";
+            $contents = file_get_contents($file);
+            $success = true;
+        } else if (is_dir($file)) {
+            $contents = array();
+            $message = "Returning directory contents for {$file}";
+            foreach (preg_grep('/^([^.])/', scandir($file)) as $object) {
+                $obj = array("name" => $object, "directory" => is_dir("{$file}/{$object}"),
+                    "path" => realpath("{$file}/{$object}"),
+                    "permissions" => substr(sprintf('%o', fileperms("{$file}/{$object}")), -4),
+                    "size" => filesize("{$file}/{$object}"));
+                array_push($contents, $obj);
+            }
+            $success = true;
+        } else {
+            $contents = null;
+            $success = false;
+            $message = "Unknown case. This should never happen.";
         }
         return array("success" => $success, "message" => $message, "content" => $contents);
     }
@@ -149,34 +161,6 @@ class EvilPortal extends Module
         $message = (file_exists($filePath)) ? "Error deleting file {$filePath}." : "{$filePath} has been deleted.";
 
         return array("success" => $success, "message" => $message);
-    }
-
-    /**
-     * Get contents of a specified directory
-     *
-     * If this method is being called as the result of an HTTP request to the API, make sure that "directory" is
-     * specified as a parameter to the request and includes the full path to the directory that should have its
-     * contents returned.
-     *
-     * @param $directory : The directory to get contents of
-     * @return array
-     */
-    private function getDirectoryContents($directory)
-    {
-        $success = false;
-        $contents = array();
-        if (file_exists($directory)) {
-            foreach (preg_grep('/^([^.])/', scandir($directory)) as $file) {
-                $obj = array("name" => $file, "directory" => is_dir("{$directory}/{$file}"),
-                    "path" => realpath("{$directory}/{$file}"),
-                    "permissions" => substr(sprintf('%o', fileperms("{$directory}/{$file}")), -4),
-                    "size" => filesize("{$directory}/{$file}"));
-                array_push($contents, $obj);
-            }
-            $success = true;
-        }
-
-        return array("success" => $success, "contents" => $contents, "directory" => $directory);
     }
 
     /**

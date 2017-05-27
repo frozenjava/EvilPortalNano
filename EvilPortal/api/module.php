@@ -112,7 +112,12 @@ class EvilPortal extends Module
             $success = false;
         } else if (is_file($file)) {
             $message = "Found file {$file} and retrieved contents";
-            $contents = file_get_contents($file);
+            $contents = array(
+                "name" => basename($file),
+                "path" => $file,
+                "size" => filesize($file),
+                "fileContent" => file_get_contents($file)
+            );
             $success = true;
         } else if (is_dir($file)) {
             $contents = array();
@@ -135,9 +140,10 @@ class EvilPortal extends Module
 
     /**
      * Write given content to a given file.
-     * @param $file: The file to write content to
-     * @param $content: The content to write to the file
-     * @param $append: Should the data be appended to the end of the file (true) or over-write the file (false)
+     * @param $file : The file to write content to
+     * @param $content : The content to write to the file
+     * @param $append : Should the data be appended to the end of the file (true) or over-write the file (false)
+     * @return array
      */
     private function writeFileContents($file, $content, $append)
     {
@@ -145,6 +151,7 @@ class EvilPortal extends Module
             file_put_contents($file, $content, FILE_APPEND);
         else
             file_put_contents($file, $content);
+        return array("success" => true, "message" => null);
     }
 
     /**

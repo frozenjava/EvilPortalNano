@@ -226,10 +226,57 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 $scope.sendMessage("Error Getting Contents", response.message);
                 return;
             }
-            $scope.workshop.editFile.content = response.content;
-            $scope.workshop.editFile.path = filePath;
+            $scope.workshop.editFile = {
+                "name": response.content.name,
+                "path": response.content.path,
+                "size": response.content.size,
+                "content": response.content.fileContent
+            };
         });
     };
+
+    $scope.setupNewFile = function() {
+        var basePath = ($scope.workshop.portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
+        $scope.workshop.editFile.path = basePath + $scope.workshop.portal.title + "/";
+        $scope.workshop.editFile.isNewFile = true;
+    };
+
+    /**
+     * Write file content to the file system.
+     * @param editFile: A portal.editFile object
+     */
+    $scope.saveFileContent = function(editFile) {
+        // new files wont have the filename in the path so make sure to set it here if needed.
+        if (!editFile.path.includes(editFile.name))
+            editFile.path = editFile.path + editFile.name;
+
+        console.log(editFile.path);
+        writeToFile(editFile.path, editFile.content, false, function(response) {
+            if (!response.success)
+                $scope.sendMessage("Error write to file " + editFile.name, response.message);
+
+            $scope.loadPortal($scope.workshop.portal);  // refresh the portal
+        });
+    };
+
+    /**
+     * Write given content to a given file on the file system.
+     * @param filePath: The path to the file to write content to
+     * @param fileContent: The content to write to the file
+     * @param appendFile: Should the content be append to the file (true) or overwrite the file (false)
+     * @param callback: A callback function to handle the API response
+     */
+    function writeToFile(filePath, fileContent, appendFile, callback) {
+        $api.request({
+            module: "EvilPortal",
+            action: "writeFileContent",
+            filePath: filePath,
+            content: fileContent,
+            append: appendFile
+        }, function(response) {
+            callback(response);
+        });
+    }
 
     /**
      * Get the contents of a directory

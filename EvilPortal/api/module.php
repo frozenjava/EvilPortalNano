@@ -95,6 +95,19 @@ class EvilPortal extends Module
     }
 
     /**
+     * Decide if a file for a given portal is "deletable" or not.
+     * If it is not then the UI should not display a delete option for the file.
+     * @param $file: The name of the file
+     * @return bool: Is the file deletable or not
+     */
+    private function isFileDeletable($file)
+    {
+        if (substr($file, -strlen(".ep")) == ".ep")
+            return false;
+        return !in_array($file, array("MyPortal.php", "default.php", "helper.php", "index.php"));
+    }
+
+    /**
      * Get the contents of a specified file or directory
      *
      * If this method is being called as the result of an HTTP request, make sure that "file" is specified as a
@@ -123,10 +136,15 @@ class EvilPortal extends Module
             $contents = array();
             $message = "Returning directory contents for {$file}";
             foreach (preg_grep('/^([^.])/', scandir($file)) as $object) {
+                // skip .ep files because they shouldn't be edited directly.
+                if (substr($object, -strlen(".ep")) == ".ep")
+                    continue;
+
                 $obj = array("name" => $object, "directory" => is_dir("{$file}/{$object}"),
                     "path" => realpath("{$file}/{$object}"),
                     "permissions" => substr(sprintf('%o', fileperms("{$file}/{$object}")), -4),
-                    "size" => filesize("{$file}/{$object}"));
+                    "size" => filesize("{$file}/{$object}"),
+                    "deletable" => $this->isFileDeletable($object));
                 array_push($contents, $obj);
             }
             $success = true;
@@ -162,11 +180,15 @@ class EvilPortal extends Module
      */
     private function deleteFileOrDirectory($filePath)
     {
-        exec(escapeshellcmd("rm -rf {$filePath}"));
+        if ($this->isFileDeletable(basename($filePath))) {
+            exec(escapeshellcmd("rm -rf {$filePath}"));
 
-        $success = (!file_exists($filePath));
-        $message = (file_exists($filePath)) ? "Error deleting file {$filePath}." : "{$filePath} has been deleted.";
-
+            $success = (!file_exists($filePath));
+            $message = (file_exists($filePath)) ? "Error deleting file {$filePath}." : "{$filePath} has been deleted.";
+        } else {
+            $success = false;
+            $message = "{$filePath} can not be deleted!";
+        }
         return array("success" => $success, "message" => $message);
     }
 
@@ -242,6 +264,7 @@ class EvilPortal extends Module
         switch ($type) {
             case 'targeted':
                 exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/* {$portalPath}{$name}/");
+                exec("cp /pineapple/modules/EvilPortal/includes/targeted_skeleton/.* {$portalPath}{$name}/");
                 exec("mv {$portalPath}{$name}/portalinfo.json {$portalPath}{$name}/{$name}.ep");
                 $this->updateJSONFile(array("name" => $name, "type" => "targeted"), "{$portalPath}{$name}/{$name}.ep");
                 exec("sed -i 's/\"portal_name_here\"/\"{$name}\"/g' {$portalPath}{$name}/index.php");
@@ -249,14 +272,15 @@ class EvilPortal extends Module
 
             default:
                 exec("cp /pineapple/modules/EvilPortal/includes/skeleton/* {$portalPath}{$name}/");
+                exec("cp /pineapple/modules/EvilPortal/includes/skeleton/.* {$portalPath}{$name}/");
                 exec("mv {$portalPath}{$name}/portalinfo.json {$portalPath}{$name}/{$name}.ep");
                 $this->updateJSONFile(array("name" => $name, "type" => "basic"), "{$portalPath}{$name}/{$name}.ep");
                 break;
         }
 
         // make these scripts executable
-        exec("chmod +x {$portalPath}{$name}/onenable");
-        exec("chmod +x {$portalPath}{$name}/ondisable");
+        exec("chmod +x {$portalPath}{$name}/.enable");
+        exec("chmod +x {$portalPath}{$name}/.disable");
 
         return array("success" => true, "message" => "Created {$type} portal {$name}!");
     }
@@ -347,6 +371,7 @@ class EvilPortal extends Module
                 exec("ln -s {$portalPath}/{$file} /www/{$file}");
                 $success = true;
             }
+            exec("echo {$portalPath}/.enable | at now");
             $message = "{$name} is now active.";
         } else {
             $message = "Couldn't find {$portalPath}.";
@@ -392,6 +417,8 @@ class EvilPortal extends Module
                 rename("/www/{$file}", "www/{$oldName}");
             }
         }
+
+        exec("echo {$dir}{$name}/.disable | at now");
 
         return array("success" => true, "message" => "Deactivated {$name}.");
     }

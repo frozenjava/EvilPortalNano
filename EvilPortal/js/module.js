@@ -29,7 +29,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.portalDeleteValidation = null;
 
     // the portal workshop
-    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {}};
+    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {},
+        "onEnable": null, "onDisable": null
+    };
 
     /**
      * Push a message to the Evil Portal Messages Pane
@@ -213,7 +215,57 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             $scope.workshop.dirContents = response.content;
             $scope.workshop.rootDirectory = portal.fullPath;
             $scope.evilPortal.library = false;
+            console.log(response.content);
         });
+    };
+
+    /**
+     * Load toggle commands for the current portal in the work bench.
+     * These are the commands that are executed when a portal is enabled/disabled.
+     */
+    $scope.loadToggleCommands = function() {
+        [".enable", ".disable"].forEach(getScript);
+        function getScript(scriptName) {
+            getFileOrDirectoryContent($scope.workshop.rootDirectory + "/" + scriptName, function (response) {
+                if (!response.success) {
+                    $scope.sendMessage("Error Getting Contents", response.message);
+                    return;
+                }
+                if (scriptName === ".enable")
+                    $scope.workshop.onEnable = response.content.fileContent;
+                else
+                    $scope.workshop.onDisable = response.content.fileContent;
+            });
+        }
+    };
+
+    /**
+     * Save toggle commands.
+     * @param cmdFile: The commands to save (enable, disable)
+     */
+    $scope.saveToggleCommands = function(cmdFile) {
+        function sendData(f, content) {
+            writeToFile($scope.workshop.rootDirectory + "/" + f, content, false, function (response) {
+                if (!response.success)
+                    $scope.sendMessage("Error write to file " + f, response.message);
+            });
+        }
+
+        switch(cmdFile) {
+            case "disable":
+                sendData(".disable", $scope.workshop.onDisable);
+                break;
+
+            case "enable":
+                sendData(".enable", $scope.workshop.onEnable);
+                break;
+
+            default:
+                sendData(".enable", $scope.workshop.onEnable);
+                sendData(".disable", $scope.workshop.onDisable);
+                break;
+        }
+
     };
 
     /**

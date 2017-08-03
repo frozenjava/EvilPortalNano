@@ -533,17 +533,25 @@ class EvilPortal extends Module
         file_put_contents($this->CLIENTS_FILE, $allowedClients);
 
         // Configure other rules
-        exec("iptables -t nat -A PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
-        exec("iptables -A INPUT -p tcp --dport 53 -j ACCEPT");
+        exec("iptables -A INPUT -s 172.16.42.0/24 -j DROP");
+        exec("iptables -A OUTPUT -s 172.16.42.0/24 -j DROP");
+        exec("iptables -A INPUT -s 172.16.42.0/24 -p udp --dport 53 -j ACCEPT");
+
+        // Allow the pineapple
+        exec("iptables -A INPUT -s 172.16.42.1 -j ACCEPT");
+        exec("iptables -A OUTPUT -s 172.16.42.1 -j ACCEPT");
+
+        //exec("iptables -A INPUT -i br-lan -p tcp --dport 443 -j DROP");
+        //exec("iptables -t nat -A PREROUTING -i br-lan -j DROP");
+
+        exec("iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
+        exec("iptables -t nat -A POSTROUTING -j MASQUERADE");
 
         // Add rule for each allowed client
         $lines = file($this->CLIENTS_FILE);
         foreach ($lines as $client) {
             $this->authorizeClient($client);
         }
-
-        // Drop everything else
-        exec("iptables -I INPUT -p tcp --dport 443 -j DROP");
 
         $success = $this->checkEvilPortalRunning();
         $message = ($success) ? "EvilPortal is now up and running!" : "EvilPortal failed to start.";
@@ -566,7 +574,7 @@ class EvilPortal extends Module
             unlink($this->CLIENTS_FILE);
         }
 
-        exec("iptables -t nat -D PREROUTING -s 172.16.42.0/24 -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
+        exec("iptables -t nat -D PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
         exec("iptables -D INPUT -p tcp --dport 53 -j ACCEPT");
         exec("iptables -D INPUT -j DROP");
 

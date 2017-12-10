@@ -77,6 +77,20 @@ class EvilPortal extends Module
             case 'toggleCaptivePortal':
                 $this->response = $this->toggleCaptivePortal();
                 break;
+
+            case 'removeClientFromList':
+                $this->response = $this->removeFromList($this->request->clientIP, $this->request->listName);
+                break;
+
+            case 'authorizeClient':
+                $this->authorizeClient($this->request->clientIP);
+                $this->response = array("success" => true);
+                break;
+
+            case 'revokeClient':
+                $this->revokeClient($this->request->clientIP);
+                $this->response = $this->response = array("success" => true);
+                break;
         }
     }
 

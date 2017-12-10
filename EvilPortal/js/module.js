@@ -18,6 +18,10 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     // messages to be displayed in the Messages pane
     $scope.messages = [];
 
+    $scope.whiteList = {"clients": "", "toManipulate": null};
+
+    $scope.accessList = {"clients": "", "toManipulate": null};
+
     // all of the portals that could be found
     $scope.portals = [];
 
@@ -29,8 +33,17 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.portalDeleteValidation = null;
 
     // the portal workshop
-    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {},
-        "onEnable": null, "onDisable": null
+    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {"path": null, "isNewFile": true},
+        "onEnable": null, "onDisable": null, "concreteTargetedRules": null, "workingTargetedRules": null, "deleteFile": null
+    };
+
+    /**
+     * Reset the workshop object to a blank slate with initial values.
+     */
+    $scope.resetWorkshop = function () {
+        $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {"path": null, "isNewFile": true},
+            "onEnable": null, "onDisable": null, "concreteTargetedRules": null, "workingTargetedRules": null, "deleteFile": null
+        };
     };
 
     /**
@@ -269,6 +282,123 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     };
 
     /**
+     * Load the rules for targeted portals
+     */
+    $scope.loadTargetedRules = function() {
+        $api.request({
+            module: "EvilPortal",
+            action: "getRules",
+            name: $scope.workshop.portal.title,
+            storage: $scope.workshop.portal.storage
+        }, function(response) {
+            if (response.success) {
+                $scope.workshop.concreteTargetedRules = response.data;
+                $scope.workshop.workingTargetedRules = {"rules": {}};
+
+                // welcome to the realm of loops. I will be your guide
+                // We have to turn each rule into a keyed set of rules with a rule index represented by var index
+                // this is because we need a constant key for each rule when editing on the web interface
+                // the index must be removed later before saving the results to the routes.json file
+                // if you have a better way to do this you are my hero. Email me n3rdcav3@gmail.com or fork the repo :)
+
+                // This first loop loops over each rule categories such as "mac", "ssid" and so on
+                for (var key in response.data['rules']) {
+
+                    // we then create the a object with that key name in our workingData object
+                    $scope.workshop.workingTargetedRules['rules'][key] = {};
+
+                    // Now its time to loop over each category specifier such as "exact" and "regex"
+                    for (var specifier in response.data['rules'][key]) {
+                        var index = 0;
+
+                        // We then create that specifier in our workingData
+                        $scope.workshop.workingTargetedRules['rules'][key][specifier] = {};
+
+                        // finally we loop over the specific rules defined in the specifier
+                        for (var r in response.data['rules'][key][specifier]) {
+                            var obj = {};
+                            obj['key'] = r;
+                            obj['destination'] = response.data['rules'][key][specifier][r];
+                            $scope.workshop.workingTargetedRules['rules'][key][specifier][index] = obj;
+                        }
+                        // increment index
+                        index++;
+                    }
+                }
+            } else {
+                $scope.sendMessage("Error", "There was an issue getting the portal rules.");
+            }
+        });
+    };
+
+    /**
+     * Remove a targeted rule
+     * @param rule
+     * @param specifier
+     * @param index
+     */
+    $scope.removeTargetedRule = function(rule, specifier, index) {
+        delete $scope.workshop.workingTargetedRules['rules'][rule][specifier][index];
+    };
+
+    /**
+     * Create a new targeted rule
+     * @param rule
+     * @param specifier
+     */
+    $scope.newTargetedRule = function(rule, specifier) {
+        // make sure the specifier is set
+        if ($scope.workshop.workingTargetedRules['rules'][rule][specifier] == undefined) {
+            $scope.workshop.workingTargetedRules['rules'][rule][specifier] = {};
+        }
+
+        var highest = 0;
+
+        // get the highest index
+        for (var i in $scope.workshop.workingTargetedRules['rules'][rule][specifier]) {
+            if (parseInt(i) >= highest) {
+                highest = i + 1;
+            }
+        }
+
+        $scope.workshop.workingTargetedRules['rules'][rule][specifier][highest] = {"": ""};
+    };
+
+    $scope.saveTargetedRules = function() {
+        // build the rules
+        for (var key in $scope.workshop.concreteTargetedRules.rules) {
+            for (var specifier in $scope.workshop.concreteTargetedRules.rules[key]) {
+                var obj = {};
+                for (var i in $scope.workshop.workingTargetedRules['rules'][key][specifier]) {
+                    //for (var r in $scope.workingPortalRules['rules'][key][specifier][i]) {
+                    //    obj[r] = $scope.workingPortalRules['rules'][key][specifier][i]['destination'];
+                    //}
+                    obj[$scope.workshop.workingTargetedRules['rules'][key][specifier][i]['key']] = $scope.workshop.workingTargetedRules['rules'][key][specifier][i]['destination'];
+                }
+                $scope.workshop.concreteTargetedRules['rules'][key][specifier] = obj;
+            }
+        }
+
+        console.log(JSON.stringify($scope.workshop.concreteTargetedRules));
+
+        $api.request({
+            module: "EvilPortal",
+            action: "saveRules",
+            name: $scope.workshop.portal.title,
+            storage: $scope.workshop.portal.storage,
+            rules: JSON.stringify($scope.workshop.concreteTargetedRules)
+        }, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error", response.message);
+            }
+        });
+    };
+
+    $scope.isObjectEmpty = function(obj) {
+        return (Object.keys(obj).length === 0);
+    };
+
+    /**
      * Load the contents of a given file.
      * @param filePath: The path to the file to load
      */
@@ -309,6 +439,89 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
 
             $scope.loadPortal($scope.workshop.portal);  // refresh the portal
         });
+    };
+
+    /**
+     * Delete a requested file.
+     */
+    $scope.deleteFile = function() {
+        deleteFileOrDirectory($scope.workshop.deleteFile.path, function(response){
+            if (!response.success)
+                $scope.sendMessage("Error deleting file " + $scope.workshop.deleteFile.name, response.message);
+
+            $scope.loadPortal($scope.workshop.portal);  // refresh the portal
+        });
+    };
+
+    $scope.getList = function (listName) {
+        var whiteList = '/pineapple/modules/EvilPortal/data/allowed.txt';
+        var authorized = '/tmp/EVILPORTAL_CLIENTS.txt';
+
+        getFileOrDirectoryContent((listName === "whiteList") ? whiteList : authorized, function (response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Loading List", response.message);
+                return;
+            }
+
+            switch (listName) {
+                case 'whiteList':
+                    $scope.whiteList.clients = response.content.fileContent;
+                    break;
+                case 'accessList':
+                    $scope.accessList.clients = response.content.fileContent;
+                    break;
+            }
+        })
+    };
+
+    $scope.removeClientFromList = function(listName) {
+        var clientToRemove = (listName === 'whiteList') ? $scope.whiteList.toManipulate : $scope.accessList.toManipulate;
+        console.log(clientToRemove);
+        $api.request({
+            module: "EvilPortal",
+            action: "removeClientFromList",
+            clientIP: clientToRemove,
+            listName: listName
+        }, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error", response.message);
+                return;
+            }
+            $scope.getList(listName);
+            switch (listName) {
+                case 'whiteList':
+                    $scope.whiteList.toManipulate = '';
+                    break;
+                case 'accessList':
+                    $scope.accessList.toManipulate = '';
+                    break;
+            }
+        });
+    };
+
+    $scope.addWhiteListClient = function() {
+        writeToFile('/pineapple/modules/EvilPortal/data/allowed.txt', $scope.whiteList.toManipulate, true, function(response) {
+            $scope.getList('whiteList');
+        });
+        $scope.whiteList.toManipulate = "";
+    };
+
+    $scope.authorizeClient = function () {
+        $api.request({
+            module: "EvilPortal",
+            action: "authorizeClient",
+            clientIP: $scope.accessList.toManipulate
+        }, function (response) {
+
+        });
+        $scope.removeClientFromList('accessList')
+    };
+
+    $scope.getClickedClient = function(textareaId, inputname) {
+        var textarea = $('#' + textareaId);
+        var lineNumber = textarea.val().substr(0, textarea[0].selectionStart).split('\n').length;
+        var ssid = textarea.val().split('\n')[lineNumber-1].trim();
+        $("input[name='" + inputname + "']").val(ssid).trigger('input');
     };
 
     /**

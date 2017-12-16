@@ -1,6 +1,7 @@
 <div class="row" ng-controller="EvilPortalController">
 
     <div class="col-md-3">
+        <!-- Controls Panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="javascript:;" data-toggle="collapse" data-target="#collapseControls" class="text-muted"><h4
@@ -25,6 +26,7 @@
             </div>
         </div>
 
+        <!-- Messages Panel -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="javascript:;" data-toggle="collapse" data-target="#collapseMessages" class="text-muted"><h4
@@ -51,57 +53,56 @@
         </div>
     </div>
 
-    <!--<div ng-show="dependencies">-->
     <div class="panel-group" id="accordion">
         <div class="col-md-9">
             <!-- Library panel -->
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h5 class="panel-title"><a href="javascript:;" data-toggle="collapse" data-parent="#accordion"
-                                               data-target="#collapseLibrary" class="text-muted">Work Bench <b><i>{{ workshopPortal.title }}</i></b></a></h5>
+                                               data-target="#collapseLibrary" class="text-muted">Work Bench <b style="text-transform: capitalize"><i>{{ workshop.portal.title }}</i></b></a></h5>
                 </div>
                 <div id="collapseLibrary" class="panel-collapse collapse in">
                     <div class="panel-body">
-                        <div class="input-group" ng-show="library">
+                        <div class="input-group" ng-show="evilPortal.library">
 
                             <span class="input-group-btn">
-                                <select class="form-control ng-pristine ng-valid ng-touched" style="width:80px" ng-model="newPortalType">
+                                <select class="form-control ng-pristine ng-valid ng-touched" style="width:80px" ng-model="newPortal.type">
                                     <option value="basic">Basic</option>
                                     <option value="targeted">Targeted</option>
                                 </select>
                             </span>
 
-                            <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortalName">
+                            <input type="text" class="form-control" placeholder="Portal Name" name="portalName" ng-model="newPortal.name">
 
                             <span class="input-group-btn">
-                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('internal')">Create New Portal</button>
-                                <button ng-disabled="newPortalName == ''" class="btn btn-default" type="button" ng-click="createNewPortal('sd')" ng-show="sdAvailable">Create On SD Card</button>
+                                <button ng-disabled="newPortal.name == ''" class="btn btn-default" type="button" ng-click="createNewPortal('internal')">Create New Portal</button>
+                                <button ng-disabled="newPortal.name == ''" class="btn btn-default" type="button" ng-click="createNewPortal('sd')" ng-show="evilPortal.sdAvailable">Create On SD Card</button>
                             </span>
                         </div>
-                        <hr ng-show="library"/>
-                        <div ng-show="portals.length > 0 && library == true">
+                        <hr ng-show="evilPortal.library"/>
+                        <div ng-show="portals.length > 0 && evilPortal.library">
                             <div class="table-responsive">
                                 <table class="table table-striped" align="center">
                                     <thead>
                                     <th>Portal Name</th>
                                     <th>Portal Type</th>
                                     <th>Location</th>
-                                    <th ng-show="sdAvailable">Move</th>
+                                    <th ng-show="evilPortal.sdAvailable">Move</th>
                                     <th>Activate</th>
                                     <th>Delete</th>
                                     </thead>
                                     <tbody>
                                     <tr ng-repeat="portal in portals">
                                         <!-- Open portal work shop -->
-                                        <td><a href="javascript:;" ng-click="getPortalFiles(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
+                                        <td><a href="javascript:;" ng-click="loadPortal(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
                                         <!-- Portal type -->
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.type }}</i></td>
                                         <!-- What storage device the portal is on -->
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
                                         <!-- change storage -->
                                         <td>
-                                            <a ng-show="(sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
-                                            <a ng-show="(sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
+                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
+                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
                                         </td>
                                         <!-- activate/deactivate -->
                                         <td>
@@ -110,7 +111,7 @@
                                         </td>
                                         <!-- delete portal button -->
                                         <td>
-                                            <a ng-hide="portal.active" href="javascript:;" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortalRequest(portal)">Delete</a>
+                                            <a ng-hide="portal.active" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortal(false, portal)">Delete</a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -118,23 +119,23 @@
                             </div>
                         </div>
 
-                        <div ng-hide="portals.length > 0 || library == false">
+                        <div ng-hide="portals.length > 0 || !evilPortal.library">
                             <p class="text-muted text-center"><i>No Portals in Library to Display.</i></p>
                         </div>
 
                         <!-- Portal Editor -->
-                        <div ng-hide="library">
+                        <div ng-hide="evilPortal.library">
 
                             <!-- Editor Buttons -->
                             <div class="row-fluid">
                                 <span class="pull-left">
-                                    <button type="submit" class="btn btn-default btn-sm" ng-click="library = true; workshopPortal = {}">Back To Library</button>
+                                    <button type="submit" class="btn btn-default btn-sm" ng-click="evilPortal.library = true; resetWorkshop()">Back To Library</button>
                                 </span>
                                 <span class="pull-right">
-                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="editPortalFile.portalName = workshopPortal.title; editPortalFile.storage = workshopPortal.storage;">New File</button>
-                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commandEditorModal">Toggled Commands</button>
-                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshopPortal.type == 'targeted'" ng-click="getPortalRules(workshopPortal);">Target Rule Editor</button>
-                                    <button type="submit" class="btn btn-default btn-sm" ng-click="getPortalFiles(workshopPortal)">Refresh</button>
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="setupNewFile()">New File</button>
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commandEditorModal" ng-click="loadToggleCommands()">Toggle Commands</button>
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshop.portal.type == 'targeted'" ng-click="loadTargetedRules();">Target Rule Editor</button>
+                                    <button type="submit" class="btn btn-default btn-sm" ng-click="loadPortal(workshop.portal)">Refresh</button>
                                 </span>
                             </div>
 
@@ -150,10 +151,10 @@
                                     <th>Delete</th>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="file in workshopPortal.files">
+                                    <tr ng-repeat="file in workshop.dirContents">
                                         <td>{{ file.name }}</td>
-                                        <td><a href="javascript:;" ng-click="editPortal(workshopPortal, file.name)" data-toggle="modal" data-target="#fileModal">Edit</a></td>
-                                        <td><a href="javascript:;" ng-click="requestDeleteFile(file.name, workshopPortal)" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable">Delete</a></td>
+                                        <td><a href="javascript:;" ng-click="loadFileContent(file.path)" data-toggle="modal" data-target="#fileModal">Edit</a></td>
+                                        <td><a href="javascript:;" ng-click="workshop.deleteFile = file" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable">Delete</a></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -177,16 +178,14 @@
                             <i>This is a list of clients who are allowed to connect to the internet without ever viewing the captive portal.</i>
                         </p>
                         <p>
-                            <textarea id="whiteListPool" class="form-control" rows="15" ng-mouseup="getClickedClient('whiteListPool', 'whiteListInput');" ng-model="whiteList" readonly></textarea>
+                            <textarea id="whiteListPool" class="form-control" rows="15" ng-mouseup="getClickedClient('whiteListPool', 'whiteListInput');" ng-model="whiteList.clients" readonly></textarea>
                         </p>
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="IP Address" name="whiteListInput"
-                                   ng-model="whiteListInput">
+                                   ng-model="whiteList.toManipulate">
 		                    <span class="input-group-btn">
-		                        <button class="btn btn-default" type="button"
-                                        ng-click="addWhiteListClient()">Add</button>
-		                        <button class="btn btn-default" type="button"
-                                        ng-click="removeWhiteListClient()">Remove</button>
+		                        <button class="btn btn-default" type="button" ng-click="addWhiteListClient()">Add</button>
+		                        <button class="btn btn-default" type="button" ng-click="removeClientFromList('whiteList')">Remove</button>
 		                    </span>
                         </div>
                     </div>
@@ -202,22 +201,20 @@
                 </div>
                 <div id="collapseAuthorizedClients" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <p class="text-muted" ng-show="running">
+                        <p class="text-muted" ng-show="evilPortal.running">
                             <i>This is a list of clients who have been authorized through the captive portal.</i>
                         </p>
-                        <p ng-show="running">
-                            <textarea id='authorizedPool' class="form-control" rows="15" ng-mouseup="getClickedClient('authorizedPool', 'accessListInput');" ng-model="accessList" readonly></textarea>
+                        <p ng-show="evilPortal.running">
+                            <textarea id='authorizedPool' class="form-control" rows="15" ng-mouseup="getClickedClient('authorizedPool', 'accessListInput');" ng-model="accessList.clients" readonly></textarea>
                         </p>
-                        <div class="input-group" ng-show="running">
-                            <input type="text" class="form-control" placeholder="IP Address" name="accessListInput"
-                                   ng-model="accessListInput">
+                        <div class="input-group" ng-show="evilPortal.running">
+                            <input type="text" class="form-control" placeholder="IP Address" name="accessListInput" ng-model="accessList.toManipulate">
 		                    <span class="input-group-btn">
-		                        <button class="btn btn-default" type="button"
-                                        ng-click="authorizeClient()">Authorize</button>
-		                        <button class="btn btn-default" type="button" ng-click="revokeClient()">Revoke</button>
+		                        <button class="btn btn-default" type="button" ng-click="authorizeClient()">Authorize</button>
+		                        <button class="btn btn-default" type="button" ng-click="removeClientFromList('accessList')">Revoke</button>
 		                    </span>
                         </div>
-                        <div ng-hide="running">
+                        <div ng-hide="evilPortal.running">
                             <p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
                         </div>
                     </div>
@@ -233,14 +230,14 @@
                 </div>
                 <div id="collapsePreview" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <div ng-show="running">
+                        <div ng-show="evilPortal.running">
                             <iframe src="http://172.16.42.1" style="width:100%;height:300px;border:none;"
                                     id="livePreviewIframe"></iframe>
                             <button type="submit" ng-click="refreshLivePreview()" class="btn btn-default btn-sm">
                                 Refresh
                             </button>
                         </div>
-                        <div ng-hide="running">
+                        <div ng-hide="evilPortal.running">
                             <p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
                         </div>
                     </div>
@@ -333,7 +330,7 @@
 
                 if (keyCode == 9) {
                     e.preventDefault();
-                    var start = $(this).get(0).selectionStart;
+                    var start = $(this).get(0).selection;
                     var end = $(this).get(0).selectionEnd;
 
                     // set textarea value to: text before caret + tab + text after caret
@@ -354,27 +351,27 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
-                            ng-click="editPortalFile = {}">&times;</button>
-                    <h4 class="modal-title" ng-show="editPortalFile.updating">Editing File {{ editPortalFile.file }}</h4>
-                    <h4 class="modal-title" ng-hide="editPortalFile.updating">Creating New File</h4>
+                            ng-click="workshop.editFile = {}">&times;</button>
+                    <h4 class="modal-title" ng-show="!workshop.editFile.isNewFile">Editing File {{ workshop.editFile.name }}</h4>
+                    <h4 class="modal-title" ng-show="workshop.editFile.isNewFile">Creating New File</h4>
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal">
                         <div class="form-group">
                             <label class="control-label">File Name</label>
-                            <input type="text" class="form-control" ng-model="editPortalFile.file" placeholder="Notes.txt" ng-disabled="editPortalFile.updating">
+                            <input type="text" class="form-control" ng-model="workshop.editFile.name" placeholder="Notes.txt" ng-disabled="!workshop.editFile.isNewFile">
                         </div>
                         <div class="form-group">
-                            <label class="control-label">File Contents</label> <a href="javascript:;" ng-click="editPortalFile.code = ''">Clear</a>
-                            <textarea class="form-control" rows="10" ng-model="editPortalFile.code"
+                            <label class="control-label">File Contents</label> <a href="javascript:;" ng-click="workshop.editFile.content = null">Clear</a>
+                            <textarea class="form-control" rows="10" ng-model="workshop.editFile.content"
                                       placeholder="Write some text here" id="evilportalEditor"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" ng-click="savePortalCode(editPortalFile);" class="btn btn-success pull-right" data-dismiss="modal" ng-disabled="editPortalFile.file == ''">Save</button>
+                    <button type="button" ng-click="saveFileContent(workshop.editFile);" class="btn btn-success pull-right" data-dismiss="modal" ng-disabled="workshop.editFile.content == null">Save</button>
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal"
-                            ng-click="editPortalFile = {}">Cancel
+                            ng-click="workshop.editFile = {}">Cancel
                     </button>
                 </div>
             </div>
@@ -399,7 +396,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="portalToDelete = null; portalDeleteValidation = null">Cancel</button>
-                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(portalToDelete); portalToDelete = {}" ng-disabled="portalDeleteValidation.toLowerCase() != portalToDelete.title.toLowerCase()">Delete</button>
+                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deletePortal(true, portalToDelete)" ng-disabled="portalDeleteValidation.toLowerCase() != portalToDelete.title.toLowerCase()">Delete</button>
                 </div>
             </div>
         </div>
@@ -412,16 +409,16 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" ng-click="deleteFile = {}">&times;</button>
-                    <h4 class="modal-title">Delete File <i><b>{{ deleteFile.name }}</b></i>?</h4>
+                    <button type="button" class="close" data-dismiss="modal" ng-click="workshop.deleteFile = {}">&times;</button>
+                    <h4 class="modal-title">Delete File <i><b>{{ workshop.deleteFile.name }}</b></i>?</h4>
                 </div>
                 <div class="modal-body">
-                    <p>You are about to delete <b>{{ deleteFile.name }}</b>. Once you do this it can not be undone.</p>
-                    <p><b>Are you absolutely sure you want to delete <i>{{ deleteFile.name }}</i>?</b></p>
+                    <p>You are about to delete <b>{{ workshop.deleteFile.path }}</b>. Once you do this it can not be undone.</p>
+                    <p><b>Are you absolutely sure you want to delete <i>{{ workshop.deleteFile.name }}</i>?</b></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="deleteFile = {}">Cancel</button>
-                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="sendDeleteFile()">Delete {{ deleteFile.name }}</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="workshop.deleteFile = {}">Cancel</button>
+                    <button type="button" class="btn btn-danger pull-right" data-dismiss="modal" ng-click="deleteFile()">Delete {{ workshop.deleteFile.name }}</button>
                 </div>
             </div>
         </div>
@@ -435,15 +432,15 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" ng-click="">&times;</button>
-                    <h4 class="modal-title">Editing Rules for {{ workshopPortal.title }}</h4>
+                    <h4 class="modal-title">Editing Rules for {{ workshop.portal.title }}</h4>
                 </div>
                 <div class="modal-body">
-                    <div ng-repeat="(key, data) in portalRules.rules">
+                    <div ng-repeat="(key, data) in workshop.concreteTargetedRules.rules">
                         <fieldset>
                             <legend style="text-transform: uppercase">{{ key }}</legend>
                             <div ng-repeat="(specifier, values) in data">
-                                <h5 style="text-transform: capitalize">{{ specifier }} <a href="javascript:;" data-target="#" ng-click="newPortalRule(key, specifier);">Add Rule</a></h5>
-                                <div class="table-responsive" ng-hide="isObjectEmpty(workingPortalRules.rules[key][specifier])">
+                                <h5 style="text-transform: capitalize">{{ specifier }} <a href="javascript:;" data-target="#" ng-click="newTargetedRule(key, specifier);">Add Rule</a></h5>
+                                <div class="table-responsive" ng-hide="isObjectEmpty(workshop.workingTargetedRules.rules[key][specifier])">
                                     <table class="table table-striped" align="center">
                                         <thead>
                                         <th>Rule Key</th>
@@ -452,11 +449,11 @@
                                         <th>Remove</th>
                                         </thead>
                                         <tbody>
-                                        <tr ng-repeat="(i, rules) in workingPortalRules.rules[key][specifier]">
+                                        <tr ng-repeat="(i, rules) in workshop.workingTargetedRules.rules[key][specifier]">
                                             <td><input type="text" placeholder="Key Value" ng-model="rules.key"></td>
                                             <td><input type="text" placeholder="Destination.php" ng-model="rules.destination"></td>
                                             <!--<td><a href="javascript:;" data-target="#" ng-click="commitPortalRule(key, specifier, i, rules.key, rules.destination)">Commit</a></td>-->
-                                            <td><button ng-click="removePortalRule(key, specifier, i)" class="btn btn-sm btn-danger">Remove</button></td>
+                                            <td><button ng-click="removeTargetedRule(key, specifier, i)" class="btn btn-sm btn-danger">Remove</button></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -468,7 +465,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="">Cancel</button>
-                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal" ng-click="savePortalRules(workshopPortal)" >Save</button>
+                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal" ng-click="saveTargetedRules()" >Save</button>
                 </div>
             </div>
         </div>
@@ -481,36 +478,38 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" ng-click="">&times;</button>
-                    <h4 class="modal-title">Toggle Commands for {{ workshopPortal.title }}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Toggle Commands for {{ workshop.portal.title }}</h4>
                 </div>
                 <div class="modal-body">
                     <fieldset>
-                        <legend>On Activation - <a>Save</a></legend>
+                        <legend>On Activation - <a ng-click="saveToggleCommands('enable')">Save</a></legend>
                         <div class="center-block">
+                            <!-- For sake of getting EP 3.0 release, I'm not going to implement this just yet.
                             <span class="center-block">
                                 <button type="submit" class="btn btn-link btn-sm">Enable PineAP</button>
                                 <button type="submit" class="btn btn-link btn-sm">Enable Karma Associations</button>
                                 <button type="submit" class="btn btn-link btn-sm">Enable Beacon Response</button>
-                            </span>
+                            </span>-->
                         </div>
-                        <textarea style="width:100%;" rows="10"></textarea>
+                        <textarea style="width:100%;" rows="10" ng-model="workshop.onEnable"></textarea>
                     </fieldset>
                     <fieldset>
-                        <legend>On Deactivation - <a>Save</a></legend>
+                        <legend>On Deactivation - <a ng-click="saveToggleCommands('disable')">Save</a></legend>
                         <div class="row-fluid">
+                            <!-- For sake of getting EP 3.0 release, I'm not going to implement this just yet.
                             <span class="center-block">
                                 <button type="submit" class="btn btn-link btn-sm">Disable PineAP</button>
                                 <button type="submit" class="btn btn-link btn-sm">Disable Karma Associations</button>
                                 <button type="submit" class="btn btn-link btn-sm">Disable Beacon Response</button>
-                            </span>
+                            </span>-->
                         </div>
-                        <textarea style="width:100%;" rows="10"></textarea>
+                        <textarea style="width:100%;" rows="10" ng-model="workshop.onDisable"></textarea>
                     </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="">Cancel</button>
-                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal">Save All</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success pull-right" data-dismiss="modal" ng-click="saveToggleCommands('all')">Save All</button>
                 </div>
             </div>
         </div>

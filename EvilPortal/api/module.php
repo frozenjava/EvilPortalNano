@@ -86,11 +86,6 @@ class EvilPortal extends Module
                 $this->authorizeClient($this->request->clientIP);
                 $this->response = array("success" => true);
                 break;
-
-            case 'revokeClient':
-                $this->revokeClient($this->request->clientIP);
-                $this->response = $this->response = array("success" => true);
-                break;
         }
     }
 
@@ -511,6 +506,7 @@ class EvilPortal extends Module
     private function authorizeClient($client)
     {
         exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+        $this->writeFileContents($this->CLIENTS_FILE, "{$client}\n", true);
     }
 
     /**
@@ -575,7 +571,7 @@ class EvilPortal extends Module
     }
 
     /**
-     * Stopthe captive portal portion of Evil Portal from running
+     * Stop the captive portal portion of Evil Portal from running
      * @return mixed
      */
     private function stopEvilPortal()
@@ -664,6 +660,7 @@ class EvilPortal extends Module
             case "whiteList":
                 $data = file_get_contents($this->ALLOWED_FILE);
                 $data = str_replace("{$clientIP}\n", '', $data);
+                file_put_contents("/root/removeFromList", $data);
                 file_put_contents($this->ALLOWED_FILE, $data);
                 break;
 

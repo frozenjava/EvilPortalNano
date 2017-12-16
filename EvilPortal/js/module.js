@@ -364,15 +364,15 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         $scope.workshop.workingTargetedRules['rules'][rule][specifier][highest] = {"": ""};
     };
 
+    /**
+     * Build the targeted rules and sned them to the API for saving
+     */
     $scope.saveTargetedRules = function() {
         // build the rules
         for (var key in $scope.workshop.concreteTargetedRules.rules) {
             for (var specifier in $scope.workshop.concreteTargetedRules.rules[key]) {
                 var obj = {};
                 for (var i in $scope.workshop.workingTargetedRules['rules'][key][specifier]) {
-                    //for (var r in $scope.workingPortalRules['rules'][key][specifier][i]) {
-                    //    obj[r] = $scope.workingPortalRules['rules'][key][specifier][i]['destination'];
-                    //}
                     obj[$scope.workshop.workingTargetedRules['rules'][key][specifier][i]['key']] = $scope.workshop.workingTargetedRules['rules'][key][specifier][i]['destination'];
                 }
                 $scope.workshop.concreteTargetedRules['rules'][key][specifier] = obj;
@@ -394,6 +394,11 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    /**
+     * check if a given object is empty.
+     * @param obj: The object to check
+     * @returns {boolean}: true if empty false if not empty
+     */
     $scope.isObjectEmpty = function(obj) {
         return (Object.keys(obj).length === 0);
     };
@@ -417,6 +422,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    /**
+     * Setup the workshop to create a new empty file.
+     */
     $scope.setupNewFile = function() {
         var basePath = ($scope.workshop.portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
         $scope.workshop.editFile.path = basePath + $scope.workshop.portal.title + "/";
@@ -453,16 +461,15 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         });
     };
 
+    /**
+     * Load either the white list or the authorized clients (access) list
+     * @param listName: The name of the list: whiteList or accessList (authorized clients)
+     */
     $scope.getList = function (listName) {
         var whiteList = '/pineapple/modules/EvilPortal/data/allowed.txt';
         var authorized = '/tmp/EVILPORTAL_CLIENTS.txt';
 
         getFileOrDirectoryContent((listName === "whiteList") ? whiteList : authorized, function (response) {
-            if (!response.success) {
-                $scope.sendMessage("Error Loading List", response.message);
-                return;
-            }
-
             switch (listName) {
                 case 'whiteList':
                     $scope.whiteList.clients = response.content.fileContent;
@@ -474,6 +481,10 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         })
     };
 
+    /**
+     * Remove a client from either the white list (whiteList) the authorized clients list (accessList)
+     * @param listName: whiteList or accessList
+     */
     $scope.removeClientFromList = function(listName) {
         var clientToRemove = (listName === 'whiteList') ? $scope.whiteList.toManipulate : $scope.accessList.toManipulate;
         console.log(clientToRemove);
@@ -490,33 +501,44 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             $scope.getList(listName);
             switch (listName) {
                 case 'whiteList':
-                    $scope.whiteList.toManipulate = '';
+                    $scope.whiteList.toManipulate = null;
                     break;
                 case 'accessList':
-                    $scope.accessList.toManipulate = '';
+                    $scope.accessList.toManipulate = null;
                     break;
             }
         });
     };
 
+    /**
+     * Add a new client to the white list
+     */
     $scope.addWhiteListClient = function() {
-        writeToFile('/pineapple/modules/EvilPortal/data/allowed.txt', $scope.whiteList.toManipulate, true, function(response) {
+        writeToFile('/pineapple/modules/EvilPortal/data/allowed.txt', $scope.whiteList.toManipulate + "\n", true, function(response) {
             $scope.getList('whiteList');
         });
-        $scope.whiteList.toManipulate = "";
+        $scope.whiteList.toManipulate = null;
     };
 
+    /**
+     * Authorize a new client
+     */
     $scope.authorizeClient = function () {
         $api.request({
             module: "EvilPortal",
             action: "authorizeClient",
             clientIP: $scope.accessList.toManipulate
         }, function (response) {
-
+            $scope.getList('accessList');
+            $scope.accessList.toManipulate = null;
         });
-        $scope.removeClientFromList('accessList')
     };
 
+    /**
+     * Get a line clicked in a text area and set that line as the text for a text input
+     * @param textareaId: The id of the text area to grab from
+     * @param inputname: The name of the input field to write to
+     */
     $scope.getClickedClient = function(textareaId, inputname) {
         var textarea = $('#' + textareaId);
         var lineNumber = textarea.val().substr(0, textarea[0].selectionStart).split('\n').length;

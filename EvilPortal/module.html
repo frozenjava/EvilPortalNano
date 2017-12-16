@@ -211,7 +211,7 @@
                             <input type="text" class="form-control" placeholder="IP Address" name="accessListInput" ng-model="accessList.toManipulate">
 		                    <span class="input-group-btn">
 		                        <button class="btn btn-default" type="button" ng-click="authorizeClient()">Authorize</button>
-		                        <button class="btn btn-default" type="button" ng-click="revokeClient()">Revoke</button>
+		                        <button class="btn btn-default" type="button" ng-click="removeClientFromList('accessList')">Revoke</button>
 		                    </span>
                         </div>
                         <div ng-hide="evilPortal.running">

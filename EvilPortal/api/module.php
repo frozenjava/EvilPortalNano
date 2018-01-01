@@ -7,6 +7,7 @@ class EvilPortal extends Module
     private $CLIENTS_FILE = '/tmp/EVILPORTAL_CLIENTS.txt';
     private $ALLOWED_FILE = '/pineapple/modules/EvilPortal/data/allowed.txt';
     private $STORAGE_LOCATIONS = array("sd" => "/sd/portals/", "internal" => "/root/portals/");
+    private $BASE_EP_COMMAND = '/pineapple/modules/EvilPortal/executable/executable';
     // CONSTANTS
 
     /**
@@ -487,7 +488,7 @@ class EvilPortal extends Module
      */
     private function checkEvilPortalRunning()
     {
-        return !(exec("iptables -t nat -L PREROUTING | grep 172.16.42.1") == '');
+        return !(exec("iptables -t mangle -L PREROUTING | grep 172.16.42.0/24") == '');
     }
 
     /**
@@ -505,7 +506,8 @@ class EvilPortal extends Module
      */
     private function authorizeClient($client)
     {
-        exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+        //exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
+        exec("{$this->BASE_EP_COMMAND} add {$client}");
         $this->writeFileContents($this->CLIENTS_FILE, "{$client}\n", true);
     }
 
@@ -515,8 +517,9 @@ class EvilPortal extends Module
      */
     private function revokeClient($client)
     {
-        exec("iptables -t nat -D PREROUTING -s {$client}");
-        exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
+        exec("{$this->BASE_EP_COMMAND} remove {$client}");
+//        exec("iptables -t nat -D PREROUTING -s {$client}");
+//        exec("iptables -t nat -D PREROUTING -s {$client} -j ACCEPT");
     }
 
     /**
@@ -542,20 +545,22 @@ class EvilPortal extends Module
         $allowedClients = file_get_contents($this->ALLOWED_FILE);
         file_put_contents($this->CLIENTS_FILE, $allowedClients);
 
-        // Configure other rules
-        exec("iptables -A INPUT -s 172.16.42.0/24 -j DROP");
-        exec("iptables -A OUTPUT -s 172.16.42.0/24 -j DROP");
-        exec("iptables -A INPUT -s 172.16.42.0/24 -p udp --dport 53 -j ACCEPT");
+//        // Configure other rules
+//        exec("iptables -A INPUT -s 172.16.42.0/24 -j DROP");
+//        exec("iptables -A OUTPUT -s 172.16.42.0/24 -j DROP");
+//        exec("iptables -A INPUT -s 172.16.42.0/24 -p udp --dport 53 -j ACCEPT");
+//
+//        // Allow the pineapple
+//        exec("iptables -A INPUT -s 172.16.42.1 -j ACCEPT");
+//        exec("iptables -A OUTPUT -s 172.16.42.1 -j ACCEPT");
+//
+//        //exec("iptables -A INPUT -i br-lan -p tcp --dport 443 -j DROP");
+//        //exec("iptables -t nat -A PREROUTING -i br-lan -j DROP");
+//
+//        exec("iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
+//        exec("iptables -t nat -A POSTROUTING -j MASQUERADE");
 
-        // Allow the pineapple
-        exec("iptables -A INPUT -s 172.16.42.1 -j ACCEPT");
-        exec("iptables -A OUTPUT -s 172.16.42.1 -j ACCEPT");
-
-        //exec("iptables -A INPUT -i br-lan -p tcp --dport 443 -j DROP");
-        //exec("iptables -t nat -A PREROUTING -i br-lan -j DROP");
-
-        exec("iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
-        exec("iptables -t nat -A POSTROUTING -j MASQUERADE");
+        exec("{$this->BASE_EP_COMMAND} init");
 
         // Add rule for each allowed client
         $lines = file($this->CLIENTS_FILE);
@@ -584,9 +589,11 @@ class EvilPortal extends Module
             unlink($this->CLIENTS_FILE);
         }
 
-        exec("iptables -t nat -D PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
-        exec("iptables -D INPUT -p tcp --dport 53 -j ACCEPT");
-        exec("iptables -D INPUT -j DROP");
+//        exec("iptables -t nat -D PREROUTING -i br-lan -p tcp --dport 80 -j DNAT --to-destination 172.16.42.1:80");
+//        exec("iptables -D INPUT -p tcp --dport 53 -j ACCEPT");
+//        exec("iptables -D INPUT -j DROP");
+
+        exec("{$this->BASE_EP_COMMAND} purge");
 
         $success = !$this->checkEvilPortalRunning();
         $message = ($success) ? "EvilPortal has stopped running" : "There was an issue stopping EvilPortal";

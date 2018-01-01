@@ -7,6 +7,7 @@ abstract class Portal
     protected $error;
 
     protected $AUTHORIZED_CLIENTS_FILE = "/tmp/EVILPORTAL_CLIENTS.txt";
+    private $BASE_EP_COMMAND = '/pineapple/modules/EvilPortal/executable/executable';
 
     public function __construct($request)
     {
@@ -27,9 +28,11 @@ abstract class Portal
     protected function authorizeClient($clientIP)
     {
         if (!$this->isClientAuthorized($clientIP)) {
-            exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
+            //exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
+            exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
             $this->redirect();
+            return true;
         } else {
             return false;
         }

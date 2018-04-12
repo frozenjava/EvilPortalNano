@@ -40,7 +40,7 @@ abstract class Portal
         if (!$this->request->target) {
             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
             $this->showSuccess();
-        } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR']) !== false) {
+        } elseif (!$this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
             $this->showSuccess();
         } else {
             $this->showError();

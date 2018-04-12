@@ -37,10 +37,10 @@ abstract class Portal
 
     protected function handleAuthorization()
     {
-        if (isset($this->request->target)) {
+        if (!$this->request->target) {
             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
             $this->showSuccess();
-        } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
+        } elseif (!$this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
             $this->showSuccess();
         } else {
             $this->showError();

@@ -26,7 +26,7 @@ abstract class Portal
 
     protected function authorizeClient($clientIP)
     {
-        if (!$this->isClientAuthorized($clientIP)) {
+        if (!$this->isClientAuthorized($clientIP) !== false) {
             exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
             $this->redirect();

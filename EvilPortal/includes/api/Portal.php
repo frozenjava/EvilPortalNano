@@ -26,7 +26,7 @@ abstract class Portal
 
     protected function authorizeClient($clientIP)
     {
-        if (!$this->isClientAuthorized($clientIP) !== false) {
+        if (!$this->isClientAuthorized($clientIP)) {
             exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
             $this->redirect();
@@ -37,7 +37,7 @@ abstract class Portal
 
     protected function handleAuthorization()
     {
-        if (isset($this->request->target)) {
+        if (!$this->request->target) {
             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
             $this->showSuccess();
         } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR']) !== false) {

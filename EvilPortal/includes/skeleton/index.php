@@ -9,9 +9,7 @@ require_once('helper.php');
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
-        <script type="text/javascript">
-            function redirect() { setTimeout(function(){window.location = "/captiveportal/index.php";},100);} 
-        </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </HEAD>
 
     <BODY>
@@ -23,7 +21,7 @@ require_once('helper.php');
             <p>Your MAC Address is <?=getClientMac($_SERVER['REMOTE_ADDR']);?></p>
             <p>Your internal IP address is <?=$_SERVER['REMOTE_ADDR'];?></p>
 
-            <form method="POST" action="/captiveportal/index.php" onsubmit="redirect()">
+            <form method="POST" action="/captiveportal/index.php">
                 <input type="hidden" name="target" value="<?=$destination?>">
                 <button type="submit">Authorize</button>
             </form>

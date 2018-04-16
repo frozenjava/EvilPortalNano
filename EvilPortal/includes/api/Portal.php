@@ -42,9 +42,9 @@ abstract class Portal
     {
         if (isset($this->request->target)) {
             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
-            $this->showSuccess();
+            $this->redirect();
         } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
-            $this->showSuccess();
+            $this->redirect();
         } else {
             $this->showError();
         }
@@ -54,7 +54,7 @@ abstract class Portal
     {
         header("Location: {$this->request->target}", true, 302);
     }
-
+    #I think this can now be deleted, we do not want a message that we are authorized we want to be online right away!
     protected function showSuccess()
     {
         echo "You have been authorized successfully.";

@@ -100,9 +100,9 @@
                                         <!-- What storage device the portal is on -->
                                         <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
                                         <!-- change storage -->
-                                        <td>
-                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
-                                            <a ng-show="(evilPortal.sdAvailable && portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
+                                        <td ng-show="evilPortal.sdAvailable">
+                                            <a ng-show="(portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
+                                            <a ng-show="(portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
                                         </td>
                                         <!-- activate/deactivate -->
                                         <td>

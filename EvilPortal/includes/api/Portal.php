@@ -7,7 +7,7 @@ abstract class Portal
     protected $error;
 
     protected $AUTHORIZED_CLIENTS_FILE = "/tmp/EVILPORTAL_CLIENTS.txt";
-    private $BASE_EP_COMMAND = '/pineapple/modules/EvilPortal/executable/executable';
+    private $BASE_EP_COMMAND = 'module EvilPortal';
 
     public function __construct($request)
     {
@@ -25,11 +25,16 @@ abstract class Portal
         }
     }
 
+    protected function execBackground($command)
+    {
+        return exec("echo \"{$command}\" | at now");
+    }
+
     protected function authorizeClient($clientIP)
     {
         if (!$this->isClientAuthorized($clientIP)) {
-            //exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
-            exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
+            exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
+//            exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
             $this->redirect();
             return true;
@@ -42,6 +47,7 @@ abstract class Portal
     {
         if (isset($this->request->target)) {
             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
+            $this->onSuccess();
             $this->redirect();
         } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
             $this->redirect();
@@ -54,17 +60,30 @@ abstract class Portal
     {
         header("Location: {$this->request->target}", true, 302);
     }
-    #I think this can now be deleted, we do not want a message that we are authorized we want to be online right away!
-    protected function showSuccess()
+
+    /**
+     * Override this to do something when the client is successfully authorized.
+     * By default it just notifies the Web UI.
+     */
+    protected function onSuccess()
     {
-        echo "You have been authorized successfully.";
+        $this->execBackground("notify New client authorized through EvilPortal!");
     }
 
+    /**
+     * If an error occurs then do something here.
+     * Override to provide your own functionality.
+     */
     protected function showError()
     {
         echo "You have not been authorized.";
     }
 
+    /**
+     * Checks if the client has been authorized.
+     * @param $clientIP: The IP of the client to check.
+     * @return bool|int: True if the client is authorized else false.
+     */
     protected function isClientAuthorized($clientIP)
     {
         $authorizeClients = file_get_contents($this->AUTHORIZED_CLIENTS_FILE);

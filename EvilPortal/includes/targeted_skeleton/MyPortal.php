@@ -11,12 +11,20 @@ class MyPortal extends Portal
         parent::handleAuthorization();
     }
 
-    public function showSuccess()
+    /**
+     * Override this to do something when the client is successfully authorized.
+     * By default it just notifies the Web UI.
+     */
+    public function onSuccess()
     {
         // Calls default success message
-        parent::showSuccess();
+        parent::onSuccess();
     }
 
+    /**
+     * If an error occurs then do something here.
+     * Override to provide your own functionality.
+     */
     public function showError()
     {
         // Calls default error message

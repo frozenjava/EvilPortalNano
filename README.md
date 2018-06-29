@@ -38,15 +38,17 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 [Official Youtube Playlist](https://www.youtube.com/playlist?list=PLW7RuuSaPPzDgrZINbNkt4ujR7RDTUCMB)
 [My website: frozendevelopment.net](http://frozendevelopment.net/)
 
-## Upcoming Releases
+## Tasks for Upcoming Release
 
 ### TODO
-* Figure out how to redirect clients going to HTTPS sites
-* Add ability to program commands to run when a portal is enabled/disabled
-* Make sure that portals from previous versions can be seamlessly migrated to the new version
-* Add doc strings to all methods in module.php and functions in module.js
+* Fix client redirection after authorization
+* Test everything again
+* ~Figure out how to redirect clients going to HTTPS sites~
+* ~Add ability to program commands to run when a portal is enabled/disabled~
+* ~Make sure that portals from previous versions can be seamlessly migrated to the new version~
 
 ### DONE
+* Add doc strings to all methods in module.php and functions in module.js
 * Get SSID of connected client by IP address
 * Add ability to route clients to different portals based upon some identifier [ssid, mac vendor, ip, etc...]
 * Update the work bench so users can choose between targeted and non-targeted portals

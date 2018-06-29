@@ -362,9 +362,10 @@ class EvilPortal extends Module
         // check if there is a currently activate portal and deactivate it.
         foreach(scandir("/www") as $file) {
             if (substr($file, strlen($file) - strlen(".ep")) === ".ep") {  // deactivate a portal if needed
+                $portalName = rtrim($file, ".ep");
                 $realPath = realpath("/www/{$file}");
-                $storage = (substr($realPath, 0, strlen($realPath) === "/root")) ? "internal": "sd";
-                $this->deactivatePortal(rtrim($file, ".ep"), $storage);
+                $storage = ($realPath == "{$this->STORAGE_LOCATIONS['internal']}{$portalName}/{$portalName}.ep") ? "internal": "sd";
+                $this->deactivatePortal($portalName, $storage);
                 break;
             }
         }
@@ -381,7 +382,8 @@ class EvilPortal extends Module
                 exec("ln -s {$portalPath}/{$file} /www/{$file}");
                 $success = true;
             }
-            exec("echo {$portalPath}/.enable | at now");
+            // holding off on toggle commands until a future release.
+            // exec("echo {$portalPath}/.enable | at now");
             $message = "{$name} is now active.";
         } else {
             $message = "Couldn't find {$portalPath}.";
@@ -428,7 +430,8 @@ class EvilPortal extends Module
             }
         }
 
-        exec("echo {$dir}{$name}/.disable | at now");
+        // holding off on toggle commands until a future release.
+        // exec("echo {$dir}{$name}/.disable | at now");
 
         return array("success" => true, "message" => "Deactivated {$name}.");
     }
@@ -508,7 +511,7 @@ class EvilPortal extends Module
     {
         exec("iptables -t nat -I PREROUTING -s {$client} -j ACCEPT");
 //        exec("{$this->BASE_EP_COMMAND} add {$client}");
-        $this->writeFileContents($this->CLIENTS_FILE, "{$client}\n", true);
+        $this->writeFileContents($this->CLIENTS_FILE, "{$client}", true);
     }
 
     /**

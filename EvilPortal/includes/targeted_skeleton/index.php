@@ -25,7 +25,8 @@ $MAPPED_RULES = [
 ];
 
 // Read the json
-$routeData = json_decode(file_get_contents("{$PORTAL_NAME}.ep"), true);
+$jsonData = json_decode(file_get_contents("{$PORTAL_NAME}.ep"), true);
+$routeData = $jsonData['targeted_rules'];
 
 // This variable represents the page to include
 $includePage = null;

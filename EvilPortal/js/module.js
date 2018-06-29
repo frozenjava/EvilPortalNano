@@ -165,7 +165,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             if (!response.success) {
                 $scope.sendMessage("Error Deleting Portal", response.message);  // push an error if deletion failed
             } else {
-                $scope.sendMessage("Deleted Portal", "Successfully deleted " + $scope.portalToDelete.title.toUpperCase() + ".");
+                $scope.sendMessage("Deleted Portal", "Successfully deleted " + $scope.portalToDelete.title + ".");
                 $scope.portalToDelete = null;
                 $scope.portalDeleteValidation = null;
                 getPortals();  // refresh the library
@@ -184,6 +184,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             name: portal.title,
             storage: portal.storage
         }, function(response) {
+            console.log(response);
             if (response.success) {
                 getPortals();
                 $scope.sendMessage("Activated Portal", portal.title + " has been activated successfully.");
@@ -204,6 +205,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             name: portal.title,
             storage: portal.storage
         }, function(response) {
+            console.log(response);
             if (response.success) {
                 getPortals();
                 $scope.sendMessage("Deactivated Portal", portal.title + " has been deactivated successfully.");

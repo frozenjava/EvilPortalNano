@@ -133,7 +133,8 @@
                                 </span>
                                 <span class="pull-right">
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="setupNewFile()">New File</button>
-                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commandEditorModal" ng-click="loadToggleCommands()">Toggle Commands</button>
+                                    <!-- Holding off on toggle commands until a future release. Still need to think through how they should work. -->
+                                    <!--<button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commandEditorModal" ng-click="loadToggleCommands()">Toggle Commands</button>-->
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#ruleEditorModal" ng-show="workshop.portal.type == 'targeted'" ng-click="loadTargetedRules();">Target Rule Editor</button>
                                     <button type="submit" class="btn btn-default btn-sm" ng-click="loadPortal(workshop.portal)">Refresh</button>
                                 </span>
@@ -188,6 +189,8 @@
 		                        <button class="btn btn-default" type="button" ng-click="removeClientFromList('whiteList')">Remove</button>
 		                    </span>
                         </div>
+                        <br/>
+                        <button class="btn btn-default btn-sm" type="button" ng-click="getList('whiteList')">Refresh</button>
                     </div>
                 </div>
             </div>
@@ -201,18 +204,22 @@
                 </div>
                 <div id="collapseAuthorizedClients" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <p class="text-muted" ng-show="evilPortal.running">
-                            <i>This is a list of clients who have been authorized through the captive portal.</i>
-                        </p>
-                        <p ng-show="evilPortal.running">
-                            <textarea id='authorizedPool' class="form-control" rows="15" ng-mouseup="getClickedClient('authorizedPool', 'accessListInput');" ng-model="accessList.clients" readonly></textarea>
-                        </p>
-                        <div class="input-group" ng-show="evilPortal.running">
-                            <input type="text" class="form-control" placeholder="IP Address" name="accessListInput" ng-model="accessList.toManipulate">
-		                    <span class="input-group-btn">
-		                        <button class="btn btn-default" type="button" ng-click="authorizeClient()">Authorize</button>
-		                        <button class="btn btn-default" type="button" ng-click="removeClientFromList('accessList')">Revoke</button>
-		                    </span>
+                        <div ng-show="evilPortal.running">
+                            <p class="text-muted">
+                                <i>This is a list of clients who have been authorized through the captive portal.</i>
+                            </p>
+                            <p>
+                                <textarea id='authorizedPool' class="form-control" rows="15" ng-mouseup="getClickedClient('authorizedPool', 'accessListInput');" ng-model="accessList.clients" readonly></textarea>
+                            </p>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="IP Address" name="accessListInput" ng-model="accessList.toManipulate">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="authorizeClient()">Authorize</button>
+                                    <button class="btn btn-default" type="button" ng-click="removeClientFromList('accessList')">Revoke</button>
+                                </span>
+                            </div>
+                            <br />
+                            <button class="btn btn-default btn-sm" type="button" ng-click="getList('accessList')">Refresh</button>
                         </div>
                         <div ng-hide="evilPortal.running">
                             <p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
@@ -233,9 +240,7 @@
                         <div ng-show="evilPortal.running">
                             <iframe src="http://172.16.42.1" style="width:100%;height:300px;border:none;"
                                     id="livePreviewIframe"></iframe>
-                            <button type="submit" ng-click="refreshLivePreview()" class="btn btn-default btn-sm">
-                                Refresh
-                            </button>
+                            <button type="submit" ng-click="refreshLivePreview()" class="btn btn-default btn-sm">Refresh</button>
                         </div>
                         <div ng-hide="evilPortal.running">
                             <p class="text-muted text-center"><i>Evil Portal must be started first.</i></p>
@@ -285,6 +290,7 @@
                                     <li class="text-muted">Added ability to create portals on an SD card and move between SD and Internal storage easily</li>
                                     <li class="text-muted">Made white listed and authorized clients IP addresses clickable like SSIDs in PineAP</li>
                                     <li class="text-muted">Created helper functions getClientMac, getClientSSID, getClientHostName</li>
+                                    <li class="text-muted">Sending notification when a client goes through a portal.</li>
                                     <li class="text-muted">Various quality of life improvements</li>
                                 </ul>
                             </ul>

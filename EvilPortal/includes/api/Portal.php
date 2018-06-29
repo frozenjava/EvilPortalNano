@@ -25,24 +25,36 @@ abstract class Portal
         }
     }
 
+    /**
+     * Run a command in the background and don't wait for it to finish.
+     * @param $command: The command to run
+     */
     protected function execBackground($command)
     {
-        return exec("echo \"{$command}\" | at now");
+        exec("echo \"{$command}\" | at now");
     }
 
+    /**
+     * Creates an iptables rule allowing the client to access the internet and writes them to the authorized clients.
+     * Override this method to add other authorization steps validation.
+     * @param $clientIP: The IP address of the client to authorize
+     * @return bool: True if the client was successfully authorized otherwise false.
+     */
     protected function authorizeClient($clientIP)
     {
         if (!$this->isClientAuthorized($clientIP)) {
             exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
 //            exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
-            $this->redirect();
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
 
+    /**
+     * Handle client authorization here.
+     * By default it just checks that the redirection target is in the request.
+     * Override this to perform your own validation.
+     */
     protected function handleAuthorization()
     {
         if (isset($this->request->target)) {
@@ -56,6 +68,9 @@ abstract class Portal
         }
     }
 
+    /**
+     * Where to redirect to on successful authorization.
+     */
     protected function redirect()
     {
         header("Location: {$this->request->target}", true, 302);

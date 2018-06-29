@@ -40,14 +40,18 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 
 ## Tasks for Upcoming Release
 
-### TODO
-* Fix client redirection after authorization
-* Test everything again
-* ~Figure out how to redirect clients going to HTTPS sites~
-* ~Add ability to program commands to run when a portal is enabled/disabled~
-* ~Make sure that portals from previous versions can be seamlessly migrated to the new version~
+If you want to contribute to the project feel free to tackle one of these tasks!
 
-### DONE
+### TODO
+* Figure out how to redirect clients going to HTTPS sites
+* Add ability to program commands to run when a portal is enabled/disabled
+* Create logging for portals
+* Improve the workbench code editor (syntax highlighting, tabs, etc...)
+
+
+## Release History
+
+### Version 3.0
 * Add doc strings to all methods in module.php and functions in module.js
 * Get SSID of connected client by IP address
 * Add ability to route clients to different portals based upon some identifier [ssid, mac vendor, ip, etc...]
@@ -59,8 +63,7 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 * Write up some helpful information so people can just start using the module
 * Consolidate all portal info into a single portal_name.json file
 * Disable the button to move a portal while it is activated
-
-## Release History
+* Fixed client redirection after authorization
 
 ### Version 2.1
 * Removed un-needed verbosity

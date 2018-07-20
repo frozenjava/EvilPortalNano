@@ -33,9 +33,13 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     $scope.portalDeleteValidation = null;
 
     // the portal workshop
-    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, "editFile": {"path": null, "isNewFile": true},
-        "onEnable": null, "onDisable": null, "concreteTargetedRules": null, "workingTargetedRules": null, "deleteFile": null
+    $scope.workshop = {"portal": {}, "dirContents": null, "inRoot": true, "rootDirectory": null, 
+        "editFile": {"path": null, "isNewFile": true}, "onEnable": null, "onDisable": null,
+        "concreteTargetedRules": null, "workingTargetedRules": null, "deleteFile": null
     };
+
+    // active log file
+    $scope.activeLog = {"title": null, "path": null, "contents": null};
 
     /**
      * Reset the workshop object to a blank slate with initial values.
@@ -397,12 +401,42 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     };
 
     /**
+     * Load logs for a given portal
+     * @param portal: The portal to load logs for
+     * @returns {string}: The logs for the given portal
+     */
+    $scope.loadPortalLog = function(portal) {
+        var basePath = (portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
+        var logPath = basePath + portal.title + "/.logs";
+        $scope.loadLog(logPath);
+    }
+
+    /**
      * check if a given object is empty.
      * @param obj: The object to check
      * @returns {boolean}: true if empty false if not empty
      */
     $scope.isObjectEmpty = function(obj) {
         return (Object.keys(obj).length === 0);
+    };
+
+    $scope.loadLog = function(filePath) {
+        getFileOrDirectoryContent(filePath, function(response) {
+            console.log(response);
+            if (!response.success) {
+                $scope.activeLog = {
+                    "title": "Unknown",
+                    "path": null,
+                    "contents": null
+                };
+                return;
+            }
+            $scope.activeLog = {
+                "title": response.content.name,
+                "path": response.content.path,
+                "contents": response.content.fileContent
+            };
+        });
     };
 
     /**

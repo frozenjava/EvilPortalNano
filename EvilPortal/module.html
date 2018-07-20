@@ -88,6 +88,7 @@
                                     <th>Portal Type</th>
                                     <th>Location</th>
                                     <th ng-show="evilPortal.sdAvailable">Move</th>
+                                    <th>Logs</th>
                                     <th>Activate</th>
                                     <th>Delete</th>
                                     </thead>
@@ -103,6 +104,9 @@
                                         <td ng-show="evilPortal.sdAvailable">
                                             <a ng-show="(portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
                                             <a ng-show="(portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:;" data-toggle="modal" data-target="#readLogsModal" ng-click="loadPortalLog(portal)">View</a>
                                         </td>
                                         <!-- activate/deactivate -->
                                         <td>
@@ -132,6 +136,7 @@
                                     <button type="submit" class="btn btn-default btn-sm" ng-click="evilPortal.library = true; resetWorkshop()">Back To Library</button>
                                 </span>
                                 <span class="pull-right">
+                                    <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#readLogsModal" ng-click="loadPortalLog(workshop.portal)">View Log</button>
                                     <button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#fileModal" ng-click="setupNewFile()">New File</button>
                                     <!-- Holding off on toggle commands until a future release. Still need to think through how they should work. -->
                                     <!--<button type="submit" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commandEditorModal" ng-click="loadToggleCommands()">Toggle Commands</button>-->
@@ -363,26 +368,42 @@
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal">
-                        <div class="form-group">
+                        <div class="form-group" ng-show="workshop.editFile.isNewFile">
                             <label class="control-label">File Name</label>
                             <input type="text" class="form-control" ng-model="workshop.editFile.name" placeholder="Notes.txt" ng-disabled="!workshop.editFile.isNewFile">
                         </div>
                         <div class="form-group">
                             <label class="control-label">File Contents</label> <a href="javascript:;" ng-click="workshop.editFile.content = null">Clear</a>
-                            <textarea class="form-control" rows="10" ng-model="workshop.editFile.content"
-                                      placeholder="Write some text here" id="evilportalEditor"></textarea>
+                            <textarea class="form-control" rows="10" ng-model="workshop.editFile.content" placeholder="Write some text here" id="evilportalEditor"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" ng-click="saveFileContent(workshop.editFile);" class="btn btn-success pull-right" data-dismiss="modal" ng-disabled="workshop.editFile.content == null">Save</button>
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal"
-                            ng-click="workshop.editFile = {}">Cancel
-                    </button>
+                    <button type="button" ng-click="saveFileContent(workshop.editFile);" class="btn btn-success pull-right" data-dismiss="modal"
+                     ng-disabled="workshop.editFile.content == null">Save</button>
+                    
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="workshop.editFile = {}">Cancel</button>
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <!-- Read Logs Modal -->
+    <div id="readLogsModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="activeLog = null;">&times;</button>
+                    <h4 class="modal-title">Reading Logs for {{ activeLog.title }}</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" rows="10" ng-model="activeLog.contents" placeholder="Nothing to show." readonly/>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Delete Portal Modal -->

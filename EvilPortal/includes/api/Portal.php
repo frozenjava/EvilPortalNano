@@ -29,9 +29,20 @@ abstract class Portal
      * Run a command in the background and don't wait for it to finish.
      * @param $command: The command to run
      */
-    protected function execBackground($command)
+    protected final function execBackground($command)
     {
         exec("echo \"{$command}\" | at now");
+    }
+
+    /**
+     * Write a log to the portals log file.
+     * These logs can be retrived from the web UI for .logs in the portals directory.
+     */
+    protected final function writeLog($message) 
+    {
+        $reflector = new \ReflectionClass(get_class($this));
+        $logPath = dirname($reflector->getFileName());
+        file_put_contents("{$logPath}/.logs", $message, FILE_APPEND);
     }
 
     /**
@@ -44,7 +55,7 @@ abstract class Portal
     {
         if (!$this->isClientAuthorized($clientIP)) {
             exec("iptables -t nat -I PREROUTING -s {$clientIP} -j ACCEPT");
-//            exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
+            // exec("{$this->BASE_EP_COMMAND} add {$clientIP}");
             file_put_contents($this->AUTHORIZED_CLIENTS_FILE, "{$clientIP}\n", FILE_APPEND);
         }
         return true;

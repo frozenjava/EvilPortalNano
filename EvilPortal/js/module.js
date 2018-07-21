@@ -403,7 +403,6 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
     /**
      * Load logs for a given portal
      * @param portal: The portal to load logs for
-     * @returns {string}: The logs for the given portal
      */
     $scope.loadPortalLog = function(portal) {
         var basePath = (portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
@@ -420,6 +419,9 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         return (Object.keys(obj).length === 0);
     };
 
+    /**
+     * Loads a file from filePath and puts the data into the activeLog object.
+     */
     $scope.loadLog = function(filePath) {
         getFileOrDirectoryContent(filePath, function(response) {
             console.log(response);
@@ -427,17 +429,40 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 $scope.activeLog = {
                     "title": "Unknown",
                     "path": null,
-                    "contents": null
+                    "contents": null,
+                    "size": 0
                 };
                 return;
             }
             $scope.activeLog = {
                 "title": response.content.name,
                 "path": response.content.path,
-                "contents": response.content.fileContent
+                "contents": response.content.fileContent,
+                "size": response.content.size,
             };
         });
     };
+
+    /**
+     * Writes an empty string to whatever file path is in $scope.activeLog.path
+     * On successful write, $scope.activeLog.contents is set to null.
+     *
+     * If $scope.activeLog.path is null, the request if not made.
+     *
+     */
+    $scope.clearLog = function() {
+        if ($scope.activeLog.path == null)
+            return;
+        
+        writeToFile($scope.activeLog.path, '', false, function(response) {
+            if (!response.success) {
+                $scope.sendMessage("Error Clearing Log", response.message);
+                return;
+            }
+            $scope.activeLog.contents = response.content;
+            $scope.activeLog.size = 0;
+        });
+    }
 
     /**
      * Load the contents of a given file.
@@ -465,6 +490,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         var basePath = ($scope.workshop.portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
         $scope.workshop.editFile.path = basePath + $scope.workshop.portal.title + "/";
         $scope.workshop.editFile.isNewFile = true;
+        $scope.workshop.editFile.size = 0;
     };
 
     /**
@@ -476,7 +502,6 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         if (!editFile.path.includes(editFile.name))
             editFile.path = editFile.path + editFile.name;
 
-        console.log(editFile.path);
         writeToFile(editFile.path, editFile.content, false, function(response) {
             if (!response.success)
                 $scope.sendMessage("Error write to file " + editFile.name, response.message);

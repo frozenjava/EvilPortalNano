@@ -45,11 +45,18 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 ### TODO
 * Figure out how to redirect clients going to HTTPS sites
 * Add ability to program commands to run when a portal is enabled/disabled
-* Create logging for portals
-* Improve the workbench code editor (syntax highlighting, tabs, etc...)
-
 
 ## Release History
+
+### Version 3.1
+* Added ability to write and view logs on a per-portal basis
+* Created method <i>writeLog($message)</i> that writes to the portal log file
+* Created method <i>notify($message)</i> that sends a notification to the web ui
+* Added ability to download files
+* Tab button in file editor will now insert four spaces
+* Revamped the file editor modal
+* Showing file sizes in the portal work bench
+* Various quality of life improvements
 
 ### Version 3.0
 * Add doc strings to all methods in module.php and functions in module.js

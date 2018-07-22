@@ -430,7 +430,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                     "title": "Unknown",
                     "path": null,
                     "contents": null,
-                    "size": 0
+                    "size": "0 Bytes"
                 };
                 return;
             }
@@ -438,7 +438,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 "title": response.content.name,
                 "path": response.content.path,
                 "contents": response.content.fileContent,
-                "size": response.content.size,
+                "size": response.content.size
             };
         });
     };
@@ -460,7 +460,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
                 return;
             }
             $scope.activeLog.contents = response.content;
-            $scope.activeLog.size = 0;
+            $scope.activeLog.size = "0 Bytes";
         });
     }
 
@@ -490,7 +490,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
         var basePath = ($scope.workshop.portal.storage === "sd") ? "/sd/portals/" : "/root/portals/";
         $scope.workshop.editFile.path = basePath + $scope.workshop.portal.title + "/";
         $scope.workshop.editFile.isNewFile = true;
-        $scope.workshop.editFile.size = 0;
+        $scope.workshop.editFile.size = "0 Bytes";
     };
 
     /**
@@ -520,6 +520,20 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
 
             $scope.loadPortal($scope.workshop.portal);  // refresh the portal
         });
+    };
+
+    $scope.download = function(filePath) {
+        $api.request({
+            module: "EvilPortal",
+            action: "download",
+            filePath: filePath
+        }, function (response) {
+            if (!response.success) {
+                $scope.sendMessage("Error", response.message);
+                return;
+            }
+            window.location = "/api/?download=" + response.download;
+        })
     };
 
     /**
@@ -713,6 +727,7 @@ registerController("EvilPortalController", ['$api', '$scope', function ($api, $s
             response.portals.forEach(function(item, index) {
                 $scope.portals.unshift({
                     title: item.title,
+                    size: item.size,
                     storage: item.storage,
                     active: item.active,
                     type: item.portalType,

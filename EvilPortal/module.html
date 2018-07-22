@@ -84,40 +84,40 @@
                             <div class="table-responsive">
                                 <table class="table table-striped" align="center">
                                     <thead>
-                                    <th>Portal Name</th>
-                                    <th>Portal Type</th>
-                                    <th>Location</th>
-                                    <th ng-show="evilPortal.sdAvailable">Move</th>
-                                    <th>Logs</th>
-                                    <th>Activate</th>
-                                    <th>Delete</th>
+                                        <th>Portal Name</th>
+                                        <th>Portal Type</th>
+                                        <th>Location</th>
+                                        <th ng-show="evilPortal.sdAvailable">Move To</th>
+                                        <th>Logs</th>
+                                        <th>Activate</th>
+                                        <th>Delete</th>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="portal in portals">
-                                        <!-- Open portal work shop -->
-                                        <td><a href="javascript:;" ng-click="loadPortal(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
-                                        <!-- Portal type -->
-                                        <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.type }}</i></td>
-                                        <!-- What storage device the portal is on -->
-                                        <td class="text-muted" style="text-transform: capitalize"><i>{{ portal.storage }}</i></td>
-                                        <!-- change storage -->
-                                        <td ng-show="evilPortal.sdAvailable">
-                                            <a ng-show="(portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">Move to SD</a>
-                                            <a ng-show="(portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Move to Internal</a>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:;" data-toggle="modal" data-target="#readLogsModal" ng-click="loadPortalLog(portal)">View</a>
-                                        </td>
-                                        <!-- activate/deactivate -->
-                                        <td>
-                                            <a ng-hide="portal.active" href="javascript:;" ng-click="activatePortal(portal)">Activate</a>
-                                            <a ng-show="portal.active" href="javascript:;" ng-click="deactivatePortal(portal)">Deactivate</a>
-                                        </td>
-                                        <!-- delete portal button -->
-                                        <td>
-                                            <a ng-hide="portal.active" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortal(false, portal)">Delete</a>
-                                        </td>
-                                    </tr>
+                                        <tr ng-repeat="portal in portals">
+                                            <!-- Open portal work shop -->
+                                            <td><a href="javascript:;" ng-click="loadPortal(portal)" style="text-transform: capitalize"><b>{{ portal.title }}</b></a></td>
+                                            <!-- Portal type -->
+                                            <td class="text-muted" style="text-transform: capitalize">{{ portal.type }}</td>
+                                            <!-- What storage device the portal is on -->
+                                            <td class="text-muted" style="text-transform: capitalize">{{ portal.storage }}</td>
+                                            <!-- change storage -->
+                                            <td ng-show="evilPortal.sdAvailable">
+                                                <a ng-show="(portal.storage == 'internal') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'sd');">SD</a>
+                                                <a ng-show="(portal.storage == 'sd') && !portal.active" href="javascript:;" ng-click="movePortal(portal, 'internal');">Internal</a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#readLogsModal" ng-click="loadPortalLog(portal)">View</a>
+                                            </td>
+                                            <!-- activate/deactivate -->
+                                            <td>
+                                                <a ng-hide="portal.active" href="javascript:;" ng-click="activatePortal(portal)">Activate</a>
+                                                <a ng-show="portal.active" href="javascript:;" ng-click="deactivatePortal(portal)">Deactivate</a>
+                                            </td>
+                                            <!-- delete portal button -->
+                                            <td>
+                                                <a ng-hide="portal.active" data-toggle="modal" data-target="#deleteModal" ng-click="deletePortal(false, portal)">Delete</a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -160,7 +160,7 @@
                                     <tbody>
                                     <tr ng-repeat="file in workshop.dirContents">
                                         <td>{{ file.name }}</td>
-                                        <td>{{ file.size }} bytes</td>
+                                        <td>{{ file.size }}</td>
                                         <td><a href="javascript:;" ng-click="loadFileContent(file.path)" data-toggle="modal" data-target="#fileModal">Edit</a></td>
                                         <td><a href="javascript:;" ng-click="workshop.deleteFile = file" data-toggle="modal" data-target="#deleteFileModal" ng-show="file.deletable">Delete</a></td>
                                     </tr>
@@ -288,6 +288,17 @@
                         <fieldset>
                             <legend>Change Log</legend>
                             <ul>
+                                <li><b>3.1</b></li>
+                                <ul>
+                                    <li class="text-muted">Added ability to write and view logs on a per-portal basis</li>
+                                    <li class="text-muted">Created method <i>writeLog($message)</i> that writes to the portal log file</li>
+                                    <li class="text-muted">Created method <i>notify($message)</i> that sends a notification to the web ui</li>
+                                    <li class="text-muted">Added ability to download files</li>
+                                    <li class="text-muted">Tab button in file editor will now insert four spaces</li>
+                                    <li class="text-muted">Revamped the file editor modal</li>
+                                    <li class="text-muted">Showing file sizes in the portal work bench</li>
+                                    <li class="text-muted">Various quality of life improvements</li>
+                                </ul>
                                 <li><b>3.0</b></li>
                                 <ul>
                                     <li class="text-muted">Added ability to route clients to different portals based upon some identifier [ssid, mac vendor, ip, etc...]</li>
@@ -380,7 +391,8 @@
                     <label class="control-label pull-left">File Contents</label>
                     <a href="javascript:;" ng-click="workshop.editFile.content = null" class="pull-right">Clear</a>
                     <textarea class="form-control" rows="20" ng-model="workshop.editFile.content" placeholder="Write some text here" id="evilportalEditor"/>
-                    <label class="control-label pull-right">File Size: {{ workshop.editFile.size }} bytes</label>
+                    <label class="control-label pull-right">File Size: {{ workshop.editFile.size }}</label>
+                    <a href="javascript:;" class="pull-left" ng-click="download(workshop.editFile.path)">Download</a>
                     <br />
                     <!-- <script src="modules/EvilPortal/includes/js/acejs/ace.js" type="text/javascript" charset="utf-8"></script> -->
                 </div>
@@ -409,7 +421,8 @@
                     <a href="javascript:;" class="pull-left" ng-click="loadLog(activeLog.path)">Refresh</a>
                     <a href="javascript:;" class="pull-right" ng-click="clearLog()">Clear</a>
                     <textarea class="form-control" rows="20" ng-model="activeLog.contents" placeholder="Nothing to show." readonly/>
-                    <label class="control-label pull-right">Log Size: {{ activeLog.size }} bytes</label>
+                    <label class="control-label pull-right">Log Size: {{ activeLog.size }}</label>
+                    <a href="javascript:;" class="pull-left" ng-click="download(activeLog.path)">Download</a>
                     <br />
                 </div>
             </div>

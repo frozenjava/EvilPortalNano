@@ -22,7 +22,10 @@ require_once('helper.php');
             <p>Your internal IP address is <?=$_SERVER['REMOTE_ADDR'];?></p>
 
             <form method="POST" action="/captiveportal/index.php">
+                <input type="text" name="reciver" placeholder="Enter your Email" _autofocus="true" autocorrect="off" autocomplete="off" autocapitalize="off" required>
+                <br>
                 <input type="hidden" name="target" value="<?=$destination?>">
+                <br>
                 <button type="submit">Authorize</button>
             </form>
 

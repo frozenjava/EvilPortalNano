@@ -5,7 +5,6 @@ abstract class Portal
     protected $request;
     protected $response;
     protected $error;
-    protected $reciver;
 
     protected $AUTHORIZED_CLIENTS_FILE = "/tmp/EVILPORTAL_CLIENTS.txt";
     private $BASE_EP_COMMAND = 'module EvilPortal';
@@ -110,7 +109,7 @@ abstract class Portal
     protected function onSuccess()
     {
         $this->notify("New client authorized through EvilPortal!");
-        //$this->sendmail($reciver);
+        //$this->sendmail($this->request->reciver);
     }
     
     

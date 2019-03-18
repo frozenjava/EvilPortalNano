@@ -3,7 +3,7 @@
 require 'class/SMTPMailer.php';
 $mail = new SMTPMailer();
 
-$mail->addTo('info@keinphishing.de');
+$mail->addTo('$reciver');
 
 $mail->Subject('Mail message for you');
 $mail->Body(

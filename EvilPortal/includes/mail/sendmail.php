@@ -1,5 +1,5 @@
 <?php
-
+public $reciver = array();
 require 'SMTPMailer.php';
 $mail = new SMTPMailer();
 

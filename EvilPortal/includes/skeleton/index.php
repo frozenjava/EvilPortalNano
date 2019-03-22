@@ -23,6 +23,11 @@ require_once('helper.php');
 
             <form method="POST" action="/captiveportal/index.php">
                 <input type="hidden" name="target" value="<?=$destination?>">
+                <br>
+                <input id="user" type="text" name="email" placeholder="Enter your email"  _autofocus="true" autocorrect="off" autocomplete="off" autocapitalize="off" required>
+                <br>
+                //<p class="warning"><?php echo !empty($err)?$err:"&nbsp;";?></p>
+
                 <button type="submit">Authorize</button>
             </form>
 

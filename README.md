@@ -35,7 +35,7 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 
 ## Portal Sendmail function needs to be setup ! (optional)
 You need to edit the /etc/ssmtp/ssmtp.conf and change it with your configuration.
-For example, configuration for GMAIL: 
+For example, configuration for GMAIL(needs less secure apps enabled): 
 ```
 # /etc/ssmtp.conf -- a config file for sSMTP sendmail.
 #
@@ -82,6 +82,8 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 
 ### TODO
 * Add ability to program commands to run when a portal is enabled/disabled
+* writelog function refiew 
+* documenatation for portals and functions / calls 
 
 ## Release History
 * Figure out how to redirect clients going to HTTPS sites 

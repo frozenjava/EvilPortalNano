@@ -33,7 +33,7 @@ scp -r EvilPortal root@172.16.42.1:/pineapple/modules/
 
 Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal module. You're all done!
 
-## Portal Sendmail function needs to be setup ! 
+## Portal Sendmail function needs to be setup ! (optional)
 You need to edit the /etc/ssmtp/ssmtp.conf and change it with your configuration.
 For example, configuration for GMAIL: 
 ```

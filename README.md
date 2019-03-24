@@ -72,6 +72,9 @@ AuthPass=your_gmail_password
 #TLSCert=/etc/ssl/certs/ssmtp.pem﻿
 ```
 
+Example for Protal with sendmail is comming!
+
+
 ## Useful Links
 [Official Hak5 Forum Thread](https://forums.hak5.org/index.php?/topic/37874-official-evilportal/)
 [Official Youtube Playlist](https://www.youtube.com/playlist?list=PLW7RuuSaPPzDgrZINbNkt4ujR7RDTUCMB)

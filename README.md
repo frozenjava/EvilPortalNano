@@ -87,7 +87,8 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 
 ### TODO
 * Add ability to program commands to run when a portal is enabled/disabled
-* writelog function refiew 
+* writelog function refiew (looks like its not working ? )
+* redirect function refiew (for calling without $target eg refresh page) 
 * documenatation for portals and functions / calls 
 
 ## Release History

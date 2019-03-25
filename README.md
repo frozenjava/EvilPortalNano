@@ -72,7 +72,9 @@ AuthPass=your_gmail_password
 #TLSCert=/etc/ssl/certs/ssmtp.pem﻿
 ```
 
-Example for Protal with sendmail is comming!
+Example for Protal with sendmail 
+
+https://github.com/H4xl0r/evilportals/tree/master/portals/mailtoken
 
 
 ## Useful Links
@@ -89,7 +91,7 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 * documenatation for portals and functions / calls 
 
 ## Release History
-* Figure out how to redirect clients going to HTTPS sites 
+* Figured out how to redirect clients going to HTTPS sites 
 * Added Mail function via sendmail , Portals can send emails now !
 
 ### Version 3.1

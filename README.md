@@ -72,9 +72,9 @@ AuthPass=your_gmail_password
 #TLSCert=/etc/ssl/certs/ssmtp.pem﻿
 ```
 
-Example for Protal with sendmail 
+Example for Portal with sendmail :
 
-https://github.com/H4xl0r/evilportals/tree/master/portals/mailtoken
+https://github.com/kbeflo/evilportals/tree/master/portals/mailtoken
 
 
 ## Useful Links

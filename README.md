@@ -99,7 +99,7 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 * Figured out how to redirect clients going to HTTPS sites 
 * Added Mail function via sendmail , Portals can send emails now !
 
-### Version 3.1
+### Version 3.1 (beta)
 * Added ability to write and view logs on a per-portal basis
 * Created method <i>writeLog($message)</i> that writes to the portal log file
 * Created method <i>notify($message)</i> that sends a notification to the web ui

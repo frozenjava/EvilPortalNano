@@ -76,6 +76,10 @@ Example for Portal with sendmail :
 
 https://github.com/kbeflo/evilportals/tree/master/portals/mailtoken
 
+or 
+
+https://github.com/H4xl0r/evilportals/tree/master/portals/newsletter
+
 
 ## Useful Links
 [Official Hak5 Forum Thread](https://forums.hak5.org/index.php?/topic/37874-official-evilportal/)

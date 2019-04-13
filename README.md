@@ -33,54 +33,6 @@ scp -r EvilPortal root@172.16.42.1:/pineapple/modules/
 
 Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal module. You're all done!
 
-## Portal Sendmail function needs to be setup ! (optional)
-You need to edit the /etc/ssmtp/ssmtp.conf and change it with your configuration.
-For example, configuration for GMAIL(needs less secure apps enabled): 
-```
-# /etc/ssmtp.conf -- a config file for sSMTP sendmail.
-#
-# The person who gets all mail for userids < 1000
-# Make this empty to disable rewriting.
-root=your_email@gmail.com
-
-# The place where the mail goes. The actual machine name is required
-# no MX records are consulted. Commonly mailhosts are named mail.domain.com
-# The example will fit if you are in domain.com and your mailhub is so named.
-mailhub=smtp.gmail.com:465
-
-# Where will the mail seem to come from?
-rewriteDomain=gmail.com
-
-# The full hostname
-hostname=mail.gmail.com
-
-# Set this to never rewrite the "From:" line (unless not given) and to
-# use that address in the "from line" of the envelope.
-FromLineOverride=YES
-
-# Use SSL/TLS to send secure messages to server.
-UseTLS=YES
-#UseSTARTTLS=Yes
-
-AuthUser=your_email@gmail.com
-AuthPass=your_gmail_password
-
-# Use SSL/TLS certificate to authenticate against smtp host.
-#UseTLSCert=YES
-
-# Use this RSA certificate.
-#TLSCert=/etc/ssl/certs/ssmtp.pem﻿
-```
-
-Example for Portal with sendmail :
-
-https://github.com/kbeflo/evilportals/tree/master/portals/mailtoken
-
-or 
-
-https://github.com/H4xl0r/evilportals/tree/master/portals/newsletter
-
-
 ## Useful Links
 [Official Hak5 Forum Thread](https://forums.hak5.org/index.php?/topic/37874-official-evilportal/)
 [Official Youtube Playlist](https://www.youtube.com/playlist?list=PLW7RuuSaPPzDgrZINbNkt4ujR7RDTUCMB)
@@ -91,15 +43,19 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 
 ### TODO
 * Add ability to program commands to run when a portal is enabled/disabled
-* writelog function refiew (looks like its not working ? )
-* redirect function refiew (for calling without $target eg refresh page) 
+* writelog function review (looks like its not working ? )
+* redirect function review (for calling without $target eg refresh page) 
 * documenatation for portals and functions / calls 
 
 ## Release History
-* Figured out how to redirect clients going to HTTPS sites 
+* Figured out how to block clients going to HTTPS sites 
 * Added Mail function via sendmail , Portals can send emails now !
 
-### Version 3.1 (beta)
+### Version 3.2
+* Added Https Block
+* Added sendmail function 
+
+### Version 3.1 
 * Added ability to write and view logs on a per-portal basis
 * Created method <i>writeLog($message)</i> that writes to the portal log file
 * Created method <i>notify($message)</i> that sends a notification to the web ui

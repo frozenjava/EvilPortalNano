@@ -38,7 +38,7 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 ## Smtp / sendmail Installation
 You need to edit the /etc/ssmtp/ssmtp.conf and change it with your configuration.
 For example, configuration for GMAIL (less secure apps enabled):
-
+```
 root@Pineapple:/etc/ssmtp# cat ssmtp.conf
 #
 # /etc/ssmtp.conf -- a config file for sSMTP sendmail.
@@ -74,7 +74,7 @@ AuthPass=your_gmail_password
 
 # Use this RSA certificate.
 #TLSCert=/etc/ssl/certs/ssmtp.pem
-
+```
 
 ## Useful Links
 [Official Hak5 Forum Thread](https://forums.hak5.org/index.php?/topic/37874-official-evilportal/)

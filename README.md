@@ -48,8 +48,12 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 * documenatation for portals and functions / calls 
 
 ## Release History
-* Figured out how to block clients going to HTTPS sites 
-* Added Mail function via sendmail , Portals can send emails now !
+* Mail function skeleton !
+
+### Version 3.3
+* Added smtp settings to readme
+* Added sendmail skeleton 
+
 
 ### Version 3.2
 * Added Https Block

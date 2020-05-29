@@ -23,11 +23,15 @@ User connects ---> enters email / pw ---> Internet
 ## New possible flow: 
 User connects ---> enters email / pw ---> portal sends token ---> User enters Token ---> Internet
 
+## Portals
 ### Basic Portals
 Basic Portals allow you to create a simple captive portal page that is the same for everyone who visits it. This is useful if your needs don't involve different clients seeing different branded pages or pages with unique functionality to them.
 
 ### Targeted Portals
 Targeted Portals allow you to create different portals to target a specific device or groups of devices based upon your pre-defined conditions. This is incredibly useful if you want all android devices to go to one android themed portal and all clients who are connected to "some-coffee-shop-wifi" go to a different portal all together. Targeted portals currently let you create targeting rules based on mac addresses, ssids, hostnames, and http useragents all on a per-client basis. You can either specify exact string matches or regex matches.
+
+### Token Portals
+Token Portals are Basic Portals with ability to generate tokens and send those via mail, those user based tokens will be request later to login. (sure will still ask for email and password !).
 
 ## Manual Installation
 
@@ -49,6 +53,54 @@ Finally, with your Wifi Pineapple connected upload the EvilPortal directory to t
 scp -r EvilPortal root@172.16.42.1:/pineapple/modules/
 ```
 
+# Now you need to setup your SMTP Settings on your pinapple:
+(you can ssh and edit the files or use the [Cabinet Module](https://github.com/hak5/wifipineapple-modules/tree/master/Cabinet)) 
+
+```
+edit the /etc/ssmtp/ssmtp.conf and change it with your configuration.
+For example, configuration for GMAIL:
+root@Pineapple:/etc/ssmtp# cat ssmtp.conf
+#
+# /etc/ssmtp.conf -- a config file for sSMTP sendmail.
+#
+# The person who gets all mail for userids < 1000
+# Make this empty to disable rewriting.
+root=your_email@gmail.com
+
+# The place where the mail goes. The actual machine name is required
+# no MX records are consulted. Commonly mailhosts are named mail.domain.com
+# The example will fit if you are in domain.com and your mailhub is so named.
+mailhub=smtp.gmail.com:465
+
+# Where will the mail seem to come from?
+rewriteDomain=gmail.com
+
+# The full hostname
+hostname=mail.gmail.com
+
+# Set this to never rewrite the "From:" line (unless not given) and to
+# use that address in the "from line" of the envelope.
+FromLineOverride=YES
+
+# Use SSL/TLS to send secure messages to server.
+UseTLS=YES
+#UseSTARTTLS=Yes
+
+AuthUser=your_email@gmail.com
+AuthPass=your_gmail_password
+
+# Use SSL/TLS certificate to authenticate against smtp host.
+#UseTLSCert=YES
+
+# Use this RSA certificate.
+#TLSCert=/etc/ssl/certs/ssmtp.pem
+```
+# Edit Email details matching your needs:
+```
+$sub = "Google FI - Your WIFI-Token !\nContent-Type: text/html"; //Subject of the mail & html format info just replace "Google FI - Your WIFI-Token !"
+$sender = "your_email@gmail.com or your_fake_sender_email@gmail.com"; //Sender of the mail
+```
+
 Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal module. You're all done!
 
 ## Useful Links
@@ -61,10 +113,13 @@ Head on over to the Wifi Pineapples Web Interface and go to the Evil Portal modu
 If you want to contribute to the project feel free to tackle one of these tasks!
 
 ### TODO
-* Figure out how to redirect clients going to HTTPS sites
 * Add ability to program commands to run when a portal is enabled/disabled
 
 ## Release History
+
+### Version 4.B
+* Added Sendmail and Token 
+* Https fix
 
 ### Version 3.1
 * Added ability to write and view logs on a per-portal basis

@@ -1,6 +1,8 @@
 # EvilPortal
 Evil Portal is a captive portal module for the [Hak5](https://www.hak5.org) [Wifi Pineapple](https://www.wifipineapple.com/). 
+
 This is a clone of the repository [EvilPortalNano](https://github.com/frozenjava/EvilPortalNano) for the [Wifi Pineapple Nano](http://hakshop.myshopify.com/products/wifi-pineapple?variant=81044992) and [Wifi Pineapple Tetra](http://hakshop.myshopify.com/products/wifi-pineapple?variant=11303845317). 
+
 If you have a Wifi Pineapple MKV you can find the code for that version [here](https://github.com/frozenjava/evilportal).
 
 ## Overview

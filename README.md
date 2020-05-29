@@ -8,7 +8,9 @@ This brings new abilities.
 But requires you to setup:
 
 --> smtp settings on your pinapple. (smtp server infos needed)
+
 --> edit details of sender and subject of the mail in the MyPortal.php. (The sender and Subject for the user token mail)
+
 --> if needed replace the template.html (email template with your own | the template needs to have a string "TOKEN" !)
 
 Normal flow : 

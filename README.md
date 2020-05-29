@@ -1,11 +1,13 @@
 # EvilPortal
-Evil Portal is a captive portal module for the [Hak5](https://www.hak5.org) [Wifi Pineapple](https://www.wifipineapple.com/). This is a clone of the repository [EvilPortalNano](https://github.com/frozenjava/EvilPortalNano) for the [Wifi Pineapple Nano](http://hakshop.myshopify.com/products/wifi-pineapple?variant=81044992) and [Wifi Pineapple Tetra](http://hakshop.myshopify.com/products/wifi-pineapple?variant=11303845317). If you have a Wifi Pineapple MKV you can find the code for that version [here](https://github.com/frozenjava/evilportal).
+Evil Portal is a captive portal module for the [Hak5](https://www.hak5.org) [Wifi Pineapple](https://www.wifipineapple.com/). 
+This is a clone of the repository [EvilPortalNano](https://github.com/frozenjava/EvilPortalNano) for the [Wifi Pineapple Nano](http://hakshop.myshopify.com/products/wifi-pineapple?variant=81044992) and [Wifi Pineapple Tetra](http://hakshop.myshopify.com/products/wifi-pineapple?variant=11303845317). 
+If you have a Wifi Pineapple MKV you can find the code for that version [here](https://github.com/frozenjava/evilportal).
 
 ## Overview
 This version of the portal is able generate tokens and send those via mail (from template) and verifies those later.
 This brings new abilities.
 
-But requires you to setup:
+## Requires you to setup:
 
 --> smtp settings on your pinapple. (smtp server infos needed)
 
@@ -13,10 +15,10 @@ But requires you to setup:
 
 --> if needed replace the template.html (email template with your own | the template needs to have a string "TOKEN" !)
 
-Normal flow : 
+## Normal flow : 
 User connects ---> enters email / pw ---> Internet
 
-New possible flow: 
+## New possible flow: 
 User connects ---> enters email / pw ---> portal sends token ---> User enters Token ---> Internet
 
 ### Basic Portals

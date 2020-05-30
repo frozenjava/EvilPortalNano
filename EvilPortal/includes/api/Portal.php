@@ -34,6 +34,16 @@ abstract class Portal
         exec("echo \"{$command}\" | at now");
     }
 
+	  /**
+     * sendmail.
+     * @param $email: The receive mail
+     */
+    protected final function sendmail($sub, $bod, $sender, $email)
+    {
+        exec("echo -e 'Subject: {$sub} \n\n {$bod}\n' | sendmail -f {$sender} {$email} | at now");
+    }
+    
+
     /**
      * Send notifications to the web UI.
      * @param $message: The notification message
@@ -59,6 +69,7 @@ abstract class Portal
             // do nothing.
         }
     }
+
 
     /**
      * Creates an iptables rule allowing the client to access the internet and writes them to the authorized clients.
@@ -102,6 +113,7 @@ abstract class Portal
         header("Location: {$this->request->target}", true, 302);
     }
 
+    
     /**
      * Override this to do something when the client is successfully authorized.
      * By default it just notifies the Web UI.

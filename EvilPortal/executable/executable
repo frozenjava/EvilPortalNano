@@ -22,7 +22,7 @@ case "$1" in
         $IPTABLES -t mangle -I PREROUTING -p all ! -s $CLIENTNET -j RETURN
 
         # Traffic not coming from an accepted user gets marked 99.
-        $IPTABLES -t mangle -A mark -j MARK --set-mark 99
+        $IPTABLES -t mangle -A fwmark -j MARK --set-mark 99
 
         # Traffic which has been marked 99 and is headed for 80/TCP or 443/TCP
         # should be redirected to the captive portal web server.

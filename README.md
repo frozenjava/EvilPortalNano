@@ -120,6 +120,8 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 
 ### Version 4.B
 * Added Sendmail and Token 
+* Added Hotspot detection html 
+* Added Tracking Script (Pinapple Dashboard Browser Stats (Still Beta))
 * Https fix
 
 ### Version 3.1

@@ -97,6 +97,7 @@ AuthPass=your_gmail_password
 ```
 # Edit Email details matching your needs:
 ```
+edit MyPortal.php and change:
 $sub = "Google FI - Your WIFI-Token !\nContent-Type: text/html"; //Subject of the mail & html format info just replace "Google FI - Your WIFI-Token !"
 $sender = "your_email@gmail.com or your_fake_sender_email@gmail.com"; //Sender of the mail
 ```

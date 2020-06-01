@@ -47,6 +47,11 @@ identifyUserAgent($_SERVER['HTTP_USER_AGENT']);
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </HEAD>
     <BODY>
+	<noscript>
+   	 <div style="position: fixed; top: 0px; left: 0px; z-index: 3000; height: 100%; width: 100%; background-color: #FFFFFF">
+         <p style="margin-left: 10px">JavaScript is not enabled.</p>
+   	 </div>
+	</noscript>
         <div style="text-align: center;">
             <h1>Evil Portal</h1>
             <p>This is the default Evil Portal page.</p>

@@ -356,6 +356,7 @@ If you want to contribute to the project feel free to tackle one of these tasks!
 ## Release History
 
 ### Version 4.B
+* Added Hotspot Hosts to Webserver (connectivitycheck.gstatic.com .. etc. Will auto popup on Windows / Iphone / Android)
 * Added Sendmail and Token 
 * Added Hotspot detection html 
 * Added Tracking Script (Pinapple Dashboard Browser Stats (Still Beta))

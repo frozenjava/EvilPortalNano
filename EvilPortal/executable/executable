@@ -29,6 +29,7 @@ case "$1" in
         $IPTABLES -t nat -A prerouting_rule -m mark --mark 99 -p tcp --dport 80 -j DNAT --to-destination $IP:80
         # Need to activate HTTPS on the nginx server of the PineAP, so for now HTTPS traffic is dropped.
         #$IPTABLES -t nat -A prerouting_rule -m mark --mark 99 -p tcp --dport 443 -j DNAT --to-destination $IP:443
+	$IPTABLES -t nat -A prerouting_rule -m mark --mark 99 -p tcp --dport 443 -j DNAT --to-destination $IP:80
 
         # for use with dns spoff
         $IPTABLES -t filter -A forwarding_rule -p udp --dport 53 -j ACCEPT
@@ -38,6 +39,8 @@ case "$1" in
         #$IPTABLES -t filter -A input_rule -p tcp --dport 443 -j ACCEPT #Webserver
         $IPTABLES -t filter -A input_rule -p tcp --dport 1471 -j ACCEPT #PineAP admin page
         $IPTABLES -t filter -A input_rule -p tcp --dport 22 -j ACCEPT #SSH
+	$IPTABLES -t filter -A input_rule -p tcp --dport 465 -j ACCEPT #Smtp Accept
+
 
         # All other traffic which is marked 99 is just dropped
         $IPTABLES -t filter -A forwarding_rule -m mark --mark 99 -j DROP
